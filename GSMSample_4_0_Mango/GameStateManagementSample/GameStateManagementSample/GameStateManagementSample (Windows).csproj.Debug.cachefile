@@ -1,10 +1,10 @@
 Content\background.xnb
 Content\blank.xnb
 Content\gradient.xnb
-Content\menufont.xnb
-Content\gamefont.xnb
 Content\Character\player.xnb
 Content\Background\Building1.xnb
 Content\Background\road.xnb
 Content\Background\sky.xnb
+Content\menufont.xnb
+Content\gamefont.xnb
 Content\Levels\Level.xml

@@ -15,7 +15,7 @@ namespace GameStateManagementSample
         {
         }
 
-        public override void Update(GameTime gameTime, Level level)
+        public override void Update(GameTime gameTime)
         {
             
             base.Update(gameTime);

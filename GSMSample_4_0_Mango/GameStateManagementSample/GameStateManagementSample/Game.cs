@@ -30,7 +30,7 @@ namespace GameStateManagementSample
         /// </summary>
         public GameStateManagementGame()
         {
-            Content.RootDirectory = "Content";
+            Content.RootDirectory = "Content"; 
 
             graphics = new GraphicsDeviceManager(this);
             TargetElapsedTime = TimeSpan.FromTicks(333333);
