@@ -14,7 +14,7 @@ namespace GameStateManagementSample
             : base(content.Load<Texture2D>("Character/player"), new Vector2(10,350))
         {
         }
-
+        
         public override void Update(GameTime gameTime)
         {
             
