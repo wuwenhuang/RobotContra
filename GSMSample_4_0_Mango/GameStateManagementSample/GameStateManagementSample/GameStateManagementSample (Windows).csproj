@@ -66,6 +66,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Background\Background.cs" />
+    <Compile Include="Camera\Camera.cs" />
+    <Compile Include="Camera\Scene2DNode.cs" />
     <Compile Include="Character\Character.cs" />
     <Compile Include="Character\Player.cs" />
     <Compile Include="Game.cs" />

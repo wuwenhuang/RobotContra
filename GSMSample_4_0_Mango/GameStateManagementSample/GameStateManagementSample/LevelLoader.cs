@@ -19,6 +19,8 @@ namespace GameStateManagementSample
         //The types of textures (symbols) being defined by and being used in the level
         private Dictionary<char, Background> mTextures = new Dictionary<char, Background>();
 
+        public List<Background> tilesBackground = new List<Background>();
+
         private XmlReader reader;
 
         private string levelFile;
@@ -30,13 +32,22 @@ namespace GameStateManagementSample
         int mStartX = 0;
         int mStartY = 0;
 
+        public Vector2 pos;
+
         //The default height and width for the tiles that make up the level
-        public int gameWidth = 0;
+        private int gameWidth = 0;
 
         public LevelLoader(string theFile, ContentManager theContent)
             : base()
         {
+            pos = new Vector2(mStartX, mStartY);
             LoadLevelFile(theFile, theContent);
+        }
+
+        public int WIDTH
+        {
+            get { return this.gameWidth; }
+            set { this.gameWidth = value; }
         }
 
         public void LoadLevelFile(string theLevelFile, ContentManager theContent)
@@ -56,6 +67,12 @@ namespace GameStateManagementSample
                                 LoadTile(reader, theContent);
                                 break;
                             }
+
+                        case "level":
+                            {
+                                LoadLevel(reader, theContent);
+                            }
+                            break;
                     }
                 }
             }
@@ -164,15 +181,15 @@ namespace GameStateManagementSample
             }
         }
 
-        //Draw the currently loaded level
-        public void Draw(SpriteBatch theBatch)
+        public void LoadLevel(XmlReader reader, ContentManager theContent)
         {
             int aPositionY = 0;
             int aPositionX = 0;
+            Random rand = new Random();
+
+            bool addNewLineBool = false;
 
             string aCurrentElement = string.Empty;
-
-            reader = XmlReader.Create(levelFile);
 
             while (reader.Read())
             {
@@ -199,12 +216,15 @@ namespace GameStateManagementSample
                                 break;
                             }
                     }
+                    pos = new Vector2(mStartX, mStartY);
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement)
                 {
                     if (aCurrentElement == "row")
                     {
-                        aPositionY += 120;
+                        if (addNewLineBool)
+                            aPositionY += 120;
+
                         aPositionX = 0;
                     }
                 }
@@ -218,14 +238,41 @@ namespace GameStateManagementSample
                         {
                             if (mTextures.ContainsKey(aRow[aCounter]) == true)
                             {
-                                theBatch.Draw(mTextures[aRow[aCounter]].texture, new Vector2(aPositionX, aPositionY), Color.White);
-                                aPositionX = mTextures[aRow[aCounter]].texture.Width;
-                                gameWidth += aPositionX;
+                                if (mTextures[aRow[aCounter]].id == 'R')
+                                {
+                                    aPositionY = 480 - mTextures[aRow[aCounter]].texture.Height;
+                                }
+                                else if (mTextures[aRow[aCounter]].id == 'S')
+                                {
+                                    addNewLineBool = false;
+                                }
+                                else
+                                {
+                                    addNewLineBool = true;
+                                }
+                                tilesBackground.Add(new Background(mTextures[aRow[aCounter]].texture, new Vector2(aPositionX, aPositionY), mTextures[aRow[aCounter]].walkable));
+                                aPositionX += mTextures[aRow[aCounter]].texture.Width;
+
                             }
-                            
+                            else
+                            {
+                                aPositionX += rand.Next(100, 200);
+                            }
+
+                            if (aCounter == 1)
+                                gameWidth = aPositionX;
                         }
                     }
                 }
+            }
+        }
+
+        //Draw the currently loaded level
+        public virtual void Draw(SpriteBatch theBatch)
+        {
+            foreach (Background background in tilesBackground)
+            {
+                theBatch.Draw(background.texture, background.position, Color.White);
             }
         }
     }

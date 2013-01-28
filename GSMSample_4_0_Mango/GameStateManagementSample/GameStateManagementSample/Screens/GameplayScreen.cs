@@ -36,6 +36,10 @@ namespace GameStateManagementSample
 
         Player player;
 
+        private Camera camera;
+
+        private List<Scene2DNode> nodeList;
+
         Random random = new Random();
 
         float pauseAlpha;
@@ -70,7 +74,7 @@ namespace GameStateManagementSample
             if (!instancePreserved)
             {
                 if (content == null)
-                    content = new ContentManager(ScreenManager.Game.Services, "Content");
+                    content = new ContentManager(ScreenManager.Game.Services, "Content"); 
 
                 gameFont = content.Load<SpriteFont>("gamefont");
 
@@ -147,6 +151,12 @@ namespace GameStateManagementSample
             {
                 // TODO: this game isn't very fun! You could probably improve
                 // it by inserting something more interesting in this space :-)
+
+                player.Update(gameTime, level);
+
+                level.Update(gameTime, player);
+
+                camera.Update(gameTime, level, ScreenManager.GraphicsDevice, player);
             }
         }
 
@@ -184,22 +194,8 @@ namespace GameStateManagementSample
             }
             else
             {
-                // Otherwise move the player position.
-                Vector2 movement = Vector2.Zero;
-
-                if (keyboardState.IsKeyDown(Keys.Left))
-                    movement.X--;
-
-                if (keyboardState.IsKeyDown(Keys.Right))
-                    movement.X++;
-
-                if (keyboardState.IsKeyDown(Keys.Up))
-                    movement.Y--;
-
-                if (keyboardState.IsKeyDown(Keys.Down))
-                    movement.Y++;
-
-
+                // handles the player input
+                this.player.HandleInput(gamePadState, keyboardState);
             }
         }
 
@@ -222,6 +218,11 @@ namespace GameStateManagementSample
 
             player.Draw(gameTime, spriteBatch);
 
+            foreach (Scene2DNode node in nodeList)
+            {
+                camera.DrawNode(node);
+            }
+
             spriteBatch.End();
 
             // If the game is transitioning on or off, fade it out to black.
@@ -235,9 +236,23 @@ namespace GameStateManagementSample
 
         void Awake()
         {
+            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+
             level = new Level("Content/Levels/Level.xml", this.content);
 
             player = new Player(content);
+
+            nodeList = new List<Scene2DNode>();
+
+            camera = new Camera(spriteBatch);
+
+            for (int i = 0; i < level.tilesBackground.Count; i++)
+            {
+                Scene2DNode node = new Scene2DNode(level.tilesBackground[i].texture, new Vector2(level.WIDTH, 480));
+                nodeList.Add(node);
+            }
+
+            camera.Position = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2);
         }
 
 

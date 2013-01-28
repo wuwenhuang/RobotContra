@@ -2,9 +2,19 @@
 <game>
   <tiles>
     <texture>
-      <id>B</id>
+      <id>1</id>
       <picture>
         <name>Building1</name>
+      </picture>
+      <properties>
+        <walkable>false</walkable>
+      </properties>
+    </texture>
+
+    <texture>
+      <id>2</id>
+      <picture>
+        <name>Building2</name>
       </picture>
       <properties>
         <walkable>false</walkable>
@@ -39,10 +49,10 @@
         <startY>0</startY>
       </tile>
       <layout>
-        <row>S        </row>
-        <row>B  B B B</row>
-        <row>B  B B </row>
-        <row>R</row>
+        <row>SS</row>
+        <row>1-21</row>
+        <row>-21</row>
+        <row>RR</row>
       </layout>
     </level>
   </game>

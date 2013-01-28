@@ -29,6 +29,13 @@ namespace GameStateManagementSample
             this.walkable = walk;
         }
 
+        public Background(Texture2D texture, Vector2 pos, bool walkable)
+        {
+            this.texture = texture;
+            this.position = pos;
+            this.walkable = walkable;
+        }
+
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(this.texture, this.position, Color.White);
