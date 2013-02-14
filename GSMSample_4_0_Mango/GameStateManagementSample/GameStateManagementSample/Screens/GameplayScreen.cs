@@ -34,11 +34,11 @@ namespace GameStateManagementSample
 
         private Level level;
 
+        private int currentLevel = 0;
+
         Player player;
 
-        private Camera camera;
-
-        private List<Scene2DNode> nodeList;
+        private Camera2D camera;
 
         Random random = new Random();
 
@@ -146,17 +146,17 @@ namespace GameStateManagementSample
                 pauseAlpha = Math.Min(pauseAlpha + 1f / 32, 1);
             else
                 pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
-
+                
             if (IsActive)
             {
                 // TODO: this game isn't very fun! You could probably improve
-                // it by inserting something more interesting in this space :-)
+                // it by inserting something more interesting in this space :-) 
 
-                player.Update(gameTime, level);
+                player.Update(gameTime, level, ScreenManager.GraphicsDevice);
 
-                level.Update(gameTime, player);
+                level.Update(gameTime, player, ScreenManager.GraphicsDevice);
 
-                camera.Update(gameTime, level, ScreenManager.GraphicsDevice, player);
+              
             }
         }
 
@@ -171,7 +171,7 @@ namespace GameStateManagementSample
                 throw new ArgumentNullException("input");
 
             // Look up inputs for the active player profile.
-            int playerIndex = (int)ControllingPlayer.Value;
+            int playerIndex = (int)ControllingPlayer.Value; 
 
             KeyboardState keyboardState = input.CurrentKeyboardStates[playerIndex];
             GamePadState gamePadState = input.CurrentGamePadStates[playerIndex];
@@ -190,12 +190,27 @@ namespace GameStateManagementSample
                 ScreenManager.AddScreen(new PhonePauseScreen(), ControllingPlayer);
 #else
                 ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
-#endif
+#endif      
             }
             else
             {
                 // handles the player input
                 this.player.HandleInput(gamePadState, keyboardState);
+
+                if (keyboardState.IsKeyDown(Keys.R))
+                {
+                    level.Reset();
+                    this.player.Reset();
+                    camera.setPosition(Vector2.Zero);
+                    level.ChangeLevel(2, Color.DarkRed);
+                }
+                else if (keyboardState.IsKeyDown(Keys.T))
+                {
+                    level.Reset();
+                    this.player.Reset();
+                    camera.setPosition(Vector2.Zero);
+                    level.ChangeLevel(1, Color.DarkBlue);
+                }
             }
         }
 
@@ -205,24 +220,15 @@ namespace GameStateManagementSample
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            // This game has a blue background. Why? Because!
-            ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
-                                               Color.CornflowerBlue, 0, 0);
-
             // Our player and enemy are both actually just text strings.
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
             spriteBatch.Begin();
 
-            level.Draw(spriteBatch);
+            level.Draw(ScreenManager);
 
             player.Draw(gameTime, spriteBatch);
-
-            foreach (Scene2DNode node in nodeList)
-            {
-                camera.DrawNode(node);
-            }
-
+            
             spriteBatch.End();
 
             // If the game is transitioning on or off, fade it out to black.
@@ -233,26 +239,25 @@ namespace GameStateManagementSample
                 ScreenManager.FadeBackBufferToBlack(alpha);
             }
         }
-
+        
         void Awake()
         {
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
             level = new Level("Content/Levels/Level.xml", this.content);
+            
+            level.Reset();
+
+            level.ChangeLevel(1);
+
+            level.ChangeColor(Color.Black);
 
             player = new Player(content);
 
-            nodeList = new List<Scene2DNode>();
+            camera = new Camera2D();
 
-            camera = new Camera(spriteBatch);
-
-            for (int i = 0; i < level.tilesBackground.Count; i++)
-            {
-                Scene2DNode node = new Scene2DNode(level.tilesBackground[i].texture, new Vector2(level.WIDTH, 480));
-                nodeList.Add(node);
-            }
-
-            camera.Position = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2);
+            camera.setPosition(Vector2.Zero);
+            camera.setSize(ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height);
         }
 
 

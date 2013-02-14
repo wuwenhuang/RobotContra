@@ -43,16 +43,31 @@
   </tiles>
 
     <level>
-      <name>Level 1</name>
+      
+      <name>1</name>
       <tile>
         <startX>0</startX>
         <startY>0</startY>
       </tile>
       <layout>
-        <row>SS</row>
-        <row>1-21</row>
-        <row>-21</row>
-        <row>RR</row>
+        <row>SSSSSSS</row>
+        <row>1-1--2221E</row>
+        <row>2--1-2</row>
+        <row>RRRRRRR</row>
       </layout>
+
+      <name>2</name>
+      <tile>
+        <startX>0</startX>
+        <startY>0</startY>
+      </tile>
+      <layout>
+        <row>SSSSSSS</row>
+        <row>2--2-22-12E</row>
+        <row>2--1-211</row>
+        <row>RRRRRRR</row>
+      </layout>
+      
     </level>
+  
   </game>

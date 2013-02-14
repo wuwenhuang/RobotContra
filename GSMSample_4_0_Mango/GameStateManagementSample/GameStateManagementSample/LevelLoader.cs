@@ -24,10 +24,11 @@ namespace GameStateManagementSample
         private XmlReader reader;
 
         private string levelFile;
-        
-        //All of the tiles that make up the level
-        public List<Background> mTexture = new List<Background>();
 
+        private ContentManager content;
+
+        protected int level;
+        
         //The starting position for the first tile. 
         int mStartX = 0;
         int mStartY = 0;
@@ -35,51 +36,60 @@ namespace GameStateManagementSample
         public Vector2 pos;
 
         //The default height and width for the tiles that make up the level
-        private int gameWidth = 0;
+        protected int gameWidth = 0;
 
-        public LevelLoader(string theFile, ContentManager theContent)
+        public LevelLoader(string file, ContentManager content)
             : base()
         {
             pos = new Vector2(mStartX, mStartY);
-            LoadLevelFile(theFile, theContent);
+            levelFile = file;
+            this.content = content;
+            LoadAssets();
         }
 
-        public int WIDTH
+        public void LoadLevel()
+        {
+            LoadCurrentLevel();
+        }
+
+        public int width
         {
             get { return this.gameWidth; }
-            set { this.gameWidth = value; }
         }
 
-        public void LoadLevelFile(string theLevelFile, ContentManager theContent)
+        public int currentLevel
         {
-            //Cycle through the elements in the Level XML file. For each "tile" element encountered
-            //load the tile information. For each "level" element encountered, load the level information
-            levelFile = theLevelFile;
+            get { return this.level; }
+        }
+
+        private void LoadAssets()
+        {
             reader = XmlReader.Create(levelFile);
             while (reader.Read())
             {
-                if (reader.NodeType == XmlNodeType.Element)
+                if (reader.NodeType == XmlNodeType.Element &&
+                    reader.Name.Equals("texture", StringComparison.OrdinalIgnoreCase))
                 {
-                    switch (reader.Name)
-                    {
-                        case "texture":
-                            {
-                                LoadTile(reader, theContent);
-                                break;
-                            }
+                    LoadTile(reader);                
+                }
+            }
+        }
 
-                        case "level":
-                            {
-                                LoadLevel(reader, theContent);
-                            }
-                            break;
-                    }
+        public void LoadCurrentLevel()
+        {
+            reader = XmlReader.Create(levelFile);
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element &&
+                    reader.Name.Equals("level", StringComparison.OrdinalIgnoreCase))
+                {
+                     LoadLevel(reader, content);
                 }
             }
         }
         
         //Load information about the tile defined in the Level XML file
-        private void LoadTile(XmlReader reader, ContentManager theContent)
+        private void LoadTile(XmlReader reader)
         {
             string currentElement = string.Empty;
             Background texture = new Background();
@@ -107,7 +117,7 @@ namespace GameStateManagementSample
                             }
                         case "picture":
                             {
-                                LoadTexture(reader, theContent, texture);
+                                LoadTexture(reader, content, texture);
                                 break;
                             }
                         case "properties":
@@ -136,7 +146,7 @@ namespace GameStateManagementSample
                 if (reader.NodeType == XmlNodeType.Element)
                 {
                     currentElement = reader.Name;
-
+                    
                     switch (currentElement)
                     {
                         case "name":
@@ -149,8 +159,6 @@ namespace GameStateManagementSample
                     }
                 }
             }
-
-
 
         }
 
@@ -183,9 +191,33 @@ namespace GameStateManagementSample
 
         public void LoadLevel(XmlReader reader, ContentManager theContent)
         {
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.EndElement &&
+                    reader.Name.Equals("level", StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+
+                if (reader.NodeType == XmlNodeType.Element &&
+                    reader.Name.Equals("name", StringComparison.OrdinalIgnoreCase))
+                {
+                    int tempLevel = reader.ReadElementContentAsInt();
+
+                    if (level.Equals(tempLevel))
+                    {
+                        LoadThisLevel(reader, theContent);
+                    }
+                }           
+            }
+        }
+
+        public void LoadThisLevel(XmlReader reader, ContentManager theContent)
+        {
             int aPositionY = 0;
             int aPositionX = 0;
             Random rand = new Random();
+            int row = 0;
 
             bool addNewLineBool = false;
 
@@ -194,7 +226,7 @@ namespace GameStateManagementSample
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement &&
-                    reader.Name.Equals("level", StringComparison.OrdinalIgnoreCase))
+                    reader.Name.Equals("layout", StringComparison.OrdinalIgnoreCase))
                 {
                     break;
                 }
@@ -224,6 +256,8 @@ namespace GameStateManagementSample
                     {
                         if (addNewLineBool)
                             aPositionY += 120;
+
+                        row += 1;
 
                         aPositionX = 0;
                     }
@@ -256,11 +290,12 @@ namespace GameStateManagementSample
                             }
                             else
                             {
+                                if (aRow[aCounter] == 'E')
+                                {
+                                    gameWidth = aPositionX;
+                                }
                                 aPositionX += rand.Next(100, 200);
                             }
-
-                            if (aCounter == 1)
-                                gameWidth = aPositionX;
                         }
                     }
                 }
@@ -272,8 +307,9 @@ namespace GameStateManagementSample
         {
             foreach (Background background in tilesBackground)
             {
-                theBatch.Draw(background.texture, background.position, Color.White);
+                theBatch.Draw(background.texture, Camera2D.main.WorldToScreenPoint(background.position), Color.White);
             }
+            
         }
     }
 }
