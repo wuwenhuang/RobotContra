@@ -5,9 +5,9 @@ Content\Character\player.xnb
 Content\Background\Building1.xnb
 Content\Background\road.xnb
 Content\Background\sky.xnb
-Content\menufont.xnb
-Content\gamefont.xnb
 Content\Background\Building2.xnb
 Content\Weapon\rifle.xnb
 Content\Weapon\Powerups\bulletNormal.xnb
+Content\menufont.xnb
+Content\gamefont.xnb
 Content\Levels\Level.xml
