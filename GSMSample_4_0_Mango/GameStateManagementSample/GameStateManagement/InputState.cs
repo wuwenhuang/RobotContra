@@ -26,9 +26,11 @@ namespace GameStateManagement
 
         public readonly KeyboardState[] CurrentKeyboardStates;
         public readonly GamePadState[] CurrentGamePadStates;
+        public readonly MouseState[] CurrentMouseStates;
 
         public readonly KeyboardState[] LastKeyboardStates;
         public readonly GamePadState[] LastGamePadStates;
+        public readonly MouseState[] LastMouseStates;
 
         public readonly bool[] GamePadWasConnected;
 
@@ -44,9 +46,11 @@ namespace GameStateManagement
         {
             CurrentKeyboardStates = new KeyboardState[MaxInputs];
             CurrentGamePadStates = new GamePadState[MaxInputs];
+            CurrentMouseStates = new MouseState[MaxInputs];
 
             LastKeyboardStates = new KeyboardState[MaxInputs];
             LastGamePadStates = new GamePadState[MaxInputs];
+            LastMouseStates = new MouseState[MaxInputs];
 
             GamePadWasConnected = new bool[MaxInputs];
         }
@@ -60,9 +64,11 @@ namespace GameStateManagement
             {
                 LastKeyboardStates[i] = CurrentKeyboardStates[i];
                 LastGamePadStates[i] = CurrentGamePadStates[i];
+                LastMouseStates[i] = CurrentMouseStates[i];
 
                 CurrentKeyboardStates[i] = Keyboard.GetState((PlayerIndex)i);
                 CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
+                CurrentMouseStates[i] = Mouse.GetState();
 
                 // Keep track of whether a gamepad has ever been
                 // connected, so we can detect if it is unplugged.

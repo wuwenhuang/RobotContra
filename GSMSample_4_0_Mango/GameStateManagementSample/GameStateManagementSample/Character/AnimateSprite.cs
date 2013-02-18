@@ -38,13 +38,13 @@ namespace GameStateManagementSample
             {
                 case CharacterState.IDLE:
                     if (Character.main.lastState == CharacterState.MOVELEFT)
-                        sourceRect = new Rectangle(1 * spriteWidth + 10, 0, spriteWidth, spriteHeight);
+                        sourceRect = new Rectangle(1 * spriteWidth, 0, spriteWidth, spriteHeight);
                     else
                         sourceRect = new Rectangle(0, 0, spriteWidth, spriteHeight);
                     break;
 
                 case CharacterState.MOVELEFT:
-                    if (timer > interval)
+                    if (interval < timer)
                     {
                         if (frame > 3)
                         {
@@ -55,7 +55,7 @@ namespace GameStateManagementSample
                             frame += 1;
                         }
 
-                        sourceRect = new Rectangle(frame * (spriteWidth + 10), 2 * spriteHeight, spriteWidth + 10, spriteHeight);
+                        sourceRect = new Rectangle(frame * spriteWidth, 2 * spriteHeight, spriteWidth, spriteHeight);
 
                         timer = 0f;
                     }
@@ -63,7 +63,7 @@ namespace GameStateManagementSample
 
                 case CharacterState.MOVERIGHT:
 
-                    if (timer > interval)
+                    if (interval < timer)
                     {
                         if (frame > 3)
                         {
@@ -74,7 +74,7 @@ namespace GameStateManagementSample
                             frame += 1;
                         }
 
-                        sourceRect = new Rectangle(frame * (spriteWidth + 10), 1 * spriteHeight, spriteWidth + 10, spriteHeight);
+                        sourceRect = new Rectangle(frame * spriteWidth, 1 * spriteHeight, spriteWidth, spriteHeight);
 
                         timer = 0f;
                     }
@@ -88,6 +88,10 @@ namespace GameStateManagementSample
                     break;
 
                 case CharacterState.SHOOT:
+                    if (Character.main.lastState == CharacterState.MOVELEFT)
+                        sourceRect = new Rectangle(3 * spriteWidth, 0, spriteWidth, spriteHeight);
+                    else
+                        sourceRect = new Rectangle(2 * spriteWidth, 0, spriteWidth, spriteHeight);
                     break;
 
                 case CharacterState.DUCK:

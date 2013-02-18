@@ -29,14 +29,16 @@ namespace GameStateManagementSample
     {
         #region Fields
 
-        ContentManager content;
+        public ContentManager content;
         SpriteFont gameFont;
 
         private Level level;
 
         private int currentLevel = 0;
 
-        Player player;
+        public static GameplayScreen main;
+
+        public Player player;
 
         private Camera2D camera;
 
@@ -63,6 +65,8 @@ namespace GameStateManagementSample
                 new Buttons[] { Buttons.Start, Buttons.Back },
                 new Keys[] { Keys.Escape },
                 true);
+
+            main = this;
         }
 
 
@@ -169,12 +173,13 @@ namespace GameStateManagementSample
         {
             if (input == null)
                 throw new ArgumentNullException("input");
-
+            
             // Look up inputs for the active player profile.
             int playerIndex = (int)ControllingPlayer.Value; 
 
             KeyboardState keyboardState = input.CurrentKeyboardStates[playerIndex];
             GamePadState gamePadState = input.CurrentGamePadStates[playerIndex];
+            MouseState mouseState = input.CurrentMouseStates[playerIndex];
 
             // The game pauses either if the user presses the pause button, or if
             // they unplug the active gamepad. This requires us to keep track of
@@ -195,7 +200,15 @@ namespace GameStateManagementSample
             else
             {
                 // handles the player input
-                this.player.HandleInput(gamePadState, keyboardState);
+                if (gamePadState.IsConnected)
+                {
+                    this.player.HandleInput(gamePadState);
+                }
+                else
+                {
+                    this.player.HandleInput(keyboardState, mouseState);
+                }
+                
 
                 if (keyboardState.IsKeyDown(Keys.R))
                 {
@@ -252,7 +265,7 @@ namespace GameStateManagementSample
 
             level.ChangeColor(Color.Black);
 
-            player = new Player(content);
+            player = new Player();
 
             camera = new Camera2D();
 

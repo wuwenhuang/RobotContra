@@ -11,14 +11,14 @@ namespace GameStateManagementSample
 {
     class Player : Character
     {
-        Weapon weapon;
+        private Weapon weapon;
         
-        public Player(ContentManager content)
-            : base(content.Load<Texture2D>("Character/player"), new Vector2(10,350), new Vector2(60, 130))
+        public Player()
+            : base(GameplayScreen.main.content.Load<Texture2D>("Character/player"), new Vector2(10,350), new Vector2(70, 130))
         {
-            weapon = new Weapon(content.Load<Texture2D>("Weapon/rifle"), new Vector2(this.position.X + 5, this.position.Y + 35), new Vector2(100,30));
+            weapon = new Weapon(GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5,35), new Vector2(100,30));
 
-            this.childObjects.Add(weapon);
+            this.AddChild(weapon);
         }
 
         public void Reset()
@@ -32,44 +32,189 @@ namespace GameStateManagementSample
             base.Update(gameTime, level, graphic);  
         }
 
-        public void HandleInput(GamePadState gamePad, KeyboardState keyboard)
+        public void HandleInput(GamePadState gamePad)
         {
-            if (gamePad.IsButtonDown(Buttons.DPadLeft)
-                || keyboard.IsKeyDown(Keys.Left))
+            switch (currentState)
             {
-                this.currentState = CharacterState.MOVELEFT;
-                this.lastState = currentState;
+                case CharacterState.IDLE:
+
+                    if (gamePad.IsButtonDown(Buttons.DPadLeft))
+                    {
+                        this.currentState = CharacterState.MOVELEFT;
+
+                    }
+
+                    if (gamePad.IsButtonDown(Buttons.DPadRight))
+                    {
+                        this.currentState = CharacterState.MOVERIGHT;
+                    }
+
+                    if (gamePad.IsButtonDown(Buttons.DPadUp))
+                    {
+                        this.currentState = CharacterState.MOVEUP;
+                    }
+
+                    if (gamePad.IsButtonDown(Buttons.DPadDown))
+                    {
+                        this.currentState = CharacterState.MOVEDOWN;
+                    }
+
+                    if (gamePad.IsButtonDown(Buttons.X))
+                    {
+                        this.currentState = CharacterState.JUMP;
+                    }
+
+                    if (gamePad.IsButtonDown(Buttons.Y))
+                    {
+                        this.currentState = CharacterState.SHOOT;
+                    }
+                    break;
+
+                case CharacterState.MOVERIGHT:
+                    if (gamePad.IsButtonUp(Buttons.DPadRight))
+                    {
+                        this.lastState = currentState;
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    else
+                    {
+                        if (gamePad.IsButtonDown(Buttons.Y))
+                        {
+                            this.currentState = CharacterState.SHOOT;
+                        }
+                    }
+                    break;
+
+                case CharacterState.MOVELEFT:
+                    if (gamePad.IsButtonUp(Buttons.DPadLeft))
+                    {
+                        this.lastState = currentState;
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    else
+                    {
+                        if (gamePad.IsButtonDown(Buttons.Y))
+                        {
+                            this.currentState = CharacterState.SHOOT;
+                        }
+                    }
+                    break;
+
+                case CharacterState.MOVEUP:
+                    if (gamePad.IsButtonUp(Buttons.DPadUp))
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    break;
+
+                case CharacterState.MOVEDOWN:
+                    if (gamePad.IsButtonUp(Buttons.DPadDown))
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+
+                    break;
+
+                case CharacterState.SHOOT:
+                    if (gamePad.IsButtonUp(Buttons.X))
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    break;
             }
 
-            else if (gamePad.IsButtonDown(Buttons.DPadRight)
-                || keyboard.IsKeyDown(Keys.Right))
+        }
+
+        public void HandleInput(KeyboardState keyPad, MouseState mousePad)
+        {
+            switch (currentState)
             {
-                this.currentState = CharacterState.MOVERIGHT;
-                this.lastState = currentState;
-            }
-                
-            else if (gamePad.IsButtonDown(Buttons.DPadUp)
-            || keyboard.IsKeyDown(Keys.Up))
-            {
-                this.currentState = CharacterState.MOVEUP;
+                case CharacterState.IDLE:
+
+                    if (keyPad.IsKeyDown(Keys.A))
+                    {
+                        this.currentState = CharacterState.MOVELEFT;
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.D))
+                    {
+                        this.currentState = CharacterState.MOVERIGHT;
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.W))
+                    {
+                        this.currentState = CharacterState.MOVEUP;
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.S))
+                    {
+                        this.currentState = CharacterState.MOVEDOWN;
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.Space))
+                    {
+                        this.currentState = CharacterState.JUMP;
+                    }
+                    if (mousePad.LeftButton == ButtonState.Pressed)
+                    {
+                        this.currentState = CharacterState.SHOOT;
+                    }
+                    
+                    break;
+
+                case CharacterState.MOVERIGHT:
+                    if (keyPad.IsKeyUp(Keys.D))
+                    {
+                        this.lastState = currentState;
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    else
+                    {
+                        if (mousePad.LeftButton == ButtonState.Pressed)
+                        {
+                            this.currentState = CharacterState.SHOOT;
+                        }
+                    }
+                    
+                    break;
+
+                case CharacterState.MOVELEFT:
+                    if (keyPad.IsKeyUp(Keys.A))
+                    {
+                        this.lastState = currentState;
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    else
+                    {
+                        if (mousePad.LeftButton == ButtonState.Pressed)
+                        {
+                            this.currentState = CharacterState.SHOOT;
+                        }
+                    }
+                    break;
+
+                case CharacterState.MOVEUP:
+                    if (keyPad.IsKeyUp(Keys.W))
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    break;
+
+                case CharacterState.MOVEDOWN:
+                    if (keyPad.IsKeyUp(Keys.S))
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    break;
+
+                case CharacterState.SHOOT:
+                    if (mousePad.LeftButton == ButtonState.Released)
+                    {
+                        this.currentState = CharacterState.IDLE;
+                    }
+                    break;
             }
 
-            else if (gamePad.IsButtonDown(Buttons.DPadDown)
-            || keyboard.IsKeyDown(Keys.Down))
-            {
-                this.currentState = CharacterState.MOVEDOWN;
-            }
-
-            else if (gamePad.IsButtonDown(Buttons.DPadDown)
-                || keyboard.IsKeyDown(Keys.Down))
-            {
-                this.currentState = CharacterState.JUMP;
-            }
-
-            else
-            {
-                this.currentState = CharacterState.IDLE;
-            }
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

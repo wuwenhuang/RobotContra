@@ -22,7 +22,7 @@ namespace GameStateManagementSample
     abstract class Character : AnimateSprite
     {
         public Vector2 position;
-        public float speed = 250.0f;
+        public float speed = 200.0f;
         public CharacterState currentState;
         public CharacterState lastState;
 
@@ -31,7 +31,7 @@ namespace GameStateManagementSample
         public static Character main;
         
         public Character()
-        {
+        { 
             main = this;
             this.currentState = CharacterState.IDLE;
             this.lastState = currentState;
@@ -77,6 +77,30 @@ namespace GameStateManagementSample
             }
         }
 
+        public GameObject SearchChild(GameObject searchObject)
+        {
+            foreach (GameObject child in childObjects)
+            {
+                if (child.Equals(searchObject))
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
+
+        public GameObject SearchChild(string id)
+        {
+            foreach (GameObject child in childObjects)
+            {
+                if (child.ID.Equals(id))
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
+
         public GameObject[] GetAllChildren()
         {
             return this.childObjects.ToArray();
@@ -90,7 +114,7 @@ namespace GameStateManagementSample
             {
                 foreach (GameObject child in childObjects)
                 {
-                    child.Draw(gameTime, spriteBatch);
+                    child.Draw(spriteBatch);
                 }
             }
         }
@@ -106,21 +130,13 @@ namespace GameStateManagementSample
                     break;
 
                 case CharacterState.SHOOT:
+                    
                     break;
 
                 case CharacterState.MOVELEFT:
                     if (this.position.X > 0)
                     {
                         this.position.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                        if (childObjects != null)
-                        {
-                            foreach (GameObject child in childObjects)
-                            {
-                                child.position.X -= child.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                            }
-                            break;
-                        }
                     }
                     break;
 
@@ -128,15 +144,6 @@ namespace GameStateManagementSample
                     if (this.position.X + this.sourceRect.Width < level.width)
                     {
                         this.position.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                        if (childObjects != null) 
-                        {
-                            foreach (GameObject child in childObjects)
-                            {
-                                child.position.X += child.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                            }
-                            break;
-                        }
                     }
                     break;
 
@@ -148,15 +155,6 @@ namespace GameStateManagementSample
                             if (this.position.Y > background.position.Y - background.texture.Height)
                             {
                                 this.position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                                if (childObjects != null)
-                                {
-                                    foreach (GameObject child in childObjects)
-                                    {
-                                        child.position.Y -= child.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                                    }
-                                    break;
-                                }
                             }
                             break;
                         }
@@ -167,21 +165,18 @@ namespace GameStateManagementSample
                     if (this.position.Y + this.sourceRect.Height < graphics.Viewport.Height)
                     {
                         this.position.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        if (childObjects != null)
-                        {
-                            foreach (GameObject child in childObjects)
-                            {
-                                child.position.Y += child.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                            }
-                            break;
-                        }
                     }
                     break;
             }
-            foreach (GameObject child in childObjects)
+            if (childObjects != null)
             {
-                child.Update(gameTime);
+                foreach (GameObject child in childObjects)
+                {
+                    child.Update(gameTime);
+                    break;
+                }
             }
+
             base.Update(gameTime);
         }
     }

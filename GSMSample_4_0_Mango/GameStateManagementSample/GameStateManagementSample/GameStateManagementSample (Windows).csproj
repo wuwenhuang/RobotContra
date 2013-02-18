@@ -71,6 +71,7 @@
     <Compile Include="Character\Character.cs" />
     <Compile Include="Character\GameObject.cs" />
     <Compile Include="Character\Player.cs" />
+    <Compile Include="Character\Powerups\Bullet.cs" />
     <Compile Include="Character\Weapon.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Level.cs" />

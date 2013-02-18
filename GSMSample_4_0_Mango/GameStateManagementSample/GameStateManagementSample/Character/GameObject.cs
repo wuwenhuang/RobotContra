@@ -12,6 +12,8 @@ namespace GameStateManagementSample
         private string id;
         public Vector2 position;
         protected float speed;
+        public Vector2 parentPosition;
+        private Vector2 offsetPosition;
 
         public GameObject()
             : base()
@@ -19,14 +21,18 @@ namespace GameStateManagementSample
             this.id = "";
             this.position = Vector2.Zero;
             this.speed = Character.main.speed;
+            this.parentPosition = Character.main.position;
+            this.offsetPosition = Vector2.Zero;
         }
 
         public GameObject(string id, Texture2D texture, Vector2 position, Vector2 size)
             : base(texture,0, (int)size.X, (int)size.Y)
         {
             this.id = id;
-            this.position = position;
             this.speed = Character.main.speed;
+            this.parentPosition = Character.main.position;
+            this.offsetPosition = position;
+            this.position = offsetPosition + parentPosition;
         }
 
         public void SetTexture(Texture2D newTexture)
@@ -65,30 +71,33 @@ namespace GameStateManagementSample
 
         public float Speed{ get { return this.speed; } }
 
-
-
-        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Destroy()
         {
-            spriteBatch.Draw(this.texture, Camera2D.main.WorldToScreenPoint(this.position), Color.White);
+            this.texture = null;
+            this.position = Vector2.Zero;
+            this.speed = 0;
+            this.sourceRect = new Rectangle();
+            this.id = "";
+        }
+
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(this.texture, Camera2D.main.WorldToScreenPoint(this.position), this.sourceRect, Color.White);
         }
 
         public override void Update(GameTime gameTime)
         {
+            this.parentPosition = Character.main.position;
+
             switch (Character.main.currentState)
             {
                 case CharacterState.IDLE:
-                    break;
-
                 case CharacterState.MOVEUP:
-                    break;
-
                 case CharacterState.MOVEDOWN:
-                    break;
-
                 case CharacterState.MOVELEFT:
-                    break;
-
                 case CharacterState.MOVERIGHT:
+                case CharacterState.SHOOT:
+                    this.position = parentPosition + offsetPosition;
                     break;
 
                 case CharacterState.JUMP:
@@ -97,8 +106,7 @@ namespace GameStateManagementSample
                 case CharacterState.DUCK:
                     break;
 
-                case CharacterState.SHOOT:
-                    break;
+                
             }
         }
     }
