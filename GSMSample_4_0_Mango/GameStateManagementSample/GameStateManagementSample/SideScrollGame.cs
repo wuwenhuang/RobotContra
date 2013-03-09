@@ -31,7 +31,7 @@ namespace GameStateManagementSample
 
         public int currentLevel;
 
-        NetClient client;
+        public NetClient client;
 
         private Level _level;
 
@@ -102,28 +102,26 @@ namespace GameStateManagementSample
 
         public void Update(GameTime gameTime)
         {
-            if (_isNetwork == false)
+            if (player != null)
             {
-                if (player != null)
+                if (player.currentState == CharacterState.DEAD)
                 {
-                    if (player.currentState == CharacterState.DEAD)
-                    {
-                        gameOver = true;
-                    }
-                    else
-                    {
-                        _level.Update(gameTime, player);
-                    }
-
-                    player.Update(gameTime, _level);
+                    gameOver = true;
+                }
+                else
+                {
+                    _level.Update(gameTime, player);
                 }
 
-                if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
-                {
-                    currentLevel += 1;
-                    this.Reset(currentLevel, level[currentLevel]);
-                }
+                player.Update(gameTime, _level);
             }
+
+            if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
+            {
+                currentLevel += 1;
+                this.Reset(currentLevel, level[currentLevel]);
+            }
+            
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -199,8 +197,7 @@ namespace GameStateManagementSample
                             }
                             else
                             {
-                                if (player.id.Equals(who) == false)
-                                    otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                             }
                             break;
                     }

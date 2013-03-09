@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Lidgren.Network;
 
 namespace GameStateManagementSample
 {
@@ -150,6 +151,15 @@ namespace GameStateManagementSample
                             }
                         }
                     }
+                }
+            }
+            if (SideScrollGame.main.IsNetwork)
+            {
+                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+                {
+                    outmessage.Write(this.position.X);
+                    outmessage.Write(this.position.Y);
+                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
                 }
             }
 

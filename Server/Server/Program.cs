@@ -103,14 +103,17 @@ namespace XnaGameServer
                             //
                             // The client sent input to the server
                             //
-                            int xinput = msg.ReadInt32();
-                            int yinput = msg.ReadInt32();
+                            int xPosition = msg.ReadInt32();
+                            int yPosition = msg.ReadInt32();
 
-                            int[] pos = msg.SenderConnection.Tag as int[];
-
-                            // fancy movement logic goes here; we just append input to position
-                            pos[0] += xinput;
-                            pos[1] += yinput;
+                            foreach (MultiplayerPlayers players in multiplayerPlayers)
+                            {
+                                if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
+                                {
+                                    players.x = xPosition;
+                                    players.y = yPosition;
+                                }
+                            }
                             break;
                     }
 
@@ -127,16 +130,22 @@ namespace XnaGameServer
                         {
 
                             NetConnection player = server.Connections[i] as NetConnection;
-                            NetOutgoingMessage om = server.CreateMessage();
+                            // ... send information about every other player (actually including self)
+                            for (int j = 0; j < server.Connections.Count; j++)
+                            {
+                                // send position update about 'otherPlayer' to 'player'
+                                NetOutgoingMessage om = server.CreateMessage();
 
-                            // write who this position is for
-                            om.Write(multiplayerPlayers[i].id);
+                                // write who this position is for
+                                om.Write(multiplayerPlayers[j].id);
 
-                            om.Write(multiplayerPlayers[i].x);
-                            om.Write(multiplayerPlayers[i].y);
+                                om.Write(multiplayerPlayers[j].x);
+                                om.Write(multiplayerPlayers[j].y);
 
-                            // send message
-                            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                                // send message
+                                server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                            }
+                            
                         }
 
                         // schedule next update
