@@ -199,7 +199,7 @@ namespace GameStateManagementSample
                             }
                             else
                             {
-                                if (player.id != who)
+                                if (player.id.Equals(who) == false)
                                     otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                             }
                             break;

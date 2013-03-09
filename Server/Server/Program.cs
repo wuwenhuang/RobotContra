@@ -83,19 +83,19 @@ namespace XnaGameServer
                                     
                                 }
 
-                                //for (int i = 0; i < server.Connections.Count; i++)
-                                //{
-                                //    if (server.Connections[i].RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
-                                //    {
-                                //        NetConnection player = server.Connections[i] as NetConnection;
-                                //        NetOutgoingMessage outMessage = server.CreateMessage();
-                                //        outMessage.Write((long)multiplayerPlayers[i].id);
-                                //        outMessage.Write((int)multiplayerPlayers[i].x);
-                                //        outMessage.Write((int)multiplayerPlayers[i].y);
-                                //        server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
-                                //        break;
-                                //    }
-                                //}
+                                for (int i = 0; i < server.Connections.Count; i++)
+                                {
+                                    if (server.Connections[i].RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
+                                    {
+                                        NetConnection player = server.Connections[i] as NetConnection;
+                                        NetOutgoingMessage outMessage = server.CreateMessage();
+                                        outMessage.Write((long)multiplayerPlayers[i].id);
+                                        outMessage.Write((int)multiplayerPlayers[i].x);
+                                        outMessage.Write((int)multiplayerPlayers[i].y);
+                                        server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
+                                        break;
+                                    }
+                                }
                             }
 
                             break;
