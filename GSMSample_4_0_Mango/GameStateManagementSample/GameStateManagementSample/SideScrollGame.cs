@@ -135,9 +135,9 @@ namespace GameStateManagementSample
 
             if (_isNetwork)
             {
-                for (int i = 1; i < otherPlayers.Count; i++)
+                foreach (var players in otherPlayers)
                 {
-                    otherPlayers[i].Draw(spriteBatch);
+                    players.Value.Draw(spriteBatch);
                 }
             }
         }
