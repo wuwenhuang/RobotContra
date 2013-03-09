@@ -47,6 +47,7 @@ namespace XnaGameServer
                             //
                             // Server received a discovery request from a client; send a discovery response (with no extra data attached)
                             //
+                            
                             server.SendDiscoveryResponse(null, msg.SenderEndPoint);
                             break;
                         case NetIncomingMessageType.VerboseDebugMessage:
@@ -68,7 +69,6 @@ namespace XnaGameServer
                                 Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " connected!");
                                 
                                 multiplayerPlayers.Add(new MultiplayerPlayers(msg.SenderConnection.RemoteUniqueIdentifier));
-                                
 
                                 // randomize his position and store in connection tag
                                 if (multiplayerPlayers.Count == 0)
@@ -79,6 +79,20 @@ namespace XnaGameServer
                                 else
                                 {
                                     msg.SenderConnection.Tag = new int[] { multiplayerPlayers[multiplayerPlayers.Count - 1].x, multiplayerPlayers[multiplayerPlayers.Count - 1].y };
+                                }
+
+                                for (int i = 0; i < server.Connections.Count; i++)
+                                {
+                                    if (server.Connections[i].RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
+                                    {
+                                        NetConnection player = server.Connections[i] as NetConnection;
+                                        NetOutgoingMessage outMessage = server.CreateMessage();
+                                        outMessage.Write((long)multiplayerPlayers[i].id);
+                                        outMessage.Write((int)multiplayerPlayers[i].x);
+                                        outMessage.Write((int)multiplayerPlayers[i].y);
+                                        server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
+                                        break;
+                                    }
                                 }
                             }
 

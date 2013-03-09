@@ -75,23 +75,9 @@ namespace GameStateManagementSample
                 Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerWorldUpdate));
                 updateClientsWorld.Start();
 
-                if (otherPlayers.Count > 0)
+                while (player == null)
                 {
-                    if (color == PlayerColor.BLUE)
-                    {
-                        player = new Player(
-                            gameplay.content.Load<Texture2D>("Character/player"),
-                            new Vector2(
-                                otherPlayers[otherPlayers.Count - 1].position.X + otherPlayers[otherPlayers.Count - 1].SourceRect.Width,
-                                otherPlayers[otherPlayers.Count - 1].position.Y));
-                    }
-                }
-                else
-                {
-                    if (color == PlayerColor.BLUE)
-                    {
-                        player = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(10, 350));
-                    }
+
                 }
 
             }
@@ -146,6 +132,14 @@ namespace GameStateManagementSample
 
             if (player != null)
                 player.Draw(spriteBatch);
+
+            if (_isNetwork)
+            {
+                for (int i = 1; i < otherPlayers.Count; i++)
+                {
+                    otherPlayers[i].Draw(spriteBatch);
+                }
+            }
         }
 
         public void Reset(int levelnum, Color color)
@@ -198,10 +192,20 @@ namespace GameStateManagementSample
                             long who = msg.ReadInt64();
                             int x = msg.ReadInt32();
                             int y = msg.ReadInt32();
-                            otherPlayers[who] = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                            
+                            if (player == null)
+                            {
+                                player = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                            }
+                            else
+                            {
+                                otherPlayers[who] = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                            }
                             break;
                     }
                 }
+
+                
             }
         }
 
