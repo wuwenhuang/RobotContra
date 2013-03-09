@@ -19,6 +19,7 @@ namespace GameStateManagementSample
     {
         private Weapon weapon;
         private Health healthBar;
+        public long id;
 
         private float moveAnalogX, moveAnalogY;
 
@@ -27,6 +28,18 @@ namespace GameStateManagementSample
             : base(texture, position, new Vector2(70, 130))
         {
             weapon = new Weapon(this, GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5,35), new Vector2(100,30));
+            healthBar = new Health(this);
+
+            this.AddChild(weapon);
+            this.AddChild(healthBar);
+            this.setBulletType(BulletType.NORMAL, 15.0f);
+        }
+
+        public Player(long id, Texture2D texture, Vector2 position)
+            : base(texture, position, new Vector2(70, 130))
+        {
+            this.id = id;
+            weapon = new Weapon(this, GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5, 35), new Vector2(100, 30));
             healthBar = new Health(this);
 
             this.AddChild(weapon);

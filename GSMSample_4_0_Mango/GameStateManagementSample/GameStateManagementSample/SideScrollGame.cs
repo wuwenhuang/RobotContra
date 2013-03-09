@@ -195,11 +195,12 @@ namespace GameStateManagementSample
                             
                             if (player == null)
                             {
-                                player = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                player = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                             }
                             else
                             {
-                                otherPlayers[who] = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                if (player.id != who)
+                                    otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                             }
                             break;
                     }

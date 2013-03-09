@@ -71,29 +71,31 @@ namespace XnaGameServer
                                 multiplayerPlayers.Add(new MultiplayerPlayers(msg.SenderConnection.RemoteUniqueIdentifier));
 
                                 // randomize his position and store in connection tag
-                                if (multiplayerPlayers.Count == 0)
+                                if (multiplayerPlayers.Count <= 1)
                                 {
                                     multiplayerPlayers[0].x = 10;
                                     multiplayerPlayers[0].y = 350;
                                 }
                                 else
                                 {
-                                    msg.SenderConnection.Tag = new int[] { multiplayerPlayers[multiplayerPlayers.Count - 1].x, multiplayerPlayers[multiplayerPlayers.Count - 1].y };
+                                    multiplayerPlayers[multiplayerPlayers.Count-1].x = multiplayerPlayers[multiplayerPlayers.Count - 2].x + 70;
+                                    multiplayerPlayers[multiplayerPlayers.Count-1].y = multiplayerPlayers[multiplayerPlayers.Count - 2].y;
+                                    
                                 }
 
-                                for (int i = 0; i < server.Connections.Count; i++)
-                                {
-                                    if (server.Connections[i].RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
-                                    {
-                                        NetConnection player = server.Connections[i] as NetConnection;
-                                        NetOutgoingMessage outMessage = server.CreateMessage();
-                                        outMessage.Write((long)multiplayerPlayers[i].id);
-                                        outMessage.Write((int)multiplayerPlayers[i].x);
-                                        outMessage.Write((int)multiplayerPlayers[i].y);
-                                        server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
-                                        break;
-                                    }
-                                }
+                                //for (int i = 0; i < server.Connections.Count; i++)
+                                //{
+                                //    if (server.Connections[i].RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
+                                //    {
+                                //        NetConnection player = server.Connections[i] as NetConnection;
+                                //        NetOutgoingMessage outMessage = server.CreateMessage();
+                                //        outMessage.Write((long)multiplayerPlayers[i].id);
+                                //        outMessage.Write((int)multiplayerPlayers[i].x);
+                                //        outMessage.Write((int)multiplayerPlayers[i].y);
+                                //        server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
+                                //        break;
+                                //    }
+                                //}
                             }
 
                             break;
@@ -121,27 +123,20 @@ namespace XnaGameServer
                         // Yes, it's time to send position updates
 
                         // for each player...
-                        foreach (NetConnection player in server.Connections)
+                        for (int i = 0; i < server.Connections.Count; i++)
                         {
-                            // ... send information about every other player (actually including self)
-                            foreach (NetConnection otherPlayer in server.Connections)
-                            {
-                                // send position update about 'otherPlayer' to 'player'
-                                NetOutgoingMessage om = server.CreateMessage();
 
-                                // write who this position is for
-                                om.Write(otherPlayer.RemoteUniqueIdentifier);
+                            NetConnection player = server.Connections[i] as NetConnection;
+                            NetOutgoingMessage om = server.CreateMessage();
 
-                                if (otherPlayer.Tag == null)
-                                    otherPlayer.Tag = new int[2];
+                            // write who this position is for
+                            om.Write(multiplayerPlayers[i].id);
 
-                                int[] pos = otherPlayer.Tag as int[];
-                                om.Write(pos[0]);
-                                om.Write(pos[1]);
+                            om.Write(multiplayerPlayers[i].x);
+                            om.Write(multiplayerPlayers[i].y);
 
-                                // send message
-                                server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
-                            }
+                            // send message
+                            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
                         }
 
                         // schedule next update
