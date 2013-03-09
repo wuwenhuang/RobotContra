@@ -64,12 +64,16 @@ namespace GameStateManagementSample
             }
             else
             {
+
                 NetPeerConfiguration config = new NetPeerConfiguration("robotcontra");
                 config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
 
                 client = new NetClient(config);
                 client.Start();
                 client.DiscoverLocalPeers(16868);
+
+                Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerWorldUpdate));
+                updateClientsWorld.Start();
 
                 if (otherPlayers.Count > 0)
                 {
@@ -90,9 +94,6 @@ namespace GameStateManagementSample
                     }
                 }
 
-                Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerWorldUpdate));
-
-                updateClientsWorld.Start();
             }
             Awake();
         }
@@ -180,27 +181,30 @@ namespace GameStateManagementSample
 
         void getPlayerWorldUpdate()
         {
-            NetIncomingMessage msg;
-            while ((msg = client.ReadMessage()) != null)
+            while (true)
             {
-                switch (msg.MessageType)
+                NetIncomingMessage msg;
+                while ((msg = client.ReadMessage()) != null)
                 {
-                    case NetIncomingMessageType.DiscoveryResponse:
-                        // just connect to first server discovered
-                        client.Connect(msg.SenderEndPoint);
-                        break;
+                    switch (msg.MessageType)
+                    {
+                        case NetIncomingMessageType.DiscoveryResponse:
+                            // just connect to first server discovered
+                            client.Connect(msg.SenderEndPoint);
+                            break;
 
-
-                    case NetIncomingMessageType.Data:
-                        // server sent a position update
-                        long who = msg.ReadInt64();
-                        int x = msg.ReadInt32();
-                        int y = msg.ReadInt32();
-                        otherPlayers[who] = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                        break;
+                        case NetIncomingMessageType.Data:
+                            // server sent a position update
+                            long who = msg.ReadInt64();
+                            int x = msg.ReadInt32();
+                            int y = msg.ReadInt32();
+                            otherPlayers[who] = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                            break;
+                    }
                 }
             }
         }
+
     #endregion
     }
 }
