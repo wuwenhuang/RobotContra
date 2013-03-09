@@ -102,24 +102,31 @@ namespace GameStateManagementSample
 
         public void Update(GameTime gameTime)
         {
-            if (player != null)
+            if (_isNetwork == false)
             {
-                if (player.currentState == CharacterState.DEAD)
+                if (player != null)
                 {
-                    gameOver = true;
-                }
-                else
-                {
-                    _level.Update(gameTime, player);
+                    if (player.currentState == CharacterState.DEAD)
+                    {
+                        gameOver = true;
+                    }
+                    else
+                    {
+                        _level.Update(gameTime, player);
+                    }
+
+                    player.Update(gameTime, _level);
                 }
 
-                player.Update(gameTime, _level);
+                if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
+                {
+                    currentLevel += 1;
+                    this.Reset(currentLevel, level[currentLevel]);
+                }
             }
-
-            if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
+            else
             {
-                currentLevel += 1;
-                this.Reset(currentLevel, level[currentLevel]);
+                player.Update(gameTime, _level);
             }
             
         }
