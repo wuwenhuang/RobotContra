@@ -12,7 +12,7 @@ namespace GameStateManagementSample
         private string id;
         public Vector2 position;
         protected float speed;
-        public Vector2 parentPosition;
+        private Vector2 parentPosition;
         private Vector2 offsetPosition;
 
         public GameObject()
@@ -20,17 +20,19 @@ namespace GameStateManagementSample
         {
             this.id = "";
             this.position = Vector2.Zero;
-            this.speed = Character.main.speed;
-            this.parentPosition = Character.main.position;
+            this.speed = 0;
+            this.parentPosition = Vector2.Zero;
             this.offsetPosition = Vector2.Zero;
+            this.character = null;
         }
 
-        public GameObject(string id, Texture2D texture, Vector2 position, Vector2 size)
+        public GameObject(Character character, string id, Texture2D texture, Vector2 position, Vector2 size)
             : base(texture,0, (int)size.X, (int)size.Y)
         {
+            this.character = character;
             this.id = id;
-            this.speed = Character.main.speed;
-            this.parentPosition = Character.main.position;
+            this.speed = character.speed;
+            this.parentPosition = character.position;
             this.offsetPosition = position;
             this.position = offsetPosition + parentPosition;
         }
@@ -59,14 +61,26 @@ namespace GameStateManagementSample
             this.position = newPosition;
         }
 
-        public Vector2 GetPosition()
-        {
-            return this.position;
-        }
-
         public void SetSpeed(float newSpeed)
         {
             this.speed = newSpeed;
+        }
+
+        public Rectangle BoundingBox
+        {
+            get
+            {
+                return new Rectangle(
+                    (int)position.X,
+                    (int)position.Y,
+                    sourceRect.Width,
+                    sourceRect.Height);
+            }
+        }
+
+        public Vector2 GetPosition()
+        {
+            return this.position;
         }
 
         public float Speed{ get { return this.speed; } }
@@ -85,28 +99,17 @@ namespace GameStateManagementSample
             spriteBatch.Draw(this.texture, Camera2D.main.WorldToScreenPoint(this.position), this.sourceRect, Color.White);
         }
 
-        public override void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
-            this.parentPosition = Character.main.position;
+            this.parentPosition = character.position;
 
-            switch (Character.main.currentState)
+            switch (character.currentState)
             {
-                case CharacterState.IDLE:
-                case CharacterState.MOVEUP:
-                case CharacterState.MOVEDOWN:
-                case CharacterState.MOVELEFT:
-                case CharacterState.MOVERIGHT:
-                case CharacterState.SHOOT:
+                
+                default:
                     this.position = parentPosition + offsetPosition;
                     break;
 
-                case CharacterState.JUMP:
-                    break;
-
-                case CharacterState.DUCK:
-                    break;
-
-                
             }
         }
     }

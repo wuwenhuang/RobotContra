@@ -18,17 +18,19 @@ namespace GameStateManagementSample
     {
         //The types of textures (symbols) being defined by and being used in the level
         private Dictionary<char, Background> mTextures = new Dictionary<char, Background>();
-
         public List<Background> tilesBackground = new List<Background>();
+
+        private Dictionary<char, Enemy> mEnemies = new Dictionary<char, Enemy>();
+        public List<Enemy> enemiesLevel = new List<Enemy>();
 
         private XmlReader reader;
 
-        private string levelFile;
+        protected string levelFile;
 
         private ContentManager content;
 
         protected int level;
-        
+
         //The starting position for the first tile. 
         int mStartX = 0;
         int mStartY = 0;
@@ -38,12 +40,12 @@ namespace GameStateManagementSample
         //The default height and width for the tiles that make up the level
         protected int gameWidth = 0;
 
-        public LevelLoader(string file, ContentManager content)
+        public LevelLoader()
             : base()
         {
+            levelFile = "Content/Levels/Level.xml";
             pos = new Vector2(mStartX, mStartY);
-            levelFile = file;
-            this.content = content;
+            this.content = GameplayScreen.main.content;
             LoadAssets();
         }
 
@@ -71,6 +73,51 @@ namespace GameStateManagementSample
                     reader.Name.Equals("texture", StringComparison.OrdinalIgnoreCase))
                 {
                     LoadTile(reader);                
+                }
+                else if (reader.NodeType == XmlNodeType.Element &&
+                    reader.Name.Equals("enemy", StringComparison.OrdinalIgnoreCase))
+                {
+                    LoadEnemy(reader);
+                }
+            }
+        }
+
+        public void LoadEnemy(XmlReader reader)
+        {
+            string currentElement = string.Empty;
+            Enemy enemy = new Enemy();
+
+            while (reader.Read())
+            {
+                //Exit the While loop when the end node is encountered and add the Tile
+                if (reader.NodeType == XmlNodeType.EndElement &&
+                    reader.Name.Equals("kind", StringComparison.OrdinalIgnoreCase))
+                {
+                    mEnemies.Add(enemy.id, enemy);
+                    break;
+                }
+
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    currentElement = reader.Name;
+
+                    switch (currentElement)
+                    {
+                        case "id":
+                            {
+                                enemy.id = reader.ReadElementContentAsString().ToCharArray()[0];
+                                break;
+                            }
+                        case "name":
+                            {
+                                // if adding a new type of enemy add to enum and match it..
+                                if (reader.ReadElementContentAsString().Equals(KindEnemy.Normal.ToString()))
+                                {
+                                    enemy = new EnemyNormal();
+                                }
+                                break;
+                            }
+                    }
                 }
             }
         }
@@ -219,8 +266,6 @@ namespace GameStateManagementSample
             Random rand = new Random();
             int row = 0;
 
-            bool addNewLineBool = false;
-
             string aCurrentElement = string.Empty;
 
             while (reader.Read())
@@ -254,9 +299,7 @@ namespace GameStateManagementSample
                 {
                     if (aCurrentElement == "row")
                     {
-                        if (addNewLineBool)
-                            aPositionY += 120;
-
+                        
                         row += 1;
 
                         aPositionX = 0;
@@ -276,17 +319,26 @@ namespace GameStateManagementSample
                                 {
                                     aPositionY = 480 - mTextures[aRow[aCounter]].texture.Height;
                                 }
-                                else if (mTextures[aRow[aCounter]].id == 'S')
-                                {
-                                    addNewLineBool = false;
-                                }
-                                else
-                                {
-                                    addNewLineBool = true;
-                                }
+                                
                                 tilesBackground.Add(new Background(mTextures[aRow[aCounter]].texture, new Vector2(aPositionX, aPositionY), mTextures[aRow[aCounter]].walkable));
                                 aPositionX += mTextures[aRow[aCounter]].texture.Width;
 
+                            }
+                            else if (mEnemies.ContainsKey(aRow[aCounter]) == true)
+                            {
+                                // add to the level..base on its id..
+                                if (mEnemies[aRow[aCounter]].id == 'N')
+                                {
+                                    if (aPositionX > gameWidth)
+                                        aPositionX = gameWidth - mEnemies[aRow[aCounter]].SourceRect.Width - 20;
+
+                                    enemiesLevel.Add(
+                                        new EnemyNormal(
+                                            new Vector2(
+                                                aPositionX, 
+                                                rand.Next(360 - 120, GameplayScreen.main.ScreenManager.GraphicsDevice.Viewport.Height - 130))));
+                                }
+                                aPositionX += mEnemies[aRow[aCounter]].SourceRect.Width;
                             }
                             else
                             {
@@ -294,7 +346,11 @@ namespace GameStateManagementSample
                                 {
                                     gameWidth = aPositionX;
                                 }
-                                aPositionX += rand.Next(100, 200);
+                                if (aRow[aCounter] == ' ')
+                                {
+                                    
+                                    aPositionX += rand.Next(300, 600);
+                                }
                             }
                         }
                     }
@@ -309,7 +365,6 @@ namespace GameStateManagementSample
             {
                 theBatch.Draw(background.texture, Camera2D.main.WorldToScreenPoint(background.position), Color.White);
             }
-            
         }
     }
 }

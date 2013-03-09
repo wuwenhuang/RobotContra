@@ -39,17 +39,14 @@ namespace GameStateManagementSample
         {
 
             // Create our menu entries.
-            createSessionMenuEntry = new MenuEntry("Create Session");
             joinSessionMenuEntry = new MenuEntry("Join Session");
             backMenuEntry = new MenuEntry("Back");
 
             // Hook up menu event handlers.
-            createSessionMenuEntry.Selected += CreateSessionMenuSelected;
             joinSessionMenuEntry.Selected += JoinSessionMenuSelected;
             backMenuEntry.Selected += BackMenuSelected;
 
             // Add entries to the menu.
-            MenuEntries.Add(createSessionMenuEntry);
             MenuEntries.Add(joinSessionMenuEntry);
             MenuEntries.Add(backMenuEntry);
         }
@@ -63,22 +60,47 @@ namespace GameStateManagementSample
 
         #region Handle Input
 
-
-        /// <summary>
-        /// Event handler for when the Ungulate menu entry is selected.
-        /// </summary>
-        void CreateSessionMenuSelected(object sender, PlayerIndexEventArgs e)
+        public override void HandleInput(GameTime gameTime, GameStateManagement.InputState input)
         {
-            // create session
+            PlayerIndex playerIndex;
+
+            // Move to the previous menu entry?
+            if (menuUp.Evaluate(input, ControllingPlayer, out playerIndex))
+            {
+                selectedEntry--;
+
+                if (selectedEntry < 0)
+                    selectedEntry = menuEntries.Count - 1;
+            }
+
+            // Move to the next menu entry?
+            if (menuDown.Evaluate(input, ControllingPlayer, out playerIndex))
+            {
+                selectedEntry++;
+
+                if (selectedEntry >= menuEntries.Count)
+                    selectedEntry = 0;
+            }
+
+            if (menuSelect.Evaluate(input, ControllingPlayer, out playerIndex))
+            {
+                OnSelectEntry(selectedEntry, playerIndex);
+            }
+            else if (menuCancel.Evaluate(input, ControllingPlayer, out playerIndex))
+            {
+
+                ScreenManager.AddScreen(new MainMenuScreen(), playerIndex);
+            }
         }
 
+        #endregion
 
-        /// <summary>
-        /// Event handler for when the Language menu entry is selected.
-        /// </summary>
+        #region Menu Selected Create, Multiplayer, Back Session
+        
         void JoinSessionMenuSelected(object sender, PlayerIndexEventArgs e)
         {
             // join session
+            ScreenManager.AddScreen(new GameplayScreen(true), e.PlayerIndex);
         }
 
         void BackMenuSelected(object sender, PlayerIndexEventArgs e)

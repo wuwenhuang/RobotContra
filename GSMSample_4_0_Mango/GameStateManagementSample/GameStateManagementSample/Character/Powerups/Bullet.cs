@@ -7,6 +7,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameStateManagementSample
 {
+    enum BulletType
+    {
+        NORMAL,
+        LASER
+    };
+
+
     class Bullet : GameObject
     {
         public float lifeSpan;
@@ -15,10 +22,12 @@ namespace GameStateManagementSample
 
         public Bullet(): base(){}
 
-        public Bullet(string id, Texture2D texture, Vector2 size, float speed, float lifeSpan, bool faceRight)
+        public Bullet(Character character, string id, Texture2D texture, Vector2 size, float speed, float lifeSpan)
             : base()
         {
-            if (Player.main.SearchChild("weapon") != null)
+            this.character = character;
+
+            if (character.SearchChild("weapon") != null)
             {
                 this.texture = texture;
                 this.spriteWidth = (int)size.X;
@@ -26,18 +35,21 @@ namespace GameStateManagementSample
                 this.speed = speed;
                 this.lifeSpan = lifeSpan;
                 this.SetId(id);
-                this._faceRight = faceRight;
+                if (this.character.lastState == CharacterState.MOVELEFT)
+                    this._faceRight = false;
+                else
+                    this._faceRight = true;
 
-                if (faceRight)
+                if (_faceRight)
                 {
-                    this.position = Player.main.SearchChild("weapon").position;
-                    this.position.X += Player.main.SearchChild("weapon").SourceRect.Width;
+                    this.position = (character.SearchChild("weapon") as Weapon).position;
+                    this.position.X += (character.SearchChild("weapon")as Weapon).SourceRect.Width;
                     this.sourceRect = new Rectangle(0, 0, spriteWidth, spriteHeight);
                 }
                 else
                 {
-                    this.position = (Player.main.SearchChild("weapon") as Weapon).position;
-                    this.position.X -= (Player.main.SearchChild("weapon") as Weapon).LEFTOFFSET + spriteWidth;
+                    this.position = (character.SearchChild("weapon") as Weapon).position;
+                    this.position.X -= (character.SearchChild("weapon") as Weapon).LEFTOFFSET + spriteWidth;
                     this.sourceRect = new Rectangle(spriteWidth, 0, spriteWidth, spriteHeight);
                 }
             }
@@ -78,8 +90,26 @@ namespace GameStateManagementSample
 
     class BulletNormal : Bullet
     {
-        public BulletNormal(bool faceRight)
-            : base("normal",GameplayScreen.main.content.Load<Texture2D>("Weapon/Powerups/bulletNormal"), new Vector2(20, 15), 500.0f, 1.0f, faceRight)
+        public BulletNormal(Character character)
+            : base(character, "normal", GameplayScreen.main.content.Load<Texture2D>("Weapon/Powerups/bulletNormal"), new Vector2(20, 15), 500.0f, 1.0f)
+        {
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+        }
+    }
+
+    class BulletLaser : Bullet
+    {
+        public BulletLaser(Character character)
+            : base(character, "normal", GameplayScreen.main.content.Load<Texture2D>("Weapon/Powerups/bulletLaser"), new Vector2(30, 10), 200.0f, 1.0f)
         {
         }
 

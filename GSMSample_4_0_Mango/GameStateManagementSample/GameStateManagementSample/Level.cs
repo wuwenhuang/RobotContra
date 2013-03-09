@@ -14,14 +14,23 @@ namespace GameStateManagementSample
     {
         public static Level main;
         public Color color;
+        public Character targetPlayer;
 
-        public Level(string file, ContentManager content)
-            : base(file, content)
+        public Level(Character targetPlayer)
+            : base()
         {
+            
             main = this;
             gameWidth = 0;
             color = Color.CornflowerBlue;
-        } 
+            if (targetPlayer != null)
+                this.targetPlayer = targetPlayer;
+        }
+
+        public void setTargetPlayer(Character targetPlayer)
+        {
+            this.targetPlayer = targetPlayer;
+        }
 
         public void Draw(ScreenManager screenManager)
         {
@@ -32,13 +41,29 @@ namespace GameStateManagementSample
             SpriteBatch spriteBatch = screenManager.SpriteBatch;
 
  	        base.Draw(spriteBatch);
+
+            if (enemiesLevel != null)
+            {
+                foreach (Enemy enemy in enemiesLevel)
+                {
+                    if (enemy.Alive && enemy.Texture != null)
+                        enemy.Draw(spriteBatch);
+                }
+            }
+
         }
 
         public void ChangeLevel(int level)
         {
+
             base.level = level;
             
             base.LoadLevel();
+
+            foreach (Enemy enemy in enemiesLevel)
+            {
+                enemy.SetTargetPlayer(targetPlayer);
+            }
         }
 
         public void ChangeLevel(int level, Color color)
@@ -46,6 +71,11 @@ namespace GameStateManagementSample
             this.color = color;
             base.level = level;
             base.LoadLevel();
+
+            foreach (Enemy enemy in enemiesLevel)
+            {
+                enemy.SetTargetPlayer(targetPlayer);
+            }
         }
         
         public void ChangeColor(Color color)
@@ -58,20 +88,47 @@ namespace GameStateManagementSample
             foreach (Background background in tilesBackground)
             {
                 background.texture = null;
-                background.position = new Vector2();
+                background.position = Vector2.Zero;
             }
+
+            foreach (Enemy enemy in enemiesLevel)
+            {
+                enemy.Texture = null;
+                enemy.position = Vector2.Zero;
+            }
+            enemiesLevel.Clear();
             tilesBackground.Clear();
             gameWidth = 0;
             color = Color.White;
         }
 
-        public void Update(GameTime gameTime, Player player, GraphicsDevice device)
+        public void Update(GameTime gameTime, Player player)
         {
-            if (player.position.X + player.SourceRect.Width > device.Viewport.Width / 2 && player.position.X + player.SourceRect.Width < this.width - device.Viewport.Width / 2)
+            if (player.position.X + player.SourceRect.Width > GameplayScreen.main.ScreenManager.GraphicsDevice.Viewport.Width / 2 && player.position.X + player.SourceRect.Width < this.width - GameplayScreen.main.ScreenManager.GraphicsDevice.Viewport.Width / 2)
             {
                 Camera2D.main.setPosition(new Vector2(player.position.X + player.SourceRect.Width - Camera2D.main.rect.Width / 2, 0));
             }
-            
+
+            if (enemiesLevel != null)
+            {
+                for (int i=0; i < enemiesLevel.Count; i++)
+                {
+                    if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
+                        enemiesLevel[i].setAlive(true);
+
+                    if (enemiesLevel[i].Alive)
+                    {
+                        enemiesLevel[i].Update(gameTime, this);
+                    }
+
+                    if (enemiesLevel[i].Texture == null)
+                    {
+                        enemiesLevel.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
         }
         
     }

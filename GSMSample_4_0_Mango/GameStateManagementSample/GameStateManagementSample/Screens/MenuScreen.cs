@@ -27,14 +27,14 @@ namespace GameStateManagementSample
     {
         #region Fields
 
-        List<MenuEntry> menuEntries = new List<MenuEntry>();
-        int selectedEntry = 0;
+        public List<MenuEntry> menuEntries = new List<MenuEntry>();
+        public int selectedEntry = 0;
         string menuTitle;
 
-        InputAction menuUp;
-        InputAction menuDown;
-        InputAction menuSelect;
-        InputAction menuCancel;
+        public InputAction menuUp;
+        public InputAction menuDown;
+        public InputAction menuSelect;
+        public InputAction menuCancel;
 
         #endregion
 

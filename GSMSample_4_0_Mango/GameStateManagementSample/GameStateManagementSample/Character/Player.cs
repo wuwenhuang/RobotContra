@@ -9,27 +9,138 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameStateManagementSample
 {
+    enum PlayerColor
+    {
+        BLUE,
+        RED
+    }
+
     class Player : Character
     {
         private Weapon weapon;
+        private Health healthBar;
+
+        private float moveAnalogX, moveAnalogY;
+
         
-        public Player()
-            : base(GameplayScreen.main.content.Load<Texture2D>("Character/player"), new Vector2(10,350), new Vector2(70, 130))
+        public Player(Texture2D texture, Vector2 position)
+            : base(texture, position, new Vector2(70, 130))
         {
-            weapon = new Weapon(GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5,35), new Vector2(100,30));
+            weapon = new Weapon(this, GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5,35), new Vector2(100,30));
+            healthBar = new Health(this);
 
             this.AddChild(weapon);
+            this.AddChild(healthBar);
+            this.setBulletType(BulletType.NORMAL, 15.0f);
         }
 
         public void Reset()
         {
             position = new Vector2(10, 350);
         }
-        
-        public override void Update(GameTime gameTime, Level level, GraphicsDevice graphic)
+
+        public override void Update(GameTime gameTime, Level level)
         {
-            
-            base.Update(gameTime, level, graphic);  
+            if (currentState != CharacterState.DEAD)
+            {
+                switch (currentState)
+                {
+                    case CharacterState.JUMP:
+                        this.position.Y -= this.velocity.Y * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        this.velocity += SideScrollGame.GRAVITY * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                        if (this.lastState == CharacterState.MOVERIGHT)
+                        {
+                            if (this.position.X + this.sourceRect.Width < level.width)
+                                this.position.X += this.velocity.X * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        }
+                        else
+                        {
+                            if (this.position.X > 0)
+                                this.position.X -= this.velocity.X * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        }
+
+                        if (this.lastPosition.Y < this.position.Y)
+                        {
+                            this.position.Y = this.lastPosition.Y;
+                            currentState = CharacterState.IDLE;
+                        }
+
+                        break;
+
+                    case CharacterState.BOOST:
+
+                        if (this.lastState == CharacterState.MOVERIGHT)
+                        {
+                            if (this.position.X + this.sourceRect.Width < level.width)
+                            {
+                                this.position.X += (speed * 2.0f) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                            }
+                        }
+                        else
+                        {
+                            if (this.position.X > 0)
+                            {
+                                this.position.X -= (speed * 2.0f) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVELEFT:
+                        if (this.position.X > 0)
+                        {
+                            this.position.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        }
+                        break;
+
+                    case CharacterState.MOVERIGHT:
+                        if (this.position.X + this.sourceRect.Width < level.width)
+                        {
+                            this.position.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        }
+                        break;
+
+                    case CharacterState.MOVEUP:
+                        foreach (Background background in level.tilesBackground)
+                        {
+                            if (background.walkable)
+                            {
+                                if (this.position.Y > background.position.Y - background.texture.Height)
+                                {
+                                    this.position.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVEDOWN:
+                        if (this.position.Y + this.sourceRect.Height < GameplayScreen.main.ScreenManager.GraphicsDevice.Viewport.Height)
+                        {
+                            this.position.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        }
+                        break;
+
+                }
+                //checking if bullets is hit an enemy
+                if (weapon != null && weapon.bullets != null)
+                {
+                    for (int i = 0; i < weapon.bullets.Count; i++)
+                    {
+                        foreach (Enemy enemy in level.enemiesLevel)
+                        {
+                            if (weapon.bullets[i].BoundingBox.Intersects(enemy.BoundingBox))
+                            {
+                                enemy.getHit(this.attackDamage);
+                                weapon.bullets.RemoveAt(i);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            base.Update(gameTime, level);  
         }
 
         public void HandleInput(GamePadState gamePad)
@@ -37,16 +148,18 @@ namespace GameStateManagementSample
             switch (currentState)
             {
                 case CharacterState.IDLE:
-
+                    this.lastPosition = position;
+                    
                     if (gamePad.IsButtonDown(Buttons.DPadLeft))
                     {
                         this.currentState = CharacterState.MOVELEFT;
-
+                        this.lastState = currentState;
                     }
 
                     if (gamePad.IsButtonDown(Buttons.DPadRight))
                     {
                         this.currentState = CharacterState.MOVERIGHT;
+                        this.lastState = currentState;
                     }
 
                     if (gamePad.IsButtonDown(Buttons.DPadUp))
@@ -58,13 +171,15 @@ namespace GameStateManagementSample
                     {
                         this.currentState = CharacterState.MOVEDOWN;
                     }
-
-                    if (gamePad.IsButtonDown(Buttons.X))
+                    
+                    if (gamePad.IsButtonDown(Buttons.A))
                     {
+
+                        this.velocity = new Vector2(0, jumpHeight);
                         this.currentState = CharacterState.JUMP;
                     }
 
-                    if (gamePad.IsButtonDown(Buttons.Y))
+                    if (gamePad.IsButtonDown(Buttons.X))
                     {
                         this.currentState = CharacterState.SHOOT;
                     }
@@ -78,9 +193,21 @@ namespace GameStateManagementSample
                     }
                     else
                     {
-                        if (gamePad.IsButtonDown(Buttons.Y))
+                        this.lastPosition = position;
+                        if (gamePad.IsButtonDown(Buttons.X))
                         {
                             this.currentState = CharacterState.SHOOT;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.A))
+                        {
+                            this.velocity = new Vector2(jumpDistance, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                        {
+                            this.currentState = CharacterState.BOOST;
                         }
                     }
                     break;
@@ -93,9 +220,21 @@ namespace GameStateManagementSample
                     }
                     else
                     {
-                        if (gamePad.IsButtonDown(Buttons.Y))
+                        this.lastPosition = position;
+                        if (gamePad.IsButtonDown(Buttons.X))
                         {
                             this.currentState = CharacterState.SHOOT;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.A))
+                        {
+                            this.velocity = new Vector2(jumpDistance, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                        {
+                            this.currentState = CharacterState.BOOST;
                         }
                     }
                     break;
@@ -112,7 +251,7 @@ namespace GameStateManagementSample
                     {
                         this.currentState = CharacterState.IDLE;
                     }
-
+                    
                     break;
 
                 case CharacterState.SHOOT:
@@ -121,8 +260,23 @@ namespace GameStateManagementSample
                         this.currentState = CharacterState.IDLE;
                     }
                     break;
-            }
 
+                case CharacterState.BOOST:
+                    if (gamePad.IsButtonUp(Buttons.RightTrigger))
+                    {
+                        this.currentState = lastState;
+                    }
+                    else
+                    {
+                        this.lastPosition = position;
+                        if (gamePad.IsButtonDown(Buttons.A))
+                        {
+                            this.velocity = new Vector2((jumpDistance * 2), jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+                    }
+                    break;
+            }
         }
 
         public void HandleInput(KeyboardState keyPad, MouseState mousePad)
@@ -130,15 +284,17 @@ namespace GameStateManagementSample
             switch (currentState)
             {
                 case CharacterState.IDLE:
-
+                    this.lastPosition = position;
                     if (keyPad.IsKeyDown(Keys.A))
                     {
                         this.currentState = CharacterState.MOVELEFT;
+                        this.lastState = currentState;
                     }
 
                     if (keyPad.IsKeyDown(Keys.D))
                     {
                         this.currentState = CharacterState.MOVERIGHT;
+                        this.lastState = currentState;
                     }
 
                     if (keyPad.IsKeyDown(Keys.W))
@@ -153,13 +309,41 @@ namespace GameStateManagementSample
 
                     if (keyPad.IsKeyDown(Keys.Space))
                     {
+                        this.velocity = new Vector2(0, jumpHeight);
                         this.currentState = CharacterState.JUMP;
                     }
                     if (mousePad.LeftButton == ButtonState.Pressed)
                     {
                         this.currentState = CharacterState.SHOOT;
                     }
-                    
+                    if (keyPad.IsKeyDown(Keys.OemMinus))
+                    {
+                        this.health -= 10;
+                    }
+                    if (keyPad.IsKeyDown(Keys.OemPlus))
+                    {
+                        if (health < healthMaximum)
+                            this.health += 10;
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.PageUp))
+                    {
+                        this.setBulletType(BulletType.NORMAL, 15.0f);
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.PageDown))
+                    {
+                        this.setBulletType(BulletType.LASER, 30.0f);
+                    }
+
+                    if (keyPad.IsKeyDown(Keys.Delete))
+                    {
+                        foreach (Enemy enemy in Level.main.enemiesLevel)
+                        {
+                            if (enemy.Alive)
+                                enemy.getHit(10);
+                        }
+                    }
                     break;
 
                 case CharacterState.MOVERIGHT:
@@ -170,12 +354,23 @@ namespace GameStateManagementSample
                     }
                     else
                     {
+                        this.lastPosition = position;
                         if (mousePad.LeftButton == ButtonState.Pressed)
                         {
                             this.currentState = CharacterState.SHOOT;
                         }
+
+                        if (keyPad.IsKeyDown(Keys.Space))
+                        {
+                            this.velocity = new Vector2(jumpDistance, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.LeftShift))
+                        {
+                            this.currentState = CharacterState.BOOST;
+                        }
                     }
-                    
                     break;
 
                 case CharacterState.MOVELEFT:
@@ -186,9 +381,20 @@ namespace GameStateManagementSample
                     }
                     else
                     {
+                        this.lastPosition = position;
                         if (mousePad.LeftButton == ButtonState.Pressed)
                         {
                             this.currentState = CharacterState.SHOOT;
+                        }
+                        if (keyPad.IsKeyDown(Keys.Space))
+                        {
+                            this.velocity = new Vector2(jumpDistance, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.LeftShift))
+                        {
+                            this.currentState = CharacterState.BOOST;
                         }
                     }
                     break;
@@ -213,14 +419,28 @@ namespace GameStateManagementSample
                         this.currentState = CharacterState.IDLE;
                     }
                     break;
-            }
 
+                case CharacterState.BOOST:
+                    if (keyPad.IsKeyUp(Keys.LeftShift))
+                    {
+                        this.currentState = lastState;
+                    }
+                    else
+                    {
+                        this.lastPosition = position;
+                        if (keyPad.IsKeyDown(Keys.Space))
+                        {
+                            this.velocity = new Vector2((jumpDistance*2), jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+                        }
+                    }
+                    break;
+            }
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
-
-            base.Draw(gameTime, spriteBatch);
+            base.Draw(spriteBatch);
         }
 
         public Texture2D getTexture()

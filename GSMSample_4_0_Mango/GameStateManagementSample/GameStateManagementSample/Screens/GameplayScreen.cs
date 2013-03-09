@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using GameStateManagement;
 using System.Collections.Generic;
+
 #endregion
 
 namespace GameStateManagementSample
@@ -32,15 +33,10 @@ namespace GameStateManagementSample
         public ContentManager content;
         SpriteFont gameFont;
 
-        private Level level;
-
-        private int currentLevel = 0;
+        private SideScrollGame game;
+        private bool _isNetwork;
 
         public static GameplayScreen main;
-
-        public Player player;
-
-        private Camera2D camera;
 
         Random random = new Random();
 
@@ -56,7 +52,7 @@ namespace GameStateManagementSample
         /// <summary>
         /// Constructor.
         /// </summary>
-        public GameplayScreen()
+        public GameplayScreen(bool isNetworkGame)
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
@@ -67,8 +63,9 @@ namespace GameStateManagementSample
                 true);
 
             main = this;
-        }
 
+            _isNetwork = isNetworkGame;         
+        }
 
         /// <summary>
         /// Load graphics content for the game.
@@ -82,8 +79,6 @@ namespace GameStateManagementSample
 
                 gameFont = content.Load<SpriteFont>("gamefont");
 
-                Awake();
-
                 // A real game would probably have more content than this sample, so
                 // it would take longer to load. We simulate that by delaying for a
                 // while, giving you a chance to admire the beautiful loading screen.
@@ -93,6 +88,9 @@ namespace GameStateManagementSample
                 // timing mechanism that we have just finished a very long frame, and that
                 // it should not try to catch up.
                 ScreenManager.Game.ResetElapsedTime();
+
+                game = new SideScrollGame(_isNetwork, PlayerColor.BLUE, this);
+                
             }
 
 #if WINDOWS_PHONE
@@ -155,12 +153,7 @@ namespace GameStateManagementSample
             {
                 // TODO: this game isn't very fun! You could probably improve
                 // it by inserting something more interesting in this space :-) 
-
-                player.Update(gameTime, level, ScreenManager.GraphicsDevice);
-
-                level.Update(gameTime, player, ScreenManager.GraphicsDevice);
-
-              
+                game.Update(gameTime);
             }
         }
 
@@ -179,6 +172,7 @@ namespace GameStateManagementSample
 
             KeyboardState keyboardState = input.CurrentKeyboardStates[playerIndex];
             GamePadState gamePadState = input.CurrentGamePadStates[playerIndex];
+
             MouseState mouseState = input.CurrentMouseStates[playerIndex];
 
             // The game pauses either if the user presses the pause button, or if
@@ -202,28 +196,13 @@ namespace GameStateManagementSample
                 // handles the player input
                 if (gamePadState.IsConnected)
                 {
-                    this.player.HandleInput(gamePadState);
+                    game.HandleInput(gamePadState);
                 }
                 else
                 {
-                    this.player.HandleInput(keyboardState, mouseState);
+                    game.HandleInput(keyboardState, mouseState);
                 }
                 
-
-                if (keyboardState.IsKeyDown(Keys.R))
-                {
-                    level.Reset();
-                    this.player.Reset();
-                    camera.setPosition(Vector2.Zero);
-                    level.ChangeLevel(2, Color.DarkRed);
-                }
-                else if (keyboardState.IsKeyDown(Keys.T))
-                {
-                    level.Reset();
-                    this.player.Reset();
-                    camera.setPosition(Vector2.Zero);
-                    level.ChangeLevel(1, Color.DarkBlue);
-                }
             }
         }
 
@@ -238,10 +217,8 @@ namespace GameStateManagementSample
 
             spriteBatch.Begin();
 
-            level.Draw(ScreenManager);
+            game.Draw(spriteBatch);
 
-            player.Draw(gameTime, spriteBatch);
-            
             spriteBatch.End();
 
             // If the game is transitioning on or off, fade it out to black.
@@ -253,27 +230,6 @@ namespace GameStateManagementSample
             }
         }
         
-        void Awake()
-        {
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-
-            level = new Level("Content/Levels/Level.xml", this.content);
-            
-            level.Reset();
-
-            level.ChangeLevel(1);
-
-            level.ChangeColor(Color.Black);
-
-            player = new Player();
-
-            camera = new Camera2D();
-
-            camera.setPosition(Vector2.Zero);
-            camera.setSize(ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height);
-        }
-
-
         #endregion
     }
 }
