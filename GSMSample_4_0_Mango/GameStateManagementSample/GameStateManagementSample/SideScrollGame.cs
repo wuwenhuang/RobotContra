@@ -135,6 +135,11 @@ namespace GameStateManagement.SideScrollGame
             else
             {
                 player.Update(gameTime, _level);
+
+                foreach (var otherplayers in otherPlayers)
+                {
+                    otherplayers.Value.Update(gameTime);
+                }
             }
             
         }
@@ -225,19 +230,20 @@ namespace GameStateManagement.SideScrollGame
                                     {
                                         if (otherPlayers.Count > 0)
                                         {
-                                            if (otherPlayers[who].Equals(who))
+                                            
+                                            if (otherPlayers[who].id.Equals(who))
                                             {
                                                 otherPlayers[who].position = new Vector2(x, y);
-                                                //otherPlayers[who].currentState = state;
+                                                otherPlayers[who].currentState = state;
                                             }
                                             else
                                             {
-                                                otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
+                                                otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                                             }
                                         }
                                         else
                                         {
-                                            otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
+                                            otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                                         }
                                     }
                                     break;

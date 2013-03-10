@@ -125,6 +125,7 @@ namespace XnaGameServer
 
                             break;
                         case NetIncomingMessageType.Data:
+                            
                             switch (msg.ReadByte())
                             {
                                 case (byte)PacketTypes.MYPOSITION:
@@ -143,26 +144,6 @@ namespace XnaGameServer
                                         }
                                     }
 
-                                    foreach (NetConnection player in server.Connections)
-                                    {
-                                        if (msg.SenderConnection.RemoteUniqueIdentifier != player.RemoteUniqueIdentifier)
-                                        {
-                                            for (int i = 0; i < multiplayerPlayers.Count; i++)
-                                            {
-                                                NetOutgoingMessage om = server.CreateMessage();
-                                                // write who this position is for
-                                                om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                                                om.Write((long)multiplayerPlayers[i].id);
-                                                om.Write((byte)multiplayerPlayers[i].state);
-                                                om.Write((int)multiplayerPlayers[i].x);
-                                                om.Write((int)multiplayerPlayers[i].y);
-
-                                                // send message
-                                                server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
-                                            }
-                                        }
-
-                                    }
                                     break;
                             }
                             
@@ -190,7 +171,7 @@ namespace XnaGameServer
                                 // write who this position is for
                                 om.Write((byte)PacketTypes.UPDATEPLAYERS);
                                 om.Write((long)multiplayerPlayers[j].id);
-                                om.Write((byte)multiplayerPlayers[i].state);
+                                om.Write((byte)multiplayerPlayers[j].state);
                                 om.Write((int)multiplayerPlayers[j].x);
                                 om.Write((int)multiplayerPlayers[j].y);
 
