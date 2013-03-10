@@ -220,7 +220,8 @@ namespace GameStateManagementSample
                                     int x = msg.ReadInt32();
                                     int y = msg.ReadInt32();
 
-                                    otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                    if (player.id != who)
+                                        otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
 
                                     break;
                             }

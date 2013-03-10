@@ -120,7 +120,27 @@ namespace XnaGameServer
                                         {
                                             players.x = xPosition;
                                             players.y = yPosition;
+                                            break;
                                         }
+                                    }
+
+                                    foreach (NetConnection player in server.Connections)
+                                    {
+                                        NetOutgoingMessage om = server.CreateMessage();
+
+                                        for (int i = 0; i < multiplayerPlayers.Count; i++)
+                                        {
+                                            // write who this position is for
+                                            om.Write((byte)PacketTypes.UPDATEPLAYERS);
+                                            om.Write(multiplayerPlayers[i].id);
+                                            om.Write(multiplayerPlayers[i].x);
+                                            om.Write(multiplayerPlayers[i].y);
+
+
+                                            // send message
+                                            server.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
+                                        }
+
                                     }
                                     break;
                             }
@@ -128,39 +148,39 @@ namespace XnaGameServer
                             break;
                     }
 
-                    //
-                    // send position updates 30 times per second
-                    //
-                    double now = NetTime.Now;
-                    if (now > nextSendUpdates)
-                    {
-                        // Yes, it's time to send position updates
+                    ////
+                    //// send position updates 30 times per second
+                    ////
+                    //double now = NetTime.Now;
+                    //if (now > nextSendUpdates)
+                    //{
+                    //    // Yes, it's time to send position updates
 
-                        // for each player...
-                        for (int i = 0; i < server.Connections.Count; i++)
-                        {
-                            NetConnection player = server.Connections[i] as NetConnection;
-                            // ... send information about every other player (actually including self)
-                            for (int j = 0; j < server.Connections.Count; j++)
-                            {
-                                // send position update about 'otherPlayer' to 'player'
-                                NetOutgoingMessage om = server.CreateMessage();
+                    //    // for each player...
+                    //    for (int i = 0; i < server.Connections.Count; i++)
+                    //    {
+                    //        NetConnection player = server.Connections[i] as NetConnection;
+                    //        // ... send information about every other player (actually including self)
+                    //        for (int j = 0; j < server.Connections.Count; j++)
+                    //        {
+                    //            // send position update about 'otherPlayer' to 'player'
+                    //            NetOutgoingMessage om = server.CreateMessage();
 
-                                // write who this position is for
-                                om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                                om.Write(multiplayerPlayers[i].id);
-                                om.Write(multiplayerPlayers[j].x);
-                                om.Write(multiplayerPlayers[j].y);
+                    //            // write who this position is for
+                    //            om.Write((byte)PacketTypes.UPDATEPLAYERS);
+                    //            om.Write(multiplayerPlayers[i].id);
+                    //            om.Write(multiplayerPlayers[j].x);
+                    //            om.Write(multiplayerPlayers[j].y);
 
-                                // send message
-                                server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
-                            }
+                    //            // send message
+                    //            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                    //        }
                             
-                        }
+                    //    }
 
-                        // schedule next update
-                        nextSendUpdates += (1.0 / 30.0);
-                    }
+                    //    // schedule next update
+                    //    nextSendUpdates += (1.0 / 30.0);
+                    //}
                 }
 
                 // sleep to allow other processes to run smoothly
