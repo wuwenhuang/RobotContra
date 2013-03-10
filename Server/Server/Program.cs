@@ -80,7 +80,6 @@ namespace XnaGameServer
                                 {
                                     multiplayerPlayers[multiplayerPlayers.Count-1].x = multiplayerPlayers[multiplayerPlayers.Count - 2].x + 70;
                                     multiplayerPlayers[multiplayerPlayers.Count-1].y = multiplayerPlayers[multiplayerPlayers.Count - 2].y;
-                                    
                                 }
 
                                 for (int i = 0; i < server.Connections.Count; i++)
@@ -128,7 +127,6 @@ namespace XnaGameServer
                         // for each player...
                         for (int i = 0; i < server.Connections.Count; i++)
                         {
-
                             NetConnection player = server.Connections[i] as NetConnection;
                             // ... send information about every other player (actually including self)
                             for (int j = 0; j < server.Connections.Count; j++)
@@ -137,8 +135,7 @@ namespace XnaGameServer
                                 NetOutgoingMessage om = server.CreateMessage();
 
                                 // write who this position is for
-                                om.Write(multiplayerPlayers[j].id);
-
+                                om.Write(multiplayerPlayers[i].id);
                                 om.Write(multiplayerPlayers[j].x);
                                 om.Write(multiplayerPlayers[j].y);
 

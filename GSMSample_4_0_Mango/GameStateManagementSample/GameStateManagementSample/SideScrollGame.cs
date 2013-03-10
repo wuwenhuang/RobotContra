@@ -198,13 +198,18 @@ namespace GameStateManagementSample
                             int x = msg.ReadInt32();
                             int y = msg.ReadInt32();
                             
+                            otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+
+                            break;
+
+                        case NetIncomingMessageType.StatusChanged:
+                            long id = msg.ReadInt64();
+                            int xPos = msg.ReadInt32();
+                            int yPos = msg.ReadInt32();
+                            
                             if (player == null)
                             {
-                                player = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                            }
-                            else
-                            {
-                                otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                player = new Player(id, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(xPos, yPos));
                             }
                             break;
                     }
