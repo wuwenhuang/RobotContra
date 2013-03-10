@@ -7,19 +7,20 @@ using System.Collections.Generic;
 
 namespace XnaGameServer
 {
-    
+
     enum PacketTypes
     {
         CREATEPLAYER,
         MYPOSITION,
-        UPDATEPLAYERS
+        UPDATEPLAYERS,
+      
     };
 
     class MultiplayerPlayers
     {
         public long id;
         public int x,y;
-
+        
         public MultiplayerPlayers(long id)
         {
             this.id = id;

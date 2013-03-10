@@ -164,8 +164,8 @@ namespace GameStateManagementSample
                 NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
                 {
                     outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write((int)this.position.X);
-                    outmessage.Write((int)this.position.Y);
+                    outmessage.Write(this.position.X);
+                    outmessage.Write(this.position.Y);
                     SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
                 }
             }

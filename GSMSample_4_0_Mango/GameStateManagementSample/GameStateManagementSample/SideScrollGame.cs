@@ -23,7 +23,6 @@ namespace GameStateManagementSample
 
     #region Fields
         
-
         private Camera2D _camera;
 
         public Player player;
@@ -222,7 +221,7 @@ namespace GameStateManagementSample
 
                                     if (player.id != who)
                                     {
-                                        if (otherPlayers.Count <= 0)
+                                        if (otherPlayers.Count > 0)
                                         {
                                             if (otherPlayers[who].Equals(who))
                                             {
