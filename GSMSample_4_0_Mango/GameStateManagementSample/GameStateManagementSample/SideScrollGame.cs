@@ -11,10 +11,18 @@ using Lidgren.Network;
 
 namespace GameStateManagementSample
 {
+    public enum PacketTypes
+    {
+        CREATEPLAYER,
+        MYPOSITION,
+        UPDATEPLAYERS
+    };
+
     class SideScrollGame
     {
 
     #region Fields
+        
 
         private Camera2D _camera;
 
@@ -193,23 +201,28 @@ namespace GameStateManagementSample
                             break;
 
                         case NetIncomingMessageType.Data:
-                            // server sent a position update
-                            long who = msg.ReadInt64();
-                            int x = msg.ReadInt32();
-                            int y = msg.ReadInt32();
-                            
-                            otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
 
-                            break;
-
-                        case NetIncomingMessageType.StatusChanged:
-                            long id = msg.ReadInt64();
-                            int xPos = msg.ReadInt32();
-                            int yPos = msg.ReadInt32();
-                            
-                            if (player == null)
+                            switch(msg.ReadByte())
                             {
-                                player = new Player(id, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(xPos, yPos));
+                                case (byte)PacketTypes.CREATEPLAYER:
+                                    long id = msg.ReadInt64();
+                                    int xPos = msg.ReadInt32();
+                                    int yPos = msg.ReadInt32();
+                            
+                                    if (player == null)
+                                    {
+                                        player = new Player(id, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(xPos, yPos));
+                                    }
+                                    break;
+
+                                case (byte)PacketTypes.UPDATEPLAYERS:
+                                    long who = msg.ReadInt64();
+                                    int x = msg.ReadInt32();
+                                    int y = msg.ReadInt32();
+
+                                    otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+
+                                    break;
                             }
                             break;
                     }

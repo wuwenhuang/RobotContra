@@ -7,6 +7,14 @@ using System.Collections.Generic;
 
 namespace XnaGameServer
 {
+    
+    enum PacketTypes
+    {
+        CREATEPLAYER,
+        MYPOSITION,
+        UPDATEPLAYERS
+    };
+
     class MultiplayerPlayers
     {
         public long id;
@@ -88,6 +96,7 @@ namespace XnaGameServer
                                     {
                                         NetConnection player = server.Connections[i] as NetConnection;
                                         NetOutgoingMessage outMessage = server.CreateMessage();
+                                        outMessage.Write((byte)PacketTypes.CREATEPLAYER);
                                         outMessage.Write((long)multiplayerPlayers[i].id);
                                         outMessage.Write((int)multiplayerPlayers[i].x);
                                         outMessage.Write((int)multiplayerPlayers[i].y);
@@ -99,20 +108,23 @@ namespace XnaGameServer
 
                             break;
                         case NetIncomingMessageType.Data:
-                            //
-                            // The client sent input to the server
-                            //
-                            int xPosition = msg.ReadInt32();
-                            int yPosition = msg.ReadInt32();
-
-                            foreach (MultiplayerPlayers players in multiplayerPlayers)
+                            switch (msg.ReadByte())
                             {
-                                if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
-                                {
-                                    players.x = xPosition;
-                                    players.y = yPosition;
-                                }
+                                case (byte)PacketTypes.MYPOSITION:
+                                    int xPosition = msg.ReadInt32();
+                                    int yPosition = msg.ReadInt32();
+
+                                    foreach (MultiplayerPlayers players in multiplayerPlayers)
+                                    {
+                                        if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
+                                        {
+                                            players.x = xPosition;
+                                            players.y = yPosition;
+                                        }
+                                    }
+                                    break;
                             }
+                            
                             break;
                     }
 
@@ -135,6 +147,7 @@ namespace XnaGameServer
                                 NetOutgoingMessage om = server.CreateMessage();
 
                                 // write who this position is for
+                                om.Write((byte)PacketTypes.UPDATEPLAYERS);
                                 om.Write(multiplayerPlayers[i].id);
                                 om.Write(multiplayerPlayers[j].x);
                                 om.Write(multiplayerPlayers[j].y);

@@ -154,15 +154,16 @@ namespace GameStateManagementSample
                 }
             }
 
-            //if (SideScrollGame.main.IsNetwork)
-            //{
-            //    NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-            //    {
-            //        outmessage.Write(this.position.X);
-            //        outmessage.Write(this.position.Y);
-            //        SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-            //    }
-            //}
+            if (SideScrollGame.main.IsNetwork)
+            {
+                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+                {
+                    outmessage.Write((byte)PacketTypes.MYPOSITION);
+                    outmessage.Write(this.position.X);
+                    outmessage.Write(this.position.Y);
+                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
+                }
+            }
 
             base.Update(gameTime, level);  
         }
