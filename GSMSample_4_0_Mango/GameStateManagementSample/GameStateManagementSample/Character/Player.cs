@@ -50,7 +50,12 @@ namespace GameStateManagementSample
 
         public void Reset()
         {
-            position = new Vector2(10, 350);
+            if (SideScrollGame.main.IsNetwork == false)
+                position = new Vector2(10, 350);
+            else
+            {
+                position = networkPosition;
+            }
         }
 
         public override void Update(GameTime gameTime, Level level)
@@ -154,16 +159,16 @@ namespace GameStateManagementSample
                 }
             }
 
-            if (SideScrollGame.main.IsNetwork)
-            {
-                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-                {
-                    outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write(this.position.X);
-                    outmessage.Write(this.position.Y);
-                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-                }
-            }
+            //if (SideScrollGame.main.IsNetwork)
+            //{
+            //    NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+            //    {
+            //        outmessage.Write((byte)PacketTypes.MYPOSITION);
+            //        outmessage.Write(this.position.X);
+            //        outmessage.Write(this.position.Y);
+            //        SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
+            //    }
+            //}
 
             base.Update(gameTime, level);  
         }

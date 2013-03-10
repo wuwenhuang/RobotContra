@@ -25,6 +25,8 @@ namespace GameStateManagementSample
 
     abstract class Character : AnimateSprite
     {
+        protected Vector2 networkPosition;
+
         public Vector2 position;
         public Vector2 lastPosition;
         public Vector2 velocity;
@@ -66,7 +68,13 @@ namespace GameStateManagementSample
             this.currentState = CharacterState.IDLE;
             this.lastState = CharacterState.MOVERIGHT;
 
-            this.position = pos;
+            if (SideScrollGame.main.IsNetwork == false)
+                this.position = pos;
+            else
+            {
+                this.networkPosition = pos;
+                this.position = networkPosition;
+            }
 
             this.childObjects = new List<GameObject>();
 
