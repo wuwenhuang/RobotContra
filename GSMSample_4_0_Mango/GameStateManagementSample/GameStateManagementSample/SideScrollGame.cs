@@ -8,8 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using GameStateManagement;
 using Microsoft.Xna.Framework.Input;
 using Lidgren.Network;
+using GameStateManagementSample;
 
-namespace GameStateManagementSample
+namespace GameStateManagement.SideScrollGame
 {
     public enum PacketTypes
     {
@@ -216,6 +217,7 @@ namespace GameStateManagementSample
 
                                 case (byte)PacketTypes.UPDATEPLAYERS:
                                     long who = msg.ReadInt64();
+                                    CharacterState state = (CharacterState)msg.ReadByte();
                                     int x = msg.ReadInt32();
                                     int y = msg.ReadInt32();
 
@@ -226,6 +228,7 @@ namespace GameStateManagementSample
                                             if (otherPlayers[who].Equals(who))
                                             {
                                                 otherPlayers[who].position = new Vector2(x, y);
+                                                //otherPlayers[who].currentState = state;
                                             }
                                             else
                                             {

@@ -7,8 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Lidgren.Network;
+using GameStateManagementSample;
 
-namespace GameStateManagementSample
+namespace GameStateManagement.SideScrollGame
 {
     enum PlayerColor
     {
@@ -22,9 +23,6 @@ namespace GameStateManagementSample
         private Health healthBar;
         public long id;
 
-        private float moveAnalogX, moveAnalogY;
-
-        
         public Player(Texture2D texture, Vector2 position)
             : base(texture, position, new Vector2(70, 130))
         {
@@ -164,8 +162,9 @@ namespace GameStateManagementSample
                 NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
                 {
                     outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write(this.position.X);
-                    outmessage.Write(this.position.Y);
+                    outmessage.Write((byte)this.currentState);
+                    outmessage.Write((int)this.position.X);
+                    outmessage.Write((int)this.position.Y);
                     SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
                 }
             }

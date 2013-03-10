@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using GameStateManagement;
-
 using Lidgren.Network;
 using System.Collections.Generic;
 
@@ -16,10 +15,27 @@ namespace XnaGameServer
       
     };
 
+    enum CharacterState
+    {
+        IDLE,
+        JUMP,
+        MOVERIGHT,
+        MOVELEFT,
+        MOVEUP,
+        MOVEDOWN,
+        SHOOT,
+        BOOST,
+        DEAD,
+
+        // SOME ENEMY ATTACK
+        ATTACK
+    };
+
     class MultiplayerPlayers
     {
         public long id;
         public int x,y;
+        public CharacterState state;
         
         public MultiplayerPlayers(long id)
         {
@@ -112,6 +128,7 @@ namespace XnaGameServer
                             switch (msg.ReadByte())
                             {
                                 case (byte)PacketTypes.MYPOSITION:
+                                    CharacterState state = (CharacterState)msg.ReadByte();
                                     int xPosition = msg.ReadInt32();
                                     int yPosition = msg.ReadInt32();
 
@@ -119,6 +136,7 @@ namespace XnaGameServer
                                     {
                                         if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
                                         {
+                                            players.state = state;
                                             players.x = xPosition;
                                             players.y = yPosition;
                                             break;
@@ -134,9 +152,10 @@ namespace XnaGameServer
                                                 NetOutgoingMessage om = server.CreateMessage();
                                                 // write who this position is for
                                                 om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                                                om.Write(multiplayerPlayers[i].id);
-                                                om.Write(multiplayerPlayers[i].x);
-                                                om.Write(multiplayerPlayers[i].y);
+                                                om.Write((long)multiplayerPlayers[i].id);
+                                                om.Write((byte)multiplayerPlayers[i].state);
+                                                om.Write((int)multiplayerPlayers[i].x);
+                                                om.Write((int)multiplayerPlayers[i].y);
 
                                                 // send message
                                                 server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
@@ -170,9 +189,10 @@ namespace XnaGameServer
 
                                 // write who this position is for
                                 om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                                om.Write(multiplayerPlayers[j].id);
-                                om.Write(multiplayerPlayers[j].x);
-                                om.Write(multiplayerPlayers[j].y);
+                                om.Write((long)multiplayerPlayers[j].id);
+                                om.Write((byte)multiplayerPlayers[i].state);
+                                om.Write((int)multiplayerPlayers[j].x);
+                                om.Write((int)multiplayerPlayers[j].y);
 
                                 // send message
                                 server.SendMessage(om, player, NetDeliveryMethod.Unreliable);

@@ -6,8 +6,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameStateManagement;
+using GameStateManagementSample;
 
-namespace GameStateManagementSample
+namespace GameStateManagement.SideScrollGame
 {
 
     class Level : LevelLoader
