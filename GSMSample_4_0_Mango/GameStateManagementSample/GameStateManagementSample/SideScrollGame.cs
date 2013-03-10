@@ -222,7 +222,7 @@ namespace GameStateManagementSample
 
                                     if (player.id != who)
                                     {
-                                        if (otherPlayers != null)
+                                        if (otherPlayers.Count <= 0)
                                         {
                                             if (otherPlayers[who].Equals(who))
                                             {
@@ -232,6 +232,10 @@ namespace GameStateManagementSample
                                             {
                                                 otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
                                             }
+                                        }
+                                        else
+                                        {
+                                            otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
                                         }
                                     }
                                     break;
