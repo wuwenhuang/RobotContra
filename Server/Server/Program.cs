@@ -124,26 +124,26 @@ namespace XnaGameServer
                                         }
                                     }
 
-                                    //foreach (NetConnection player in server.Connections)
-                                    //{
-                                    //    if (msg.SenderConnection.RemoteUniqueIdentifier != player.RemoteUniqueIdentifier)
-                                    //    {
-                                    //        for (int i = 0; i < multiplayerPlayers.Count; i++)
-                                    //        {
-                                    //            NetOutgoingMessage om = server.CreateMessage();
-                                    //            // write who this position is for
-                                    //            om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                                    //            om.Write(multiplayerPlayers[i].id);
-                                    //            om.Write(multiplayerPlayers[i].x);
-                                    //            om.Write(multiplayerPlayers[i].y);
+                                    foreach (NetConnection player in server.Connections)
+                                    {
+                                        if (msg.SenderConnection.RemoteUniqueIdentifier != player.RemoteUniqueIdentifier)
+                                        {
+                                            for (int i = 0; i < multiplayerPlayers.Count; i++)
+                                            {
+                                                NetOutgoingMessage om = server.CreateMessage();
+                                                // write who this position is for
+                                                om.Write((byte)PacketTypes.UPDATEPLAYERS);
+                                                om.Write(multiplayerPlayers[i].id);
+                                                om.Write(multiplayerPlayers[i].x);
+                                                om.Write(multiplayerPlayers[i].y);
 
 
-                                    //            // send message
-                                    //            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
-                                    //        }
-                                    //    }
+                                                // send message
+                                                server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                                            }
+                                        }
 
-                                    //}
+                                    }
                                     break;
                             }
                             
