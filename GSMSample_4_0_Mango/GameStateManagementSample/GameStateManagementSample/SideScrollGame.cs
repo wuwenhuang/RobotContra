@@ -221,8 +221,19 @@ namespace GameStateManagementSample
                                     int y = msg.ReadInt32();
 
                                     if (player.id != who)
-                                        otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
-
+                                    {
+                                        if (otherPlayers != null)
+                                        {
+                                            if (otherPlayers[who].Equals(who))
+                                            {
+                                                otherPlayers[who].position = new Vector2(x, y);
+                                            }
+                                            else
+                                            {
+                                                otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/Enemy/Normal"), new Vector2(x, y));
+                                            }
+                                        }
+                                    }
                                     break;
                             }
                             break;

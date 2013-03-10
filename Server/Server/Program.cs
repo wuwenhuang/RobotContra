@@ -137,7 +137,6 @@ namespace XnaGameServer
                                                 om.Write(multiplayerPlayers[i].x);
                                                 om.Write(multiplayerPlayers[i].y);
 
-
                                                 // send message
                                                 server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
                                             }
