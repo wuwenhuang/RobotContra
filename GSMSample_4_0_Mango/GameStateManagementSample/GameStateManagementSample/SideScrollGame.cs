@@ -138,7 +138,7 @@ namespace GameStateManagement.SideScrollGame
 
                 foreach (var otherplayers in otherPlayers)
                 {
-                    otherplayers.Value.Update(gameTime, _level);
+                    otherplayers.Value.CharacterUpdate(gameTime, _level);
                 }
             }
             

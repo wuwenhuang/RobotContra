@@ -174,6 +174,11 @@ namespace GameStateManagement.SideScrollGame
             base.Update(gameTime, level);  
         }
 
+        public void CharacterUpdate(GameTime gameTime, Level level)
+        {
+            base.Update(gameTime, level);
+        }
+
         public void HandleInput(GamePadState gamePad)
         {
             switch (currentState)
