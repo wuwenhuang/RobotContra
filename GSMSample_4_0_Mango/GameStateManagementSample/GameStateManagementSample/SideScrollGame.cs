@@ -80,12 +80,12 @@ namespace GameStateManagement.SideScrollGame
                 client.Start();
                 client.DiscoverLocalPeers(16868);
 
-                Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerWorldUpdate));
+                Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerUpdate));
                 updateClientsWorld.Start();
 
                 while (player == null)
                 {
-
+                    //getting creating new player
                 }
 
             }
@@ -138,7 +138,7 @@ namespace GameStateManagement.SideScrollGame
 
                 foreach (var otherplayers in otherPlayers)
                 {
-                    otherplayers.Value.Update(gameTime);
+                    otherplayers.Value.Update(gameTime, _level);
                 }
             }
             
@@ -191,7 +191,7 @@ namespace GameStateManagement.SideScrollGame
             this.Reset(currentLevel, level[currentLevel]);
         }
 
-        void getPlayerWorldUpdate()
+        void getPlayerUpdate()
         {
             while (true)
             {
@@ -223,6 +223,8 @@ namespace GameStateManagement.SideScrollGame
                                 case (byte)PacketTypes.UPDATEPLAYERS:
                                     long who = msg.ReadInt64();
                                     CharacterState state = (CharacterState)msg.ReadByte();
+                                    CharacterState laststate = (CharacterState)msg.ReadByte();
+                                    int health = msg.ReadInt32();
                                     int x = msg.ReadInt32();
                                     int y = msg.ReadInt32();
 
@@ -235,6 +237,8 @@ namespace GameStateManagement.SideScrollGame
                                             {
                                                 otherPlayers[who].position = new Vector2(x, y);
                                                 otherPlayers[who].currentState = state;
+                                                otherPlayers[who].lastState = laststate;
+                                                otherPlayers[who].health = health;
                                             }
                                             else
                                             {

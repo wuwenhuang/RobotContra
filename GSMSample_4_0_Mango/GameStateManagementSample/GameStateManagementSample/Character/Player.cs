@@ -163,6 +163,8 @@ namespace GameStateManagement.SideScrollGame
                 {
                     outmessage.Write((byte)PacketTypes.MYPOSITION);
                     outmessage.Write((byte)this.currentState);
+                    outmessage.Write((byte)this.lastState);
+                    outmessage.Write((int)this.health);
                     outmessage.Write((int)this.position.X);
                     outmessage.Write((int)this.position.Y);
                     SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
