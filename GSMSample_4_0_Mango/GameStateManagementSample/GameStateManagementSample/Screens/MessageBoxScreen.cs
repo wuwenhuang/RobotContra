@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using GameStateManagement;
+using Lidgren.Network;
 #endregion
 
 namespace GameStateManagementSample
@@ -120,7 +121,13 @@ namespace GameStateManagementSample
             {
                 // Raise the accepted event, then exit the message box.
                 if (Accepted != null)
+                {
+                    if (GameStateManagement.SideScrollGame.SideScrollGame.main.IsNetwork)
+                    {
+                        GameStateManagement.SideScrollGame.SideScrollGame.main.client.Disconnect("exiting");
+                    }
                     Accepted(this, new PlayerIndexEventArgs(playerIndex));
+                }
 
                 ExitScreen();
             }

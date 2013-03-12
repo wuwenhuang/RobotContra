@@ -15,6 +15,7 @@ namespace GameStateManagement.SideScrollGame
     public enum PacketTypes
     {
         CREATEPLAYER,
+        DELETEPLAYER,
         MYPOSITION,
         UPDATEPLAYERS
     };
@@ -203,6 +204,7 @@ namespace GameStateManagement.SideScrollGame
                         case NetIncomingMessageType.DiscoveryResponse:
                             // just connect to first server discovered
                             client.Connect(msg.SenderEndPoint);
+                            
                             break;
 
                         case NetIncomingMessageType.Data:
@@ -218,6 +220,26 @@ namespace GameStateManagement.SideScrollGame
                                     {
                                         player = new Player(id, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(xPos, yPos));
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.DELETEPLAYER:
+                                    long deleteID = msg.ReadInt64();
+
+                                    if (player.id == deleteID)
+                                    {
+                                        player = null;
+                                    }
+                                    else
+                                    {
+                                        if (otherPlayers.Count > 0)
+                                        {
+                                            if (otherPlayers[deleteID].id.Equals(deleteID))
+                                            {
+                                                otherPlayers.Remove(deleteID);
+                                            }
+                                        }
+                                    }
+
                                     break;
 
                                 case (byte)PacketTypes.UPDATEPLAYERS:

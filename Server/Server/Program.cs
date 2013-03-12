@@ -10,6 +10,7 @@ namespace XnaGameServer
     enum PacketTypes
     {
         CREATEPLAYER,
+        DELETEPLAYER,
         MYPOSITION,
         UPDATEPLAYERS,
       
@@ -131,6 +132,36 @@ namespace XnaGameServer
                                     }
                                 }
                             }
+                            else if (status == NetConnectionStatus.Disconnected || status == NetConnectionStatus.Disconnecting)
+                            {
+                                Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " DISCONNECTED FROM SERVER!");
+
+                                for (int i = 0; i < multiplayerPlayers.Count; i++)
+                                {
+                                    if (multiplayerPlayers[i].id == msg.SenderConnection.RemoteUniqueIdentifier)
+                                    {
+
+                                        if (deletePlayerFromServer(msg.SenderConnection.RemoteUniqueIdentifier))
+                                        {
+                                            Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " DELETED!");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " IS NOT EXIST!");
+                                        }
+
+                                        foreach (NetConnection player in server.Connections)
+                                        {
+                                            NetOutgoingMessage outMessage = server.CreateMessage();
+                                            outMessage.Write((byte)PacketTypes.DELETEPLAYER);
+                                            outMessage.Write((long)multiplayerPlayers[i].id);
+
+                                            server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
 
                             break;
                         case NetIncomingMessageType.Data:
@@ -170,6 +201,19 @@ namespace XnaGameServer
             }
 
             server.Shutdown("app exiting");
+        }
+
+        static bool deletePlayerFromServer(long id)
+        {
+            for (int i = 0; i < multiplayerPlayers.Count; i++)
+            {
+                if (multiplayerPlayers[i].id.Equals(id))
+                {
+                    multiplayerPlayers.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
         }
 
         static void writeClientsUpdate()
