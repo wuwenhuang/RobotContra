@@ -154,7 +154,7 @@ namespace XnaGameServer
                                         {
                                             NetOutgoingMessage outMessage = server.CreateMessage();
                                             outMessage.Write((byte)PacketTypes.DELETEPLAYER);
-                                            outMessage.Write((long)multiplayerPlayers[i].id);
+                                            outMessage.Write((long)msg.SenderConnection.RemoteUniqueIdentifier);
 
                                             server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         }

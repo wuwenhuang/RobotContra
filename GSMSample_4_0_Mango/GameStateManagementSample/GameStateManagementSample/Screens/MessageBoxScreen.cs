@@ -122,6 +122,7 @@ namespace GameStateManagementSample
                 // Raise the accepted event, then exit the message box.
                 if (Accepted != null)
                 {
+                    GameStateManagement.SideScrollGame.SideScrollGame.main.player = null;
                     if (GameStateManagement.SideScrollGame.SideScrollGame.main.IsNetwork)
                     {
                         GameStateManagement.SideScrollGame.SideScrollGame.main.client.Disconnect("exiting");
