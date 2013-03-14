@@ -10,6 +10,7 @@ namespace XnaGameServer
     enum PacketTypes
     {
         CREATEPLAYER,
+        GETNUMBEROFPLAYERS,
         DELETEPLAYER,
         MYPOSITION,
         UPDATEPLAYERS,
@@ -187,42 +188,22 @@ namespace XnaGameServer
                                             break;
                                         }
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.GETNUMBEROFPLAYERS:
+                                    NetOutgoingMessage msgOut = server.CreateMessage();
+
+                                    msgOut.Write((byte)PacketTypes.GETNUMBEROFPLAYERS);
+                                    msgOut.Write((short)multiplayerPlayers.Count);
+                                    server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                                     break;
                             }
-                            
                             break;
                     }
 
                 }
 
-                // sleep to allow other processes to run smoothly
-                Thread.Sleep(1);
-            }
-
-            server.Shutdown("app exiting");
-        }
-
-        static bool deletePlayerFromServer(long id)
-        {
-            for (int i = 0; i < multiplayerPlayers.Count; i++)
-            {
-                if (multiplayerPlayers[i].id.Equals(id))
-                {
-                    multiplayerPlayers.RemoveAt(i);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        static void writeClientsUpdate()
-        {
-            ////
-            //// send position updates 60 times per second
-            ////
-            while (true)
-            {
                 double now = NetTime.Now;
                 if (now > nextSendUpdates)
                 {
@@ -256,6 +237,34 @@ namespace XnaGameServer
                     // schedule next update
                     nextSendUpdates += (1.0 / 60.0);
                 }
+                // sleep to allow other processes to run smoothly
+                Thread.Sleep(1);
+            }
+
+            server.Shutdown("app exiting");
+        }
+
+        static bool deletePlayerFromServer(long id)
+        {
+            for (int i = 0; i < multiplayerPlayers.Count; i++)
+            {
+                if (multiplayerPlayers[i].id.Equals(id))
+                {
+                    multiplayerPlayers.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static void writeClientsUpdate()
+        {
+            ////
+            //// send position updates 60 times per second
+            ////
+            while (true)
+            {
+                
             }
         }
     }

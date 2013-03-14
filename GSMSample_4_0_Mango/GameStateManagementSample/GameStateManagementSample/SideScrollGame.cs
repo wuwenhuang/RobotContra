@@ -9,12 +9,14 @@ using GameStateManagement;
 using Microsoft.Xna.Framework.Input;
 using Lidgren.Network;
 using GameStateManagementSample;
+using System.Net;
 
 namespace GameStateManagement.SideScrollGame
 {
     public enum PacketTypes
     {
         CREATEPLAYER,
+        GETNUMBEROFPLAYERS,
         DELETEPLAYER,
         MYPOSITION,
         UPDATEPLAYERS
@@ -70,11 +72,14 @@ namespace GameStateManagement.SideScrollGame
                 {
                     player = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(10, 350));
                 }
+
+                Awake();
             }
             else
             {
 
                 NetPeerConfiguration config = new NetPeerConfiguration("robotcontra");
+                //config.LocalAddress = IPAddress.Parse("10.60.233.59"); // disable if there is firewall
                 config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
 
                 client = new NetClient(config);
@@ -88,9 +93,9 @@ namespace GameStateManagement.SideScrollGame
                 {
                     //getting creating new player
                 }
+                NetworkAwake();
 
             }
-            Awake();
         }
 
         public static Vector2 GRAVITY { get { return new Vector2(0, -9.8f); } }
@@ -135,11 +140,23 @@ namespace GameStateManagement.SideScrollGame
             }
             else
             {
-                player.Update(gameTime, _level);
-
-                foreach (var otherplayers in otherPlayers)
+                if (player != null)
                 {
-                    otherplayers.Value.CharacterUpdate(gameTime, _level);
+                    player.Update(gameTime, _level);
+
+                    foreach (var otherplayers in otherPlayers)
+                    {
+                        otherplayers.Value.CharacterUpdate(gameTime, _level);
+                    }
+
+                    if (player.currentState == CharacterState.DEAD)
+                    {
+                        gameOver = true;
+                    }
+                    else
+                    {
+                        _level.Update(gameTime, player);
+                    }
                 }
             }
             
@@ -188,6 +205,24 @@ namespace GameStateManagement.SideScrollGame
                 gameplay.ScreenManager.GraphicsDevice.Viewport.Height);
 
             gameOver = false;
+
+            this.Reset(currentLevel, level[currentLevel]);
+        }
+
+        void NetworkAwake()
+        {
+            if (player != null)
+                _level = new Level(player);
+            _camera = new Camera2D();
+
+            _camera.setSize(gameplay.ScreenManager.GraphicsDevice.Viewport.Width,
+                gameplay.ScreenManager.GraphicsDevice.Viewport.Height);
+
+            NetOutgoingMessage msg = client.CreateMessage();
+
+            msg.Write((byte)PacketTypes.GETNUMBEROFPLAYERS);
+
+            client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
 
             this.Reset(currentLevel, level[currentLevel]);
         }
@@ -250,7 +285,7 @@ namespace GameStateManagement.SideScrollGame
                                     int x = msg.ReadInt32();
                                     int y = msg.ReadInt32();
 
-                                    if (player.id != who)
+                                    if (player != null && player.id != who)
                                     {
                                         if (otherPlayers.Count > 0)
                                         {
@@ -272,6 +307,22 @@ namespace GameStateManagement.SideScrollGame
                                             otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                                         }
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.GETNUMBEROFPLAYERS:
+
+                                    int numberOfPlayers = msg.ReadInt16();
+
+                                    if (numberOfPlayers <= 1)
+                                    {
+                                        _camera.setPosition(Vector2.Zero);
+                                    }
+
+                                    else
+                                    {
+                                        _camera.setPosition(new Vector2(player.position.X + player.SourceRect.Width - _camera.rect.Width / 2, 0));
+                                    }
+
                                     break;
                             }
                             break;
