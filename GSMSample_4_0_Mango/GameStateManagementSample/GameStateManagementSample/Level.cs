@@ -110,22 +110,25 @@ namespace GameStateManagement.SideScrollGame
                 Camera2D.main.setPosition(new Vector2(player.position.X + player.SourceRect.Width - Camera2D.main.rect.Width / 2, 0));
             }
 
-            if (enemiesLevel != null)
+            if (SideScrollGame.main.IsNetwork == false)
             {
-                for (int i=0; i < enemiesLevel.Count; i++)
+                if (enemiesLevel != null)
                 {
-                    if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
-                        enemiesLevel[i].setAlive(true);
-
-                    if (enemiesLevel[i].Alive)
+                    for (int i = 0; i < enemiesLevel.Count; i++)
                     {
-                        enemiesLevel[i].Update(gameTime, this);
-                    }
+                        if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
+                            enemiesLevel[i].setAlive(true);
 
-                    if (enemiesLevel[i].Texture == null)
-                    {
-                        enemiesLevel.RemoveAt(i);
-                        break;
+                        if (enemiesLevel[i].Alive)
+                        {
+                            enemiesLevel[i].Update(gameTime, this);
+                        }
+
+                        if (enemiesLevel[i].Texture == null)
+                        {
+                            enemiesLevel.RemoveAt(i);
+                            break;
+                        }
                     }
                 }
             }
