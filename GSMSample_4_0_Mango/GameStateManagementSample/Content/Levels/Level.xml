@@ -61,8 +61,7 @@
       <layout>
         <row>SSS</row>
         <row>211E</row>
-        <row> N NN NN</row>
-        <row>  N NN NNNN</row>
+        <row>   NN</row>
         <row>RRR</row>
       </layout>
 
@@ -74,16 +73,8 @@
       <layout>
         <row>SSSSSSSSSS</row>
         <row>1221221212E</row>
-        <row> N N NNNNNNN  NNNNNN</row>
-        <row>  N NN NNNN NN NNNN NN</row>
-        <row> N NN NN  NNN N NNNNN NNN N</row>
-        <row>  N NN NNNN NNN NNNNN NNNNN NNN</row>
-        <row> N NN NNNNNN NNN NNNNN NNNN NNN</row>
-        <row> NN NNNNNNNNN NNN NNNN NNNN   NN N</row>
-        <row> N NN NNNN                  NN NN N</row>
-        <row> NN NNNNNNN        N NNNN NNN NNNN N</row>
-        <row> N NN NN  N    N NNN NNN NNN NNN NN N</row>
-        <row> NN NN NNNN N                       N</row>
+        <row>         NN</row>
+        <row>  N  N</row>
         <row>RRRRRRRRRR</row>
       </layout>
       

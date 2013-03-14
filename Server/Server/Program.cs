@@ -12,6 +12,11 @@ namespace XnaGameServer
         CREATEPLAYER,
         GETNUMBEROFPLAYERS,
         DELETEPLAYER,
+
+        WRITELEVEL,
+        GETLEVEL,
+        GETSERVERLEVEL,
+
         MYPOSITION,
         UPDATEPLAYERS,
       
@@ -53,6 +58,8 @@ namespace XnaGameServer
 
         static double nextSendUpdates;
         static NetServer server;
+
+        static int level;
 
         static void Main(string[] args)
         {
@@ -197,6 +204,18 @@ namespace XnaGameServer
                                     msgOut.Write((short)multiplayerPlayers.Count);
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
+                                    break;
+
+                                case (byte)PacketTypes.WRITELEVEL:
+                                    level = msg.ReadInt16();
+                                    break;
+
+                                case (byte)PacketTypes.GETSERVERLEVEL:
+                                    msgOut = server.CreateMessage();
+
+                                    msgOut.Write((byte)PacketTypes.GETLEVEL);
+                                    msgOut.Write((short)level);
+                                    server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
                                     break;
                             }
                             break;

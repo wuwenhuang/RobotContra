@@ -18,8 +18,13 @@ namespace GameStateManagement.SideScrollGame
         CREATEPLAYER,
         GETNUMBEROFPLAYERS,
         DELETEPLAYER,
+
+        WRITELEVEL,
+        GETLEVEL,
+        GETSERVERLEVEL,
+
         MYPOSITION,
-        UPDATEPLAYERS
+        UPDATEPLAYERS,
     };
 
     class SideScrollGame
@@ -211,6 +216,8 @@ namespace GameStateManagement.SideScrollGame
 
         void NetworkAwake()
         {
+            currentLevel = -1;
+
             if (player != null)
                 _level = new Level(player);
             _camera = new Camera2D();
@@ -223,6 +230,10 @@ namespace GameStateManagement.SideScrollGame
             msg.Write((byte)PacketTypes.GETNUMBEROFPLAYERS);
 
             client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+
+            while (currentLevel < 0)
+            {
+            }
 
             this.Reset(currentLevel, level[currentLevel]);
         }
@@ -315,13 +326,30 @@ namespace GameStateManagement.SideScrollGame
 
                                     if (numberOfPlayers <= 1)
                                     {
+                                        currentLevel = 1;
                                         _camera.setPosition(Vector2.Zero);
+
+                                        NetOutgoingMessage msgOut = client.CreateMessage();
+
+                                        msgOut.Write((byte)PacketTypes.WRITELEVEL);
+                                        msgOut.Write((short)currentLevel);
+                                        client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                                     }
 
                                     else
                                     {
                                         _camera.setPosition(new Vector2(player.position.X + player.SourceRect.Width - _camera.rect.Width / 2, 0));
+
+                                        NetOutgoingMessage msgOut = client.CreateMessage();
+
+                                        msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
+                                        client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.GETLEVEL:
+                                    int level = msg.ReadInt16();
+                                    currentLevel = level;
 
                                     break;
                             }
