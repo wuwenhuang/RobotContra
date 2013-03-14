@@ -110,8 +110,8 @@ namespace GameStateManagement.SideScrollGame
                 Camera2D.main.setPosition(new Vector2(player.position.X + player.SourceRect.Width - Camera2D.main.rect.Width / 2, 0));
             }
 
-            if (SideScrollGame.main.IsNetwork == false)
-            {
+            //if (SideScrollGame.main.IsNetwork == false)
+            //{
                 if (enemiesLevel != null)
                 {
                     for (int i = 0; i < enemiesLevel.Count; i++)
@@ -131,7 +131,7 @@ namespace GameStateManagement.SideScrollGame
                         }
                     }
                 }
-            }
+            //}
 
         }
         

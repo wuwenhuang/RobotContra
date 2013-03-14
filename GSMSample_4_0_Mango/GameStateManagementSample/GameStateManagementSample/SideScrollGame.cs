@@ -137,11 +137,6 @@ namespace GameStateManagement.SideScrollGame
                     player.Update(gameTime, _level);
                 }
 
-                if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
-                {
-                    currentLevel += 1;
-                    this.Reset(currentLevel, level[currentLevel]);
-                }
             }
             else
             {
@@ -163,6 +158,22 @@ namespace GameStateManagement.SideScrollGame
                         _level.Update(gameTime, player);
                     }
                 }
+            }
+
+            if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
+            {
+                currentLevel += 1;
+
+                if (_isNetwork)
+                {
+                    NetOutgoingMessage msgOut = client.CreateMessage();
+
+                    msgOut.Write((byte)PacketTypes.WRITELEVEL);
+                    msgOut.Write((short)currentLevel);
+                    client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+                }
+
+                this.Reset(currentLevel, level[currentLevel]);
             }
             
         }
