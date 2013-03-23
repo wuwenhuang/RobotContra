@@ -395,15 +395,26 @@ namespace GameStateManagement.SideScrollGame
                                     int level = msg.ReadInt16();
                                     currentLevel = level;
 
+                                    this.Reset(currentLevel, this.level[currentLevel]);
+
                                     int enemiesInLevel = msg.ReadInt16();
 
                                     for (int i = 0; i < enemiesInLevel; i++)
                                     {
+                                        
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].health = msg.ReadInt16();
                                         _level.enemiesLevel[i].position.X = msg.ReadInt32();
                                         _level.enemiesLevel[i].position.Y = msg.ReadInt32();
+                                    }
+
+                                    if (enemiesInLevel < _level.enemiesLevel.Count)
+                                    {
+                                        for (int deleteEnemies = enemiesInLevel; deleteEnemies < _level.enemiesLevel.Count; deleteEnemies++)
+                                        {
+                                            _level.enemiesLevel.RemoveAt(deleteEnemies);
+                                        }
                                     }
                                     break;
 
