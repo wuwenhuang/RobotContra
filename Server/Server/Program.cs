@@ -45,12 +45,10 @@ namespace XnaGameServer
         public CharacterState state;
         public CharacterState lastState;
         public int health;
-        private int maxHealth = 500;
 
         public MultiplayerPlayers(long id)
         {
             this.id = id;
-            this.health = maxHealth;
         }
     };
 
@@ -181,6 +179,9 @@ namespace XnaGameServer
                                 case (byte)PacketTypes.MYPOSITION:
                                     CharacterState state = (CharacterState)msg.ReadByte();
                                     CharacterState laststate = (CharacterState)msg.ReadByte();
+                                    int health = msg.ReadInt32();
+                                    int xPosition = msg.ReadInt32();
+                                    int yPosition = msg.ReadInt32();
 
                                     foreach (MultiplayerPlayers players in multiplayerPlayers)
                                     {
@@ -188,6 +189,9 @@ namespace XnaGameServer
                                         {
                                             players.state = state;
                                             players.lastState = laststate;
+                                            players.health = health;
+                                            players.x = xPosition;
+                                            players.y = yPosition;
                                             break;
                                         }
                                     }
