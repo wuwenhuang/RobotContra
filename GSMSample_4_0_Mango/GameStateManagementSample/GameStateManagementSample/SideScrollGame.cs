@@ -25,6 +25,10 @@ namespace GameStateManagement.SideScrollGame
 
         MYPOSITION,
         UPDATEPLAYERS,
+
+        UPDATEENEMYPOSITION,
+        SENDENEMYPOSITIONS,
+        GETSERVERENEMYPOSITIONS
     };
 
     class SideScrollGame
@@ -35,6 +39,7 @@ namespace GameStateManagement.SideScrollGame
         private Camera2D _camera;
 
         public Player player;
+        public bool isHost;
         public Dictionary<long, Player> otherPlayers = new Dictionary<long, Player>();
 
         public bool gameOver = false;
@@ -73,6 +78,7 @@ namespace GameStateManagement.SideScrollGame
 
             if (_isNetwork == false)
             {
+                isHost = true;
                 if (color == PlayerColor.BLUE)
                 {
                     player = new Player(gameplay.content.Load<Texture2D>("Character/player"), new Vector2(10, 350));
@@ -164,16 +170,29 @@ namespace GameStateManagement.SideScrollGame
             {
                 currentLevel += 1;
 
-                if (_isNetwork)
+                if (_isNetwork && isHost)
                 {
+                    this.Reset(currentLevel, level[currentLevel]);
+
                     NetOutgoingMessage msgOut = client.CreateMessage();
 
                     msgOut.Write((byte)PacketTypes.WRITELEVEL);
                     msgOut.Write((short)currentLevel);
+                    msgOut.Write((short)_level.enemiesLevel.Count);
+
+                    foreach (Enemy enemy in _level.enemiesLevel)
+                    {
+                        msgOut.Write((byte)enemy.currentState);
+                        msgOut.Write((byte)enemy.lastState);
+                        msgOut.Write((short)enemy.health);
+                        msgOut.Write((int)enemy.position.X);
+                        msgOut.Write((int)enemy.position.Y);
+                    }
+
                     client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                 }
 
-                this.Reset(currentLevel, level[currentLevel]);
+                
             }
             
         }
@@ -246,7 +265,6 @@ namespace GameStateManagement.SideScrollGame
             {
             }
 
-            this.Reset(currentLevel, level[currentLevel]);
         }
 
         void getPlayerUpdate()
@@ -340,6 +358,10 @@ namespace GameStateManagement.SideScrollGame
                                         currentLevel = 1;
                                         _camera.setPosition(Vector2.Zero);
 
+                                        isHost = true;
+
+                                        this.Reset(currentLevel, this.level[currentLevel]);
+
                                         NetOutgoingMessage msgOut = client.CreateMessage();
 
                                         msgOut.Write((byte)PacketTypes.WRITELEVEL);
@@ -360,6 +382,8 @@ namespace GameStateManagement.SideScrollGame
                                     {
                                         _camera.setPosition(new Vector2(player.position.X + player.SourceRect.Width - _camera.rect.Width / 2, 0));
 
+                                        isHost = false;
+
                                         NetOutgoingMessage msgOut = client.CreateMessage();
 
                                         msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
@@ -374,6 +398,19 @@ namespace GameStateManagement.SideScrollGame
                                     int enemiesInLevel = msg.ReadInt16();
 
                                     for (int i = 0; i < enemiesInLevel; i++)
+                                    {
+                                        _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].health = msg.ReadInt16();
+                                        _level.enemiesLevel[i].position.X = msg.ReadInt32();
+                                        _level.enemiesLevel[i].position.Y = msg.ReadInt32();
+                                    }
+                                    break;
+
+                                case (byte)PacketTypes.SENDENEMYPOSITIONS:
+                                    int enemiesLevel = msg.ReadInt16();
+
+                                    for (int i = 0; i < enemiesLevel; i++)
                                     {
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();

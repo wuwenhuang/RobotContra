@@ -19,7 +19,10 @@ namespace XnaGameServer
 
         MYPOSITION,
         UPDATEPLAYERS,
-      
+
+        UPDATEENEMYPOSITION,
+        SENDENEMYPOSITIONS,
+        GETSERVERENEMYPOSITIONS
     };
 
     enum CharacterState
@@ -232,6 +235,37 @@ namespace XnaGameServer
 
                                     }
 
+
+                                    break;
+
+                                case (byte)PacketTypes.UPDATEENEMYPOSITION:
+                                    int enemyInLevel = msg.ReadInt16();
+                                    for (int i = 0; i < enemyInLevel; i++)
+                                    {
+                                        enemies[i].state = (CharacterState)msg.ReadByte();
+                                        enemies[i].lastState = (CharacterState)msg.ReadByte();
+                                        enemies[i].health = msg.ReadInt16();
+                                        enemies[i].x = msg.ReadInt32();
+                                        enemies[i].y = msg.ReadInt32();
+
+                                    }
+                                    break;
+
+                                case (byte)PacketTypes.GETSERVERENEMYPOSITIONS:
+                                    msgOut = server.CreateMessage();
+
+                                    msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
+                                    msgOut.Write((short)enemies.Count);
+
+                                    for (int i = 0; i < enemies.Count; i++)
+                                    {
+                                        msgOut.Write((byte)enemies[i].state);
+                                        msgOut.Write((byte)enemies[i].lastState);
+                                        msgOut.Write((short)enemies[i].health);
+                                        msgOut.Write((int)enemies[i].x);
+                                        msgOut.Write((int)enemies[i].y);
+                                    }
+                                    server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                                     break;
 

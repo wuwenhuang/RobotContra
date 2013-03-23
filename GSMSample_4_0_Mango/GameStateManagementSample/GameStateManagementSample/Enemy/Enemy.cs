@@ -140,6 +140,11 @@ namespace GameStateManagement.SideScrollGame
             base.Update(gameTime, level);
         }
 
+        public void GetEnemyUpdate(GameTime gameTime, Level level)
+        {
+            base.Update(gameTime, level);
+        }
+
     }
     #endregion
 

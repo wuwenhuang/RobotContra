@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameStateManagement;
 using GameStateManagementSample;
+using Lidgren.Network;
 
 namespace GameStateManagement.SideScrollGame
 {
@@ -110,28 +111,51 @@ namespace GameStateManagement.SideScrollGame
                 Camera2D.main.setPosition(new Vector2(player.position.X + player.SourceRect.Width - Camera2D.main.rect.Width / 2, 0));
             }
 
-            //if (SideScrollGame.main.IsNetwork == false)
-            //{
-                if (enemiesLevel != null)
+            if (enemiesLevel != null)
+            {
+                for (int i = 0; i < enemiesLevel.Count; i++)
                 {
-                    for (int i = 0; i < enemiesLevel.Count; i++)
+                    if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
+                        enemiesLevel[i].setAlive(true);
+
+                    if (enemiesLevel[i].Alive)
                     {
-                        if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
-                            enemiesLevel[i].setAlive(true);
-
-                        if (enemiesLevel[i].Alive)
-                        {
+                        if (SideScrollGame.main.isHost)
                             enemiesLevel[i].Update(gameTime, this);
-                        }
+                    }
 
-                        if (enemiesLevel[i].Texture == null)
-                        {
-                            enemiesLevel.RemoveAt(i);
-                            break;
-                        }
+                    if (enemiesLevel[i].Texture == null)
+                    {
+                        enemiesLevel.RemoveAt(i);
+                        break;
                     }
                 }
-            //}
+            }
+            if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost)
+            {
+                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                outMsg.Write((byte)PacketTypes.UPDATEENEMYPOSITION);
+                outMsg.Write((short)enemiesLevel.Count);
+
+                foreach (Enemy enemy in enemiesLevel)
+                {
+                    outMsg.Write((byte)enemy.currentState);
+                    outMsg.Write((byte)enemy.lastState);
+                    outMsg.Write((short)enemy.health);
+                    outMsg.Write((int)enemy.position.X);
+                    outMsg.Write((int)enemy.position.Y);
+                }
+                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+            }
+            else
+            {
+                NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
+                msgOut.Write((byte)PacketTypes.GETSERVERENEMYPOSITIONS);
+                SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+            }
+
 
         }
         
