@@ -157,6 +157,20 @@ namespace GameStateManagement.SideScrollGame
                 }
             }
 
+            if (SideScrollGame.main.IsNetwork)
+            {
+                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+                {
+                    outmessage.Write((byte)PacketTypes.MYPOSITION);
+                    outmessage.Write((byte)this.currentState);
+                    outmessage.Write((byte)this.lastState);
+                    outmessage.Write((int)this.health);
+                    outmessage.Write((int)this.position.X);
+                    outmessage.Write((int)this.position.Y);
+                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
+                }
+            }
+
             base.Update(gameTime, level);  
         }
 
@@ -298,16 +312,6 @@ namespace GameStateManagement.SideScrollGame
                         }
                     }
                     break;
-            }
-            if (SideScrollGame.main.IsNetwork)
-            {
-                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-                {
-                    outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write((byte)this.currentState);
-                    outmessage.Write((byte)this.lastState);
-                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-                }
             }
         }
 
@@ -467,16 +471,6 @@ namespace GameStateManagement.SideScrollGame
                         }
                     }
                     break;
-            }
-            if (SideScrollGame.main.IsNetwork)
-            {
-                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-                {
-                    outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write((byte)this.currentState);
-                    outmessage.Write((byte)this.lastState);
-                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-                }
             }
         }
 
