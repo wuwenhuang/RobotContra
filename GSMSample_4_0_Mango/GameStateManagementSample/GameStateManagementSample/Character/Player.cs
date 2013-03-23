@@ -58,20 +58,6 @@ namespace GameStateManagement.SideScrollGame
 
         public override void Update(GameTime gameTime, Level level)
         {
-            UpdatePosition(gameTime, level);
-
-            base.Update(gameTime, level);  
-        }
-
-        public void CharacterUpdate(GameTime gameTime, Level level)
-        {
-            UpdatePosition(gameTime, level);
-
-            base.Update(gameTime, level);
-        }
-
-        private void UpdatePosition(GameTime gameTime, Level level)
-        {
             if (currentState != CharacterState.DEAD)
             {
                 switch (currentState)
@@ -185,6 +171,12 @@ namespace GameStateManagement.SideScrollGame
                 }
             }
 
+            base.Update(gameTime, level);  
+        }
+
+        public void CharacterUpdate(GameTime gameTime, Level level)
+        {
+            base.Update(gameTime, level);
         }
 
         public void HandleInput(GamePadState gamePad)

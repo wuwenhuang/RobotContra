@@ -344,6 +344,15 @@ namespace GameStateManagement.SideScrollGame
 
                                         msgOut.Write((byte)PacketTypes.WRITELEVEL);
                                         msgOut.Write((short)currentLevel);
+                                        msgOut.Write((short)_level.enemiesLevel.Count);
+                                        foreach (Enemy enemy in _level.enemiesLevel)
+                                        {
+                                            msgOut.Write((byte)enemy.currentState);
+                                            msgOut.Write((byte)enemy.lastState);
+                                            msgOut.Write((int)enemy.health);
+                                            msgOut.Write((int)enemy.position.X);
+                                            msgOut.Write((int)enemy.position.Y);
+                                        }
                                         client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                                     }
 
@@ -361,6 +370,17 @@ namespace GameStateManagement.SideScrollGame
                                 case (byte)PacketTypes.GETLEVEL:
                                     int level = msg.ReadInt16();
                                     currentLevel = level;
+
+                                    int enemiesInLevel = msg.ReadInt16();
+
+                                    for (int i = 0; i < enemiesInLevel; i++)
+                                    {
+                                        _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].health = msg.ReadInt16();
+                                        _level.enemiesLevel[i].position.X = msg.ReadInt32();
+                                        _level.enemiesLevel[i].position.Y = msg.ReadInt32();
+                                    }
 
                                     break;
                             }
