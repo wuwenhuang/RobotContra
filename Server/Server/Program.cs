@@ -243,6 +243,7 @@ namespace XnaGameServer
                                                 NetOutgoingMessage outMsg = server.CreateMessage();
 
                                                 outMsg.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
+                                                outMsg.Write((short)multiplayerPlayers[i].id);
                                                 outMsg.Write((float)multiplayerPlayers[i].velocityX);
                                                 outMsg.Write((float)multiplayerPlayers[i].velocityY);
 

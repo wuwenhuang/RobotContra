@@ -321,6 +321,24 @@ namespace GameStateManagement.SideScrollGame
 
                                     break;
 
+                                case (byte)PacketTypes.SENDUPDATEVELOCITY:
+                                    long updateVelocityWho = msg.ReadInt64();
+                                    float velocityX = msg.ReadFloat();
+                                    float velocityY = msg.ReadFloat();
+
+                                    if (player != null && player.id != updateVelocityWho)
+                                    {
+                                        if (otherPlayers.Count > 0)
+                                        {
+                                            if (otherPlayers[updateVelocityWho].id.Equals(updateVelocityWho))
+                                            {
+                                                otherPlayers[updateVelocityWho].velocity.X = velocityX;
+                                                otherPlayers[updateVelocityWho].velocity.Y = velocityY;
+                                            }
+                                        }
+                                    }
+                                    break;
+
                                 case (byte)PacketTypes.UPDATEPLAYERS:
                                     long who = msg.ReadInt64();
                                     CharacterState state = (CharacterState)msg.ReadByte();
