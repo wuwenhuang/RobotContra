@@ -247,11 +247,15 @@ namespace XnaGameServer
                                     int enemyInLevel = msg.ReadInt16();
                                     for (int i = 0; i < enemyInLevel; i++)
                                     {
-                                        enemies[i].state = (CharacterState)msg.ReadByte();
-                                        enemies[i].lastState = (CharacterState)msg.ReadByte();
-                                        enemies[i].health = msg.ReadInt16();
-                                        enemies[i].x = msg.ReadInt32();
-                                        enemies[i].y = msg.ReadInt32();
+                                        int readHealth = msg.ReadInt16();
+                                        if (readHealth > 0)
+                                        {
+                                            enemies[i].state = (CharacterState)msg.ReadByte();
+                                            enemies[i].lastState = (CharacterState)msg.ReadByte();
+                                            enemies[i].health = readHealth;
+                                            enemies[i].x = msg.ReadInt32();
+                                            enemies[i].y = msg.ReadInt32();
+                                        }
 
                                     }
                                     break;

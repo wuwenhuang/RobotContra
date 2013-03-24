@@ -149,9 +149,10 @@ namespace GameStateManagement.SideScrollGame
                 {
                     if (enemy.health > 0)
                     {
+                        outMsg.Write((short)enemy.health);
                         outMsg.Write((byte)enemy.currentState);
                         outMsg.Write((byte)enemy.lastState);
-                        outMsg.Write((short)enemy.health);
+                        
                         outMsg.Write((int)enemy.position.X);
                         outMsg.Write((int)enemy.position.Y);
                     }
