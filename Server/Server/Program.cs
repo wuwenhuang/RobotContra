@@ -45,7 +45,7 @@ namespace XnaGameServer
     class MultiplayerPlayers
     {
         public long id;
-        public int x,y;
+        public float x,y;
         public CharacterState state;
         public CharacterState lastState;
         public int health;
@@ -58,7 +58,7 @@ namespace XnaGameServer
 
     class Enemy
     {
-        public int x,y;
+        public float x,y;
         public CharacterState state;
         public CharacterState lastState;
         public int health;
@@ -151,8 +151,8 @@ namespace XnaGameServer
                                         NetOutgoingMessage outMessage = server.CreateMessage();
                                         outMessage.Write((byte)PacketTypes.CREATEPLAYER);
                                         outMessage.Write((long)multiplayerPlayers[i].id);
-                                        outMessage.Write((int)multiplayerPlayers[i].x);
-                                        outMessage.Write((int)multiplayerPlayers[i].y);
+                                        outMessage.Write((float)multiplayerPlayers[i].x);
+                                        outMessage.Write((float)multiplayerPlayers[i].y);
                                         server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         break;
                                     }
@@ -198,8 +198,8 @@ namespace XnaGameServer
                                     CharacterState state = (CharacterState)msg.ReadByte();
                                     CharacterState laststate = (CharacterState)msg.ReadByte();
                                     int health = msg.ReadInt32();
-                                    int xPosition = msg.ReadInt32();
-                                    int yPosition = msg.ReadInt32();
+                                    float xPosition = msg.ReadFloat();
+                                    float yPosition = msg.ReadFloat();
 
                                     foreach (MultiplayerPlayers players in multiplayerPlayers)
                                     {
@@ -234,8 +234,8 @@ namespace XnaGameServer
                                         tempEnemy.state = (CharacterState)msg.ReadByte();
                                         tempEnemy.lastState = (CharacterState)msg.ReadByte();
                                         tempEnemy.health = msg.ReadInt32();
-                                        tempEnemy.x = msg.ReadInt32();
-                                        tempEnemy.y = msg.ReadInt32();
+                                        tempEnemy.x = msg.ReadFloat();
+                                        tempEnemy.y = msg.ReadFloat();
                                         enemies.Add(tempEnemy);
 
                                     }
@@ -253,8 +253,8 @@ namespace XnaGameServer
                                             enemies[i].state = (CharacterState)msg.ReadByte();
                                             enemies[i].lastState = (CharacterState)msg.ReadByte();
                                             enemies[i].health = readHealth;
-                                            enemies[i].x = msg.ReadInt32();
-                                            enemies[i].y = msg.ReadInt32();
+                                            enemies[i].x = msg.ReadFloat();
+                                            enemies[i].y = msg.ReadFloat();
                                         }
                                         else
                                         {
@@ -284,8 +284,8 @@ namespace XnaGameServer
                                             msgOut.Write((byte)enemies[i].state);
                                             msgOut.Write((byte)enemies[i].lastState);
                                             msgOut.Write((short)enemies[i].health);
-                                            msgOut.Write((int)enemies[i].x);
-                                            msgOut.Write((int)enemies[i].y);
+                                            msgOut.Write((float)enemies[i].x);
+                                            msgOut.Write((float)enemies[i].y);
                                         }
                                         else
                                         {
@@ -308,8 +308,8 @@ namespace XnaGameServer
                                         msgOut.Write((byte)enemies[i].state);
                                         msgOut.Write((byte)enemies[i].lastState);
                                         msgOut.Write((short)enemies[i].health);
-                                        msgOut.Write((int)enemies[i].x);
-                                        msgOut.Write((int)enemies[i].y);
+                                        msgOut.Write((float)enemies[i].x);
+                                        msgOut.Write((float)enemies[i].y);
 
                                     }
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
@@ -341,8 +341,8 @@ namespace XnaGameServer
                             om.Write((byte)multiplayerPlayers[j].state);
                             om.Write((byte)multiplayerPlayers[j].lastState);
                             om.Write((int)multiplayerPlayers[j].health);
-                            om.Write((int)multiplayerPlayers[j].x);
-                            om.Write((int)multiplayerPlayers[j].y);
+                            om.Write((float)multiplayerPlayers[j].x);
+                            om.Write((float)multiplayerPlayers[j].y);
 
                             // send message
                             server.SendMessage(om, player, NetDeliveryMethod.Unreliable);

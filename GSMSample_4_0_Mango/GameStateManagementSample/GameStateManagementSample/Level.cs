@@ -153,8 +153,8 @@ namespace GameStateManagement.SideScrollGame
                         outMsg.Write((byte)enemy.currentState);
                         outMsg.Write((byte)enemy.lastState);
 
-                        outMsg.Write((int)enemy.position.X);
-                        outMsg.Write((int)enemy.position.Y);
+                        outMsg.Write((float)enemy.position.X);
+                        outMsg.Write((float)enemy.position.Y);
                     }
                     else
                         break;

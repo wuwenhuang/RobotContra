@@ -290,8 +290,8 @@ namespace GameStateManagement.SideScrollGame
                             {
                                 case (byte)PacketTypes.CREATEPLAYER:
                                     long id = msg.ReadInt64();
-                                    int xPos = msg.ReadInt32();
-                                    int yPos = msg.ReadInt32();
+                                    float xPos = msg.ReadFloat();
+                                    float yPos = msg.ReadFloat();
                             
                                     if (player == null)
                                     {
@@ -324,8 +324,8 @@ namespace GameStateManagement.SideScrollGame
                                     CharacterState state = (CharacterState)msg.ReadByte();
                                     CharacterState laststate = (CharacterState)msg.ReadByte();
                                     int health = msg.ReadInt32();
-                                    int x = msg.ReadInt32();
-                                    int y = msg.ReadInt32();
+                                    float x = msg.ReadFloat();
+                                    float y = msg.ReadFloat();
 
                                     if (player != null && player.id != who)
                                     {
@@ -381,8 +381,8 @@ namespace GameStateManagement.SideScrollGame
                                             msgOut.Write((byte)enemy.currentState);
                                             msgOut.Write((byte)enemy.lastState);
                                             msgOut.Write((int)enemy.health);
-                                            msgOut.Write((int)enemy.position.X);
-                                            msgOut.Write((int)enemy.position.Y);
+                                            msgOut.Write((float)enemy.position.X);
+                                            msgOut.Write((float)enemy.position.Y);
                                         }
                                         client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                                     }
@@ -413,8 +413,8 @@ namespace GameStateManagement.SideScrollGame
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].health = msg.ReadInt16();
-                                        _level.enemiesLevel[i].position.X = msg.ReadInt32();
-                                        _level.enemiesLevel[i].position.Y = msg.ReadInt32();
+                                        _level.enemiesLevel[i].position.X = msg.ReadFloat();
+                                        _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                     }
 
                                     if (enemiesInLevel < _level.enemiesLevel.Count)
@@ -436,8 +436,8 @@ namespace GameStateManagement.SideScrollGame
                                             _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                             _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
                                             _level.enemiesLevel[i].health = msg.ReadInt16();
-                                            _level.enemiesLevel[i].position.X = msg.ReadInt32();
-                                            _level.enemiesLevel[i].position.Y = msg.ReadInt32();
+                                            _level.enemiesLevel[i].position.X = msg.ReadFloat();
+                                            _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                         }
                                         else
                                         {
