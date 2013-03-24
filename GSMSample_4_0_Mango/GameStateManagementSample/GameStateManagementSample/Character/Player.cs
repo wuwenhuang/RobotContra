@@ -69,6 +69,8 @@ namespace GameStateManagement.SideScrollGame
                     outmessage.Write((int)this.health);
                     outmessage.Write((float)this.position.X);
                     outmessage.Write((float)this.position.Y);
+                    outmessage.Write((float)this.velocity.X);
+                    outmessage.Write((float)this.velocity.Y);
                     SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
                 }
             }

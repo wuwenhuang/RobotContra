@@ -334,14 +334,7 @@ namespace GameStateManagement.SideScrollGame
                                             
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                if (otherPlayers[who].position.X - x > tolerance)
-                                                {
-                                                    otherPlayers[who].position.X = x;
-                                                }
-                                                if (otherPlayers[who].position.Y - y > tolerance)
-                                                {
-                                                    otherPlayers[who].position.Y = y;
-                                                }
+                                                
                                                 otherPlayers[who].currentState = state;
                                                 otherPlayers[who].lastState = laststate;
                                                 otherPlayers[who].health = health;

@@ -46,6 +46,7 @@ namespace XnaGameServer
     {
         public long id;
         public float x,y;
+        public float velocityX, velocityY;
         public CharacterState state;
         public CharacterState lastState;
         public int health;
@@ -200,6 +201,8 @@ namespace XnaGameServer
                                     int health = msg.ReadInt32();
                                     float xPosition = msg.ReadFloat();
                                     float yPosition = msg.ReadFloat();
+                                    float velX = msg.ReadFloat();
+                                    float velY = msg.ReadFloat();
 
                                     foreach (MultiplayerPlayers players in multiplayerPlayers)
                                     {
@@ -210,6 +213,8 @@ namespace XnaGameServer
                                             players.health = health;
                                             players.x = xPosition;
                                             players.y = yPosition;
+                                            players.velocityX = velX;
+                                            players.velocityY = velY;
                                             break;
                                         }
                                     }
