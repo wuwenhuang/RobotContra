@@ -74,6 +74,7 @@ namespace XnaGameServer
         static NetServer server;
         static bool updateEnemy = true;
         static Semaphore sem;
+        static bool deleteEnemy = false;
 
         static int level;
 
@@ -269,11 +270,14 @@ namespace XnaGameServer
 
                                     for (int i = 0; i < enemies.Count; i++)
                                     {
-                                        msgOut.Write((byte)enemies[i].state);
-                                        msgOut.Write((byte)enemies[i].lastState);
-                                        msgOut.Write((short)enemies[i].health);
-                                        msgOut.Write((int)enemies[i].x);
-                                        msgOut.Write((int)enemies[i].y);
+                                        if (enemies[i].health > 0)
+                                        {
+                                            msgOut.Write((byte)enemies[i].state);
+                                            msgOut.Write((byte)enemies[i].lastState);
+                                            msgOut.Write((short)enemies[i].health);
+                                            msgOut.Write((int)enemies[i].x);
+                                            msgOut.Write((int)enemies[i].y);
+                                        }
                                     }
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
