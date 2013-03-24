@@ -401,7 +401,6 @@ namespace GameStateManagement.SideScrollGame
 
                                     for (int i = 0; i < enemiesInLevel; i++)
                                     {
-                                        
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].health = msg.ReadInt16();
