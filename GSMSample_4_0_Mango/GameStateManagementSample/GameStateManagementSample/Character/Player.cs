@@ -58,7 +58,7 @@ namespace GameStateManagement.SideScrollGame
 
         public override void Update(GameTime gameTime, Level level)
         {
-            UpdatePosition(gameTime, level)
+            UpdatePosition(gameTime, level);
             if (SideScrollGame.main.IsNetwork)
             {
                 NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
@@ -78,7 +78,7 @@ namespace GameStateManagement.SideScrollGame
 
         public void CharacterUpdate(GameTime gameTime, Level level)
         {
-            UpdatePosition(gameTime, level)
+            UpdatePosition(gameTime, level);
             base.Update(gameTime, level);
         }
 
