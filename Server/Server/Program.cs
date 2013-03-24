@@ -19,6 +19,7 @@ namespace XnaGameServer
 
         MYPOSITION,
         UPDATEPLAYERS,
+        UPDATEVELOCITY,
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
@@ -201,8 +202,6 @@ namespace XnaGameServer
                                     int health = msg.ReadInt32();
                                     float xPosition = msg.ReadFloat();
                                     float yPosition = msg.ReadFloat();
-                                    float velX = msg.ReadFloat();
-                                    float velY = msg.ReadFloat();
 
                                     foreach (MultiplayerPlayers players in multiplayerPlayers)
                                     {
@@ -213,11 +212,24 @@ namespace XnaGameServer
                                             players.health = health;
                                             players.x = xPosition;
                                             players.y = yPosition;
-                                            players.velocityX = velX;
-                                            players.velocityY = velY;
                                             break;
                                         }
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.UPDATEVELOCITY:
+                                    float updateVelX = msg.ReadFloat();
+                                    float updateVelY = msg.ReadFloat();
+
+                                    foreach (MultiplayerPlayers players in multiplayerPlayers)
+                                    {
+                                        if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
+                                        {
+                                            players.velocityX = updateVelX;
+                                            players.velocityY = updateVelY;
+                                        }
+                                    }
+
                                     break;
 
                                 case (byte)PacketTypes.GETNUMBEROFPLAYERS:

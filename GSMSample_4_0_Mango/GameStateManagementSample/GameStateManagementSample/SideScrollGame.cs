@@ -25,6 +25,7 @@ namespace GameStateManagement.SideScrollGame
 
         MYPOSITION,
         UPDATEPLAYERS,
+        UPDATEVELOCITY,
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,

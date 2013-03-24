@@ -70,8 +70,6 @@ namespace GameStateManagement.SideScrollGame
                     outmessage.Write((int)this.health);
                     outmessage.Write((float)this.position.X);
                     outmessage.Write((float)this.position.Y);
-                    outmessage.Write((float)this.velocity.X);
-                    outmessage.Write((float)this.velocity.Y);
                     SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
                 }
             }
@@ -480,7 +478,19 @@ namespace GameStateManagement.SideScrollGame
                     }
                     break;
             }
-            
+            if (SideScrollGame.main.IsNetwork)
+            {
+                if (this.currentState == CharacterState.JUMP)
+                {
+                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                    outMsg.Write((float)this.velocity.X);
+                    outMsg.Write((float)this.velocity.Y);
+
+                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                }
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
