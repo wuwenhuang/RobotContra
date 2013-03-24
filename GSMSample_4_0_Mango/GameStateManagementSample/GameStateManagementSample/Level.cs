@@ -120,13 +120,20 @@ namespace GameStateManagement.SideScrollGame
 
                     if (enemiesLevel[i].Alive)
                     {
-                        if (SideScrollGame.main.isHost)
-                            enemiesLevel[i].Update(gameTime, this);
+                        enemiesLevel[i].Update(gameTime, this);
                     }
 
                     if (enemiesLevel[i].Texture == null)
                     {
+                        if (SideScrollGame.main.isHost)
+                        {
+                            NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
+                            msgOut.Write((byte)PacketTypes.DELETEENEMY);
+                            msgOut.Write((short)i);
+                            SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+                        }
                         enemiesLevel.RemoveAt(i);
+
                         break;
                     }
                 }

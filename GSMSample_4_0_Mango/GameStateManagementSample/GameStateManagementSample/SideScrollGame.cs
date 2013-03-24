@@ -28,7 +28,8 @@ namespace GameStateManagement.SideScrollGame
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
-        GETSERVERENEMYPOSITIONS
+        GETSERVERENEMYPOSITIONS,
+        DELETEENEMY
     };
 
     class SideScrollGame

@@ -22,7 +22,8 @@ namespace XnaGameServer
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
-        GETSERVERENEMYPOSITIONS
+        GETSERVERENEMYPOSITIONS,
+        DELETEENEMY
     };
 
     enum CharacterState
@@ -71,11 +72,14 @@ namespace XnaGameServer
 
         static double nextSendUpdates;
         static NetServer server;
+        static bool updateEnemy = true;
+        static Semaphore sem;
 
         static int level;
 
         static void Main(string[] args)
         {
+            sem = new Semaphore(1, 1);
             NetPeerConfiguration config = new NetPeerConfiguration("robotcontra");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             config.Port = 16868;
@@ -249,6 +253,12 @@ namespace XnaGameServer
                                         enemies[i].y = msg.ReadInt32();
 
                                     }
+                                    break;
+
+                                case (byte)PacketTypes.DELETEENEMY:
+                                    sem.WaitOne();
+                                    enemies.RemoveAt(msg.ReadInt16());
+                                    sem.Release();
                                     break;
 
                                 case (byte)PacketTypes.GETSERVERENEMYPOSITIONS:
