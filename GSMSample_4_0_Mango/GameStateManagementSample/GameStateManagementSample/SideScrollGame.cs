@@ -333,7 +333,6 @@ namespace GameStateManagement.SideScrollGame
                                             
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                otherPlayers[who].position = new Vector2(x, y);
                                                 otherPlayers[who].currentState = state;
                                                 otherPlayers[who].lastState = laststate;
                                                 otherPlayers[who].health = health;
@@ -434,6 +433,7 @@ namespace GameStateManagement.SideScrollGame
                                         else
                                         {
                                             _level.enemiesLevel.RemoveAt(i);
+                                            break;
                                         }
                                     }
 

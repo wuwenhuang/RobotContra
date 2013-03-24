@@ -256,6 +256,11 @@ namespace XnaGameServer
                                             enemies[i].x = msg.ReadInt32();
                                             enemies[i].y = msg.ReadInt32();
                                         }
+                                        else
+                                        {
+                                            enemies.RemoveAt(i);
+                                            break;
+                                        }
 
                                     }
                                     break;
@@ -281,6 +286,10 @@ namespace XnaGameServer
                                             msgOut.Write((short)enemies[i].health);
                                             msgOut.Write((int)enemies[i].x);
                                             msgOut.Write((int)enemies[i].y);
+                                        }
+                                        else
+                                        {
+                                            break;
                                         }
                                     }
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);

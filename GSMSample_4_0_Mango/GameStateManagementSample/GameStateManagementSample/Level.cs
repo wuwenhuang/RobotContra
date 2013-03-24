@@ -152,10 +152,12 @@ namespace GameStateManagement.SideScrollGame
                         outMsg.Write((short)enemy.health);
                         outMsg.Write((byte)enemy.currentState);
                         outMsg.Write((byte)enemy.lastState);
-                        
+
                         outMsg.Write((int)enemy.position.X);
                         outMsg.Write((int)enemy.position.Y);
                     }
+                    else
+                        break;
                 }
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 

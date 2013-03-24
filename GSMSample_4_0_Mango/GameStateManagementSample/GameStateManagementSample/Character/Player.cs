@@ -58,6 +58,32 @@ namespace GameStateManagement.SideScrollGame
 
         public override void Update(GameTime gameTime, Level level)
         {
+            UpdatePosition(gameTime, level)
+            if (SideScrollGame.main.IsNetwork)
+            {
+                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+                {
+                    outmessage.Write((byte)PacketTypes.MYPOSITION);
+                    outmessage.Write((byte)this.currentState);
+                    outmessage.Write((byte)this.lastState);
+                    outmessage.Write((int)this.health);
+                    outmessage.Write((int)this.position.X);
+                    outmessage.Write((int)this.position.Y);
+                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
+                }
+            }
+
+            base.Update(gameTime, level);  
+        }
+
+        public void CharacterUpdate(GameTime gameTime, Level level)
+        {
+            UpdatePosition(gameTime, level)
+            base.Update(gameTime, level);
+        }
+
+        public void UpdatePosition(GameTime gameTime, Level level)
+        {
             if (currentState != CharacterState.DEAD)
             {
                 switch (currentState)
@@ -156,27 +182,6 @@ namespace GameStateManagement.SideScrollGame
                     }
                 }
             }
-
-            if (SideScrollGame.main.IsNetwork)
-            {
-                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-                {
-                    outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write((byte)this.currentState);
-                    outmessage.Write((byte)this.lastState);
-                    outmessage.Write((int)this.health);
-                    outmessage.Write((int)this.position.X);
-                    outmessage.Write((int)this.position.Y);
-                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-                }
-            }
-
-            base.Update(gameTime, level);  
-        }
-
-        public void CharacterUpdate(GameTime gameTime, Level level)
-        {
-            base.Update(gameTime, level);
         }
 
         public void HandleInput(GamePadState gamePad)
