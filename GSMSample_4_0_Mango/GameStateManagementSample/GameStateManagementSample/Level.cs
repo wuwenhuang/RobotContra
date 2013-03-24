@@ -162,7 +162,7 @@ namespace GameStateManagement.SideScrollGame
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 
             }
-            else
+            else if (SideScrollGame.main.IsNetwork == false)
             {
                 NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
                 msgOut.Write((byte)PacketTypes.GETSERVERENEMYPOSITIONS);

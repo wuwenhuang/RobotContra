@@ -336,10 +336,8 @@ namespace GameStateManagement.SideScrollGame
                                             
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                if (state == CharacterState.JUMP)
-                                                {
-                                                    otherPlayers[who].velocity = new Vector2(velX, velY);
-                                                }
+                                                otherPlayers[who].velocity.X = velX;
+                                                otherPlayers[who].velocity.Y = velY;
                                                 otherPlayers[who].currentState = state;
                                                 otherPlayers[who].lastState = laststate;
                                                 otherPlayers[who].health = health;
