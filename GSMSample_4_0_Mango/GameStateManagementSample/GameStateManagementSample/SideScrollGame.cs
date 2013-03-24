@@ -357,7 +357,7 @@ namespace GameStateManagement.SideScrollGame
                                         {
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                if (state != CharacterState.JUMP)
+                                                if (state != CharacterState.JUMP && otherPlayers[who].currentState != CharacterState.JUMP)
                                                 {
                                                     otherPlayers[who].currentState = state;
                                                     otherPlayers[who].lastState = laststate;

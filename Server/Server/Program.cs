@@ -236,27 +236,28 @@ namespace XnaGameServer
                                         }
                                     }
 
-
                                     for (int i = 0; i < server.Connections.Count; i++)
                                     {
-                                        if (server.Connections[i].RemoteUniqueIdentifier != msg.SenderConnection.RemoteUniqueIdentifier)
+                                        NetConnection player = server.Connections[i] as NetConnection;
+                                        // ... send information about every other player (actually including self)
+                                        for (int j = 0; j < server.Connections.Count; j++)
                                         {
-                                            if (server.Connections[i].RemoteUniqueIdentifier == multiplayerPlayers[i].id)
-                                            {
-                                                NetConnection player = server.Connections[i] as NetConnection;
+                                            // send position update about 'otherPlayer' to 'player'
+                                            NetOutgoingMessage om = server.CreateMessage();
 
-                                                NetOutgoingMessage outMsg = server.CreateMessage();
+                                            // write who this position is for
 
-                                                outMsg.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
-                                                outMsg.Write((long)multiplayerPlayers[i].id);
-                                                outMsg.Write((byte)multiplayerPlayers[i].state);
-                                                outMsg.Write((byte)multiplayerPlayers[i].lastState);
-                                                outMsg.Write((float)multiplayerPlayers[i].velocityX);
-                                                outMsg.Write((float)multiplayerPlayers[i].velocityY);
+                                            om.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
+                                            om.Write((long)multiplayerPlayers[j].id);
+                                            om.Write((byte)multiplayerPlayers[j].state);
+                                            om.Write((byte)multiplayerPlayers[j].lastState);
+                                            om.Write((float)multiplayerPlayers[j].velocityX);
+                                            om.Write((float)multiplayerPlayers[j].velocityY);
 
-                                                server.SendMessage(outMsg, player, NetDeliveryMethod.ReliableOrdered);
-                                            }
+                                            // send message
+                                            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
                                         }
+
                                     }
 
                                     break;
