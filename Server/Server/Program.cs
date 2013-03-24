@@ -20,6 +20,7 @@ namespace XnaGameServer
         MYPOSITION,
         UPDATEPLAYERS,
         UPDATEVELOCITY,
+        SENDUPDATEVELOCITY,
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
@@ -230,6 +231,26 @@ namespace XnaGameServer
                                         }
                                     }
 
+
+                                    for (int i = 0; i < server.Connections.Count; i++)
+                                    {
+                                        if (server.Connections[i].RemoteUniqueIdentifier != msg.SenderConnection.RemoteUniqueIdentifier)
+                                        {
+                                            if (server.Connections[i].RemoteUniqueIdentifier == multiplayerPlayers[i].id)
+                                            {
+                                                NetConnection player = server.Connections[i] as NetConnection;
+
+                                                NetOutgoingMessage outMsg = server.CreateMessage();
+
+                                                outMsg.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
+                                                outMsg.Write((float)multiplayerPlayers[i].velocityX);
+                                                outMsg.Write((float)multiplayerPlayers[i].velocityY);
+
+                                                server.SendMessage(outMsg, player, NetDeliveryMethod.ReliableOrdered);
+                                            }
+                                        }
+                                    }
+
                                     break;
 
                                 case (byte)PacketTypes.GETNUMBEROFPLAYERS:
@@ -360,8 +381,6 @@ namespace XnaGameServer
                             om.Write((int)multiplayerPlayers[j].health);
                             om.Write((float)multiplayerPlayers[j].x);
                             om.Write((float)multiplayerPlayers[j].y);
-                            om.Write((float)multiplayerPlayers[i].velocityX);
-                            om.Write((float)multiplayerPlayers[i].velocityY);
 
                             // send message
                             server.SendMessage(om, player, NetDeliveryMethod.Unreliable);

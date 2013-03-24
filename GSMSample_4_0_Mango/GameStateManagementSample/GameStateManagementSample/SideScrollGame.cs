@@ -26,6 +26,7 @@ namespace GameStateManagement.SideScrollGame
         MYPOSITION,
         UPDATEPLAYERS,
         UPDATEVELOCITY,
+        SENDUPDATEVELOCITY,
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
@@ -327,8 +328,6 @@ namespace GameStateManagement.SideScrollGame
                                     int health = msg.ReadInt32();
                                     float x = msg.ReadFloat();
                                     float y = msg.ReadFloat();
-                                    float velX = msg.ReadFloat();
-                                    float velY = msg.ReadFloat();
 
                                     if (player != null && player.id != who)
                                     {
@@ -337,8 +336,6 @@ namespace GameStateManagement.SideScrollGame
                                             
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                otherPlayers[who].velocity.X = velX;
-                                                otherPlayers[who].velocity.Y = velY;
                                                 otherPlayers[who].currentState = state;
                                                 otherPlayers[who].lastState = laststate;
                                                 otherPlayers[who].health = health;

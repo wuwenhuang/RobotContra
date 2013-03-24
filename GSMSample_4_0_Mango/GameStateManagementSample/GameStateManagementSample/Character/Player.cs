@@ -353,6 +353,20 @@ namespace GameStateManagement.SideScrollGame
                     {
                         this.velocity = new Vector2(0, jumpHeight);
                         this.currentState = CharacterState.JUMP;
+
+                        if (SideScrollGame.main.IsNetwork)
+                        {
+                            if (this.currentState == CharacterState.JUMP)
+                            {
+                                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                outMsg.Write((float)this.velocity.X);
+                                outMsg.Write((float)this.velocity.Y);
+
+                                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                            }
+                        }
                     }
                     if (mousePad.LeftButton == ButtonState.Pressed)
                     {
@@ -406,6 +420,20 @@ namespace GameStateManagement.SideScrollGame
                         {
                             this.velocity = new Vector2(jumpDistance, jumpHeight);
                             this.currentState = CharacterState.JUMP;
+
+                            if (SideScrollGame.main.IsNetwork)
+                            {
+                                if (this.currentState == CharacterState.JUMP)
+                                {
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                    outMsg.Write((float)this.velocity.X);
+                                    outMsg.Write((float)this.velocity.Y);
+
+                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                }
+                            }
                         }
 
                         if (keyPad.IsKeyDown(Keys.LeftShift))
@@ -432,6 +460,20 @@ namespace GameStateManagement.SideScrollGame
                         {
                             this.velocity = new Vector2(jumpDistance, jumpHeight);
                             this.currentState = CharacterState.JUMP;
+
+                            if (SideScrollGame.main.IsNetwork)
+                            {
+                                if (this.currentState == CharacterState.JUMP)
+                                {
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                    outMsg.Write((float)this.velocity.X);
+                                    outMsg.Write((float)this.velocity.Y);
+
+                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                }
+                            }
                         }
 
                         if (keyPad.IsKeyDown(Keys.LeftShift))
@@ -474,23 +516,25 @@ namespace GameStateManagement.SideScrollGame
                         {
                             this.velocity = new Vector2((jumpDistance*2), jumpHeight);
                             this.currentState = CharacterState.JUMP;
+
+                            if (SideScrollGame.main.IsNetwork)
+                            {
+                                if (this.currentState == CharacterState.JUMP)
+                                {
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                    outMsg.Write((float)this.velocity.X);
+                                    outMsg.Write((float)this.velocity.Y);
+
+                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                }
+                            }
                         }
                     }
                     break;
             }
-            if (SideScrollGame.main.IsNetwork)
-            {
-                if (this.currentState == CharacterState.JUMP)
-                {
-                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
-                    outMsg.Write((float)this.velocity.X);
-                    outMsg.Write((float)this.velocity.Y);
-
-                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-
-                }
-            }
+            
         }
 
         public override void Draw(SpriteBatch spriteBatch)
