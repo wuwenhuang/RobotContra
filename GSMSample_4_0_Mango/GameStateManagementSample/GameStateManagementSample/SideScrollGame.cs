@@ -326,6 +326,8 @@ namespace GameStateManagement.SideScrollGame
                                     int health = msg.ReadInt32();
                                     float x = msg.ReadFloat();
                                     float y = msg.ReadFloat();
+                                    float velX = msg.ReadFloat();
+                                    float velY = msg.ReadFloat();
 
                                     if (player != null && player.id != who)
                                     {
@@ -334,7 +336,10 @@ namespace GameStateManagement.SideScrollGame
                                             
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                
+                                                if (state == CharacterState.JUMP)
+                                                {
+                                                    otherPlayers[who].velocity = new Vector2(velX, velY);
+                                                }
                                                 otherPlayers[who].currentState = state;
                                                 otherPlayers[who].lastState = laststate;
                                                 otherPlayers[who].health = health;

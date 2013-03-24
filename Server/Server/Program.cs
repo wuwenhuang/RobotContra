@@ -348,6 +348,8 @@ namespace XnaGameServer
                             om.Write((int)multiplayerPlayers[j].health);
                             om.Write((float)multiplayerPlayers[j].x);
                             om.Write((float)multiplayerPlayers[j].y);
+                            om.Write((float)multiplayerPlayers[i].velocityX);
+                            om.Write((float)multiplayerPlayers[i].velocityY);
 
                             // send message
                             server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
