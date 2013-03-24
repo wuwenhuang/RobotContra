@@ -48,6 +48,7 @@ namespace XnaGameServer
     {
         public long id;
         public float x,y;
+        public float lastPosX, lastPosY;
         public float velocityX, velocityY;
         public CharacterState state;
         public CharacterState lastState;
@@ -222,6 +223,9 @@ namespace XnaGameServer
                                     CharacterState currState = (CharacterState)msg.ReadByte();
                                     CharacterState lastState = (CharacterState)msg.ReadByte();
 
+                                    float lastPosX = msg.ReadFloat();
+                                    float lastPosY = msg.ReadFloat();
+
                                     float updateVelX = msg.ReadFloat();
                                     float updateVelY = msg.ReadFloat();
 
@@ -231,6 +235,8 @@ namespace XnaGameServer
                                         {
                                             players.state = currState;
                                             players.lastState = lastState;
+                                            players.lastPosX = lastPosX;
+                                            players.lastPosY = lastPosY;
                                             players.velocityX = updateVelX;
                                             players.velocityY = updateVelY;
                                         }
@@ -251,6 +257,8 @@ namespace XnaGameServer
                                             om.Write((long)multiplayerPlayers[j].id);
                                             om.Write((byte)multiplayerPlayers[j].state);
                                             om.Write((byte)multiplayerPlayers[j].lastState);
+                                            om.Write((float)multiplayerPlayers[j].lastPosX);
+                                            om.Write((float)multiplayerPlayers[j].lastPosY);
                                             om.Write((float)multiplayerPlayers[j].velocityX);
                                             om.Write((float)multiplayerPlayers[j].velocityY);
 

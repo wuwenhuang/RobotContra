@@ -325,6 +325,8 @@ namespace GameStateManagement.SideScrollGame
                                     long updateVelocityWho = msg.ReadInt64();
                                     CharacterState currState = (CharacterState)msg.ReadByte();
                                     CharacterState lastState = (CharacterState)msg.ReadByte();
+                                    float lastPosX = msg.ReadFloat();
+                                    float lastPosY = msg.ReadFloat();
                                     float velocityX = msg.ReadFloat();
                                     float velocityY = msg.ReadFloat();
 
@@ -336,6 +338,8 @@ namespace GameStateManagement.SideScrollGame
                                             {
                                                 otherPlayers[updateVelocityWho].currentState = currState;
                                                 otherPlayers[updateVelocityWho].lastState = lastState;
+                                                otherPlayers[updateVelocityWho].lastPosition.X = lastPosX;
+                                                otherPlayers[updateVelocityWho].lastPosition.Y = lastPosY;
                                                 otherPlayers[updateVelocityWho].velocity.X = velocityX;
                                                 otherPlayers[updateVelocityWho].velocity.Y = velocityY;
                                             }

@@ -362,6 +362,8 @@ namespace GameStateManagement.SideScrollGame
                                 outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
                                 outMsg.Write((byte)this.currentState);
                                 outMsg.Write((byte)this.lastState);
+                                outMsg.Write((float)this.lastPosition.X);
+                                outMsg.Write((float)this.lastPosition.Y);
                                 outMsg.Write((float)this.velocity.X);
                                 outMsg.Write((float)this.velocity.Y);
 
@@ -431,6 +433,8 @@ namespace GameStateManagement.SideScrollGame
                                     outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
                                     outMsg.Write((byte)this.currentState);
                                     outMsg.Write((byte)this.lastState);
+                                    outMsg.Write((float)this.lastPosition.X);
+                                    outMsg.Write((float)this.lastPosition.Y);
                                     outMsg.Write((float)this.velocity.X);
                                     outMsg.Write((float)this.velocity.Y);
 
@@ -473,6 +477,8 @@ namespace GameStateManagement.SideScrollGame
                                     outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
                                     outMsg.Write((byte)this.currentState);
                                     outMsg.Write((byte)this.lastState);
+                                    outMsg.Write((float)this.lastPosition.X);
+                                    outMsg.Write((float)this.lastPosition.Y);
                                     outMsg.Write((float)this.velocity.X);
                                     outMsg.Write((float)this.velocity.Y);
 
@@ -531,6 +537,8 @@ namespace GameStateManagement.SideScrollGame
                                     outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
                                     outMsg.Write((byte)this.currentState);
                                     outMsg.Write((byte)this.lastState);
+                                    outMsg.Write((float)this.lastPosition.X);
+                                    outMsg.Write((float)this.lastPosition.Y);
                                     outMsg.Write((float)this.velocity.X);
                                     outMsg.Write((float)this.velocity.Y);
 
