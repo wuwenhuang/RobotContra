@@ -323,6 +323,8 @@ namespace GameStateManagement.SideScrollGame
 
                                 case (byte)PacketTypes.SENDUPDATEVELOCITY:
                                     long updateVelocityWho = msg.ReadInt64();
+                                    CharacterState currState = (CharacterState)msg.ReadByte();
+                                    CharacterState lastState = (CharacterState)msg.ReadByte();
                                     float velocityX = msg.ReadFloat();
                                     float velocityY = msg.ReadFloat();
 
@@ -332,6 +334,8 @@ namespace GameStateManagement.SideScrollGame
                                         {
                                             if (otherPlayers[updateVelocityWho].id.Equals(updateVelocityWho))
                                             {
+                                                otherPlayers[updateVelocityWho].currentState = currState;
+                                                otherPlayers[updateVelocityWho].lastState = lastState;
                                                 otherPlayers[updateVelocityWho].velocity.X = velocityX;
                                                 otherPlayers[updateVelocityWho].velocity.Y = velocityY;
                                             }
@@ -351,11 +355,13 @@ namespace GameStateManagement.SideScrollGame
                                     {
                                         if (otherPlayers.Count > 0)
                                         {
-                                            
                                             if (otherPlayers[who].id.Equals(who))
                                             {
-                                                otherPlayers[who].currentState = state;
-                                                otherPlayers[who].lastState = laststate;
+                                                if (state != CharacterState.JUMP)
+                                                {
+                                                    otherPlayers[who].currentState = state;
+                                                    otherPlayers[who].lastState = laststate;
+                                                }
                                                 otherPlayers[who].health = health;
                                             }
                                             else

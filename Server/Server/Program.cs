@@ -219,6 +219,9 @@ namespace XnaGameServer
                                     break;
 
                                 case (byte)PacketTypes.UPDATEVELOCITY:
+                                    CharacterState currState = (CharacterState)msg.ReadByte();
+                                    CharacterState lastState = (CharacterState)msg.ReadByte();
+
                                     float updateVelX = msg.ReadFloat();
                                     float updateVelY = msg.ReadFloat();
 
@@ -226,6 +229,8 @@ namespace XnaGameServer
                                     {
                                         if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
                                         {
+                                            players.state = currState;
+                                            players.lastState = lastState;
                                             players.velocityX = updateVelX;
                                             players.velocityY = updateVelY;
                                         }
@@ -243,7 +248,9 @@ namespace XnaGameServer
                                                 NetOutgoingMessage outMsg = server.CreateMessage();
 
                                                 outMsg.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
-                                                outMsg.Write((short)multiplayerPlayers[i].id);
+                                                outMsg.Write((long)multiplayerPlayers[i].id);
+                                                outMsg.Write((byte)multiplayerPlayers[i].state);
+                                                outMsg.Write((byte)multiplayerPlayers[i].lastState);
                                                 outMsg.Write((float)multiplayerPlayers[i].velocityX);
                                                 outMsg.Write((float)multiplayerPlayers[i].velocityY);
 
