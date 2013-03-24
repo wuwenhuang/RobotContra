@@ -59,7 +59,23 @@ namespace GameStateManagement.SideScrollGame
         public override void Update(GameTime gameTime, Level level)
         {
             UpdatePosition(gameTime, level);
-            
+
+            if (SideScrollGame.main.IsNetwork)
+            {
+                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
+                {
+                    outmessage.Write((byte)PacketTypes.MYPOSITION);
+                    outmessage.Write((byte)this.currentState);
+                    outmessage.Write((byte)this.lastState);
+                    outmessage.Write((int)this.health);
+                    outmessage.Write((float)this.position.X);
+                    outmessage.Write((float)this.position.Y);
+                    outmessage.Write((float)this.velocity.X);
+                    outmessage.Write((float)this.velocity.Y);
+                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
+                }
+            }
+
             base.Update(gameTime, level);  
         }
 
@@ -464,21 +480,7 @@ namespace GameStateManagement.SideScrollGame
                     }
                     break;
             }
-            if (SideScrollGame.main.IsNetwork)
-            {
-                NetOutgoingMessage outmessage = SideScrollGame.main.client.CreateMessage();
-                {
-                    outmessage.Write((byte)PacketTypes.MYPOSITION);
-                    outmessage.Write((byte)this.currentState);
-                    outmessage.Write((byte)this.lastState);
-                    outmessage.Write((int)this.health);
-                    outmessage.Write((float)this.position.X);
-                    outmessage.Write((float)this.position.Y);
-                    outmessage.Write((float)this.velocity.X);
-                    outmessage.Write((float)this.velocity.Y);
-                    SideScrollGame.main.client.SendMessage(outmessage, NetDeliveryMethod.Unreliable);
-                }
-            }
+            
         }
 
         public override void Draw(SpriteBatch spriteBatch)
