@@ -147,11 +147,14 @@ namespace GameStateManagement.SideScrollGame
 
                 foreach (Enemy enemy in enemiesLevel)
                 {
-                    outMsg.Write((byte)enemy.currentState);
-                    outMsg.Write((byte)enemy.lastState);
-                    outMsg.Write((short)enemy.health);
-                    outMsg.Write((int)enemy.position.X);
-                    outMsg.Write((int)enemy.position.Y);
+                    if (enemy.health > 0)
+                    {
+                        outMsg.Write((byte)enemy.currentState);
+                        outMsg.Write((byte)enemy.lastState);
+                        outMsg.Write((short)enemy.health);
+                        outMsg.Write((int)enemy.position.X);
+                        outMsg.Write((int)enemy.position.Y);
+                    }
                 }
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 
