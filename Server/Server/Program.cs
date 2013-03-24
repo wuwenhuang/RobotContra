@@ -367,7 +367,16 @@ namespace XnaGameServer
             ////
             while (true)
             {
-                
+                if (enemies.Count > 0)
+                {
+                    for (int i = 0; i < enemies.Count; i++)
+                    {
+                        if (enemies[i].health <= 0)
+                        {
+                            enemies.RemoveAt(i);
+                        }
+                    }
+                }
             }
         }
     }
