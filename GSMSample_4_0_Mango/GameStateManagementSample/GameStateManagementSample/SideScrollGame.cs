@@ -336,12 +336,15 @@ namespace GameStateManagement.SideScrollGame
                                         {
                                             if (otherPlayers[updateVelocityWho].id.Equals(updateVelocityWho))
                                             {
-                                                otherPlayers[updateVelocityWho].currentState = currState;
-                                                otherPlayers[updateVelocityWho].lastState = lastState;
-                                                otherPlayers[updateVelocityWho].lastPosition.X = lastPosX;
-                                                otherPlayers[updateVelocityWho].lastPosition.Y = lastPosY;
-                                                otherPlayers[updateVelocityWho].velocity.X = velocityX;
-                                                otherPlayers[updateVelocityWho].velocity.Y = velocityY;
+                                                if (otherPlayers[updateVelocityWho].currentState != CharacterState.JUMP)
+                                                {
+                                                    otherPlayers[updateVelocityWho].currentState = currState;
+                                                    otherPlayers[updateVelocityWho].lastState = lastState;
+                                                    otherPlayers[updateVelocityWho].lastPosition.X = lastPosX;
+                                                    otherPlayers[updateVelocityWho].lastPosition.Y = lastPosY;
+                                                    otherPlayers[updateVelocityWho].velocity.X = velocityX;
+                                                    otherPlayers[updateVelocityWho].velocity.Y = velocityY;
+                                                }
                                             }
                                         }
                                     }
