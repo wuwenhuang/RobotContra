@@ -158,7 +158,7 @@ namespace GameStateManagementSample
 
                 if (game.GameOver == true)
                 {
-                    ScreenManager.AddScreen(new WinLoseScreen(game.allPlayersDead, game.allEnemiesDead), ControllingPlayer);
+                    ScreenManager.AddScreen(new WinLoseScreen(this, game.allPlayersDead, game.allEnemiesDead), ControllingPlayer);
                 }
             }
         }

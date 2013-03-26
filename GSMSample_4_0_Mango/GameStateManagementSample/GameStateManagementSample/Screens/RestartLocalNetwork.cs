@@ -34,6 +34,8 @@ namespace GameStateManagementSample
         InputAction menuNetwork;
         InputAction menuCancel;
 
+        GameScreen removeGameplayScreen;
+
         #endregion
 
         #region Events
@@ -51,9 +53,11 @@ namespace GameStateManagementSample
         /// Constructor automatically includes the standard "A=ok, B=cancel"
         /// usage text prompt.
         /// </summary>
-        public RestartLocalNetwork(string message)
+        public RestartLocalNetwork(GameScreen screen, string message)
             : this(message, true)
-        { }
+        {
+            removeGameplayScreen = screen;
+        }
 
 
         /// <summary>
@@ -139,6 +143,8 @@ namespace GameStateManagementSample
                     
                     Local(this, new PlayerIndexEventArgs(playerIndex));
                 }
+                ScreenManager.RemoveScreen(removeGameplayScreen);
+
                 ScreenManager.AddScreen(new GameplayScreen(false), ControllingPlayer);
                 ExitScreen();
             }
@@ -156,6 +162,8 @@ namespace GameStateManagementSample
 
                     Network(this, new PlayerIndexEventArgs(playerIndex));
                 }
+                ScreenManager.RemoveScreen(removeGameplayScreen);
+
                 ScreenManager.AddScreen(new GameplayScreen(true), ControllingPlayer);
                 ExitScreen();
             }

@@ -26,12 +26,15 @@ namespace GameStateManagementSample
         Texture2D texture;
         bool playersDead, enemiesDead;
 
+        GameplayScreen removeScreenGameplay;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        public WinLoseScreen(bool allPlayersDead, bool allEnemiesDead)
+        public WinLoseScreen(GameplayScreen screen, bool allPlayersDead, bool allEnemiesDead)
             : base("")
         {
+            removeScreenGameplay = screen;
             playersDead = allPlayersDead;
             enemiesDead = allEnemiesDead;
             
@@ -94,11 +97,11 @@ namespace GameStateManagementSample
         {
             const string message = "Do you want to play LOCAL or NETWORK";
 
-            RestartLocalNetwork restartGame = new RestartLocalNetwork(message);
+            RestartLocalNetwork restartGame = new RestartLocalNetwork(removeScreenGameplay, message);
 
             restartGame.Local += LocalNetworkGame;
             restartGame.Network += LocalNetworkGame;
-
+            
             ScreenManager.AddScreen(restartGame, ControllingPlayer);
         }
 
