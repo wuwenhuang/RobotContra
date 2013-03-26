@@ -19,7 +19,7 @@ namespace GameStateManagement.SideScrollGame
         public Character targetPlayer;
         public char id;
         public Health healthBar;
-        private bool isAlive;
+        private bool isAlive; // should enemy show and move
         private float distancePlayerEnemyAttack = 40.0f;
         
 
@@ -34,12 +34,15 @@ namespace GameStateManagement.SideScrollGame
             healthBar = new Health(this);
             this.AddChild(healthBar);
             this.isAlive = false;
+            this.setDead(false);
         }
 
         public void SetTargetPlayer(Character targetPerson)
         {
             this.targetPlayer = targetPerson;
         }
+
+        
 
         public void setAlive(bool alive)
         {
@@ -155,6 +158,7 @@ namespace GameStateManagement.SideScrollGame
             this.id = 'N';
             this.texture = GameplayScreen.main.content.Load<Texture2D>("Character/Enemy/Normal");
             this.sourceRect = new Rectangle(0,0,70, 130);
+            this.setDead(false);
         }
 
        public EnemyNormal(Vector2 pos)
@@ -163,6 +167,7 @@ namespace GameStateManagement.SideScrollGame
             this.id = 'N';
             this.setAttackDamage(3.0f);
             this.setMaximumHealth(150); // default maximum health is 500
+            this.setDead(false);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

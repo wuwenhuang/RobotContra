@@ -99,6 +99,16 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
+    <Compile Include="WinLoseScreenBackground\win.png">
+      <Name>win</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="WinLoseScreenBackground\lose.png">
+      <Name>lose</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Content Include="Levels\Level.xml">
       <Name>Level</Name>
       <Importer>XmlImporter</Importer>

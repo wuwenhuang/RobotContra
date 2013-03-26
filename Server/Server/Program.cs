@@ -66,6 +66,7 @@ namespace XnaGameServer
         public CharacterState state;
         public CharacterState lastState;
         public int health;
+        public bool isDead;
 
     };
 
@@ -170,7 +171,7 @@ namespace XnaGameServer
                                 {
                                     if (multiplayerPlayers[i].id == msg.SenderConnection.RemoteUniqueIdentifier)
                                     {
-
+                                        multiplayerPlayers.RemoveAt(i);
                                         if (deletePlayerFromServer(msg.SenderConnection.RemoteUniqueIdentifier))
                                         {
                                             Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " DELETED!");
@@ -188,6 +189,7 @@ namespace XnaGameServer
 
                                             server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         }
+                                        
                                         break;
                                     }
                                 }
@@ -281,6 +283,7 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.WRITELEVEL:
                                     level = msg.ReadInt16();
+                                    enemies.Clear();
                                     int enemiesInLevel = msg.ReadInt16();
 
                                     for (int i = 0; i < enemiesInLevel; i++)
@@ -289,6 +292,7 @@ namespace XnaGameServer
                                         tempEnemy.state = (CharacterState)msg.ReadByte();
                                         tempEnemy.lastState = (CharacterState)msg.ReadByte();
                                         tempEnemy.health = msg.ReadInt32();
+                                        tempEnemy.isDead = msg.ReadBoolean();
                                         tempEnemy.x = msg.ReadFloat();
                                         tempEnemy.y = msg.ReadFloat();
                                         enemies.Add(tempEnemy);
@@ -302,27 +306,20 @@ namespace XnaGameServer
                                     int enemyInLevel = msg.ReadInt16();
                                     for (int i = 0; i < enemyInLevel; i++)
                                     {
-                                        int readHealth = msg.ReadInt16();
-                                        if (readHealth > 0)
-                                        {
-                                            enemies[i].state = (CharacterState)msg.ReadByte();
-                                            enemies[i].lastState = (CharacterState)msg.ReadByte();
-                                            enemies[i].health = readHealth;
-                                            enemies[i].x = msg.ReadFloat();
-                                            enemies[i].y = msg.ReadFloat();
-                                        }
-                                        else
-                                        {
-                                            enemies.RemoveAt(i);
-                                            break;
-                                        }
-
+                                        enemies[i].health = msg.ReadInt16();
+                                        enemies[i].isDead = msg.ReadBoolean();
+                                        enemies[i].state = (CharacterState)msg.ReadByte();
+                                        enemies[i].lastState = (CharacterState)msg.ReadByte();
+                                        enemies[i].x = msg.ReadFloat();
+                                        enemies[i].y = msg.ReadFloat();
+                                    
                                     }
                                     break;
 
                                 case (byte)PacketTypes.DELETEENEMY:
+                                    int enemyDead = msg.ReadInt16();
                                     sem.WaitOne();
-                                    enemies.RemoveAt(msg.ReadInt16());
+                                    enemies[enemyDead].isDead = true;
                                     sem.Release();
                                     break;
 
@@ -339,6 +336,7 @@ namespace XnaGameServer
                                             msgOut.Write((byte)enemies[i].state);
                                             msgOut.Write((byte)enemies[i].lastState);
                                             msgOut.Write((short)enemies[i].health);
+                                            msgOut.Write((bool)enemies[i].isDead);
                                             msgOut.Write((float)enemies[i].x);
                                             msgOut.Write((float)enemies[i].y);
                                         }
@@ -363,6 +361,7 @@ namespace XnaGameServer
                                         msgOut.Write((byte)enemies[i].state);
                                         msgOut.Write((byte)enemies[i].lastState);
                                         msgOut.Write((short)enemies[i].health);
+                                        msgOut.Write((bool)enemies[i].isDead);
                                         msgOut.Write((float)enemies[i].x);
                                         msgOut.Write((float)enemies[i].y);
 
@@ -385,7 +384,7 @@ namespace XnaGameServer
                     {
                         NetConnection player = server.Connections[i] as NetConnection;
                         // ... send information about every other player (actually including self)
-                        for (int j = 0; j < server.Connections.Count; j++)
+                        for (int j = 0; j < multiplayerPlayers.Count; j++)
                         {
                             // send position update about 'otherPlayer' to 'player'
                             NetOutgoingMessage om = server.CreateMessage();
@@ -435,16 +434,7 @@ namespace XnaGameServer
             ////
             while (true)
             {
-                if (enemies.Count > 0)
-                {
-                    for (int i = 0; i < enemies.Count; i++)
-                    {
-                        if (enemies[i].health <= 0)
-                        {
-                            enemies.RemoveAt(i);
-                        }
-                    }
-                }
+                
             }
         }
     }

@@ -66,6 +66,11 @@ namespace GameStateManagement.SideScrollGame
 
         private bool _isNetwork;
 
+        private bool _goToNextLevel;
+
+        public bool allPlayersDead;
+        public bool allEnemiesDead;
+
     #endregion
 
     #region PublicFunctions
@@ -74,9 +79,15 @@ namespace GameStateManagement.SideScrollGame
         {
             main = this;
 
+            gameOver = false;
+            allPlayersDead = false;
+            allEnemiesDead = false;
+
             this.gameplay = gameplay;
 
             currentLevel = 1;
+
+            _goToNextLevel = false;
 
             _isNetwork = isNetworkGame;
 
@@ -131,72 +142,142 @@ namespace GameStateManagement.SideScrollGame
 
         public void Update(GameTime gameTime)
         {
-            if (_isNetwork == false)
+            if (gameOver == false)
             {
-                if (player != null)
+                if (_isNetwork == false)
                 {
-                    if (player.currentState == CharacterState.DEAD)
+                    if (player != null)
+                    {
+                        if (player.Dead == true)
+                        {
+                            gameOver = true;
+                            allPlayersDead = true;
+                            allEnemiesDead = false;
+                        }
+                        else
+                        {
+                            player.Update(gameTime, _level);
+                            _level.Update(gameTime, player);
+                        }
+
+                    }
+
+                }
+                // Networks is true  
+                else
+                {
+                    if (player != null)
+                    {
+                        if (player.Dead == false)
+                            player.Update(gameTime, _level);
+                        
+                        foreach (var otherplayers in otherPlayers)
+                        {
+                            if (otherplayers.Value.Dead == false)
+                                otherplayers.Value.CharacterUpdate(gameTime, _level);
+                        }
+
+                        if (player.Dead == true)
+                        {
+                            if (otherPlayers.Count <= 0)
+                            {
+                                gameOver = true;
+                            }
+                            else
+                            {
+                                foreach (var otherplayers in otherPlayers)
+                                {
+                                    if (otherplayers.Value.Dead == true)
+                                    {
+                                        gameOver = true;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        gameOver = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        _level.Update(gameTime, player);
+
+                        if (gameOver)
+                        {
+                            allPlayersDead = true;
+                            allEnemiesDead = false;
+                            _goToNextLevel = false;
+                        }
+
+                    }
+                }
+
+                if (currentLevel <= level.Count)
+                {
+                    for (int i = 0; i < _level.enemiesLevel.Count; i++)
+                    {
+                        if (i == _level.enemiesLevel.Count - 1)
+                        {
+                            if (_level.enemiesLevel[i].Dead == true && _goToNextLevel == false)
+                            {
+                                _goToNextLevel = true;
+                                break;
+                            }
+                            else
+                                break;
+                        }
+
+                        if (_level.enemiesLevel[i].Dead == true)
+                            continue;
+                        else
+                        {
+                            _goToNextLevel = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (_goToNextLevel == true && currentLevel <= level.Count)
+                {
+                    _goToNextLevel = false;
+                    currentLevel += 1;
+
+                    if (currentLevel > level.Count)
                     {
                         gameOver = true;
-                    }
-                    else
-                    {
-                        _level.Update(gameTime, player);
+                        allEnemiesDead = true;
+                        allPlayersDead = false;
+                        _goToNextLevel = false;
                     }
 
-                    player.Update(gameTime, _level);
+
+                    if (_isNetwork && isHost)
+                    {
+                        this.Reset(currentLevel, level[currentLevel]);
+
+                        NetOutgoingMessage msgOut = client.CreateMessage();
+
+                        msgOut.Write((byte)PacketTypes.WRITELEVEL);
+                        msgOut.Write((short)currentLevel);
+                        msgOut.Write((short)_level.enemiesLevel.Count);
+
+                        foreach (Enemy enemy in _level.enemiesLevel)
+                        {
+                            msgOut.Write((byte)enemy.currentState);
+                            msgOut.Write((byte)enemy.lastState);
+                            msgOut.Write((short)enemy.health);
+                            msgOut.Write((bool)enemy.Dead);
+                            msgOut.Write((int)enemy.position.X);
+                            msgOut.Write((int)enemy.position.Y);
+                        }
+
+                        client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+                    }
+                    //single player reset level
+                    if (gameOver == false)
+                        this.Reset(currentLevel, level[currentLevel]);
+
                 }
-
-            }
-            else
-            {
-                if (player != null)
-                {
-                    player.Update(gameTime, _level);
-
-                    foreach (var otherplayers in otherPlayers)
-                    {
-                        otherplayers.Value.CharacterUpdate(gameTime, _level);
-                    }
-
-                    if (player.currentState == CharacterState.DEAD)
-                    {
-                        gameOver = true;
-                    }
-                    else
-                    {
-                        _level.Update(gameTime, player);
-                    }
-                }
-            }
-
-            if (_level.enemiesLevel.Count == 0 && currentLevel < level.Count)
-            {
-                currentLevel += 1;
-
-                if (_isNetwork && isHost)
-                {
-                    this.Reset(currentLevel, level[currentLevel]);
-
-                    NetOutgoingMessage msgOut = client.CreateMessage();
-
-                    msgOut.Write((byte)PacketTypes.WRITELEVEL);
-                    msgOut.Write((short)currentLevel);
-                    msgOut.Write((short)_level.enemiesLevel.Count);
-
-                    foreach (Enemy enemy in _level.enemiesLevel)
-                    {
-                        msgOut.Write((byte)enemy.currentState);
-                        msgOut.Write((byte)enemy.lastState);
-                        msgOut.Write((short)enemy.health);
-                        msgOut.Write((int)enemy.position.X);
-                        msgOut.Write((int)enemy.position.Y);
-                    }
-
-                    client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
-                }
-
-                
             }
             
         }
@@ -406,6 +487,7 @@ namespace GameStateManagement.SideScrollGame
                                             msgOut.Write((byte)enemy.currentState);
                                             msgOut.Write((byte)enemy.lastState);
                                             msgOut.Write((int)enemy.health);
+                                            msgOut.Write((bool)enemy.Dead);
                                             msgOut.Write((float)enemy.position.X);
                                             msgOut.Write((float)enemy.position.Y);
                                         }
@@ -438,16 +520,9 @@ namespace GameStateManagement.SideScrollGame
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].health = msg.ReadInt16();
+                                        _level.enemiesLevel[i].setDead(msg.ReadBoolean());
                                         _level.enemiesLevel[i].position.X = msg.ReadFloat();
                                         _level.enemiesLevel[i].position.Y = msg.ReadFloat();
-                                    }
-
-                                    if (enemiesInLevel < _level.enemiesLevel.Count)
-                                    {
-                                        for (int deleteEnemies = enemiesInLevel; deleteEnemies < _level.enemiesLevel.Count; deleteEnemies++)
-                                        {
-                                            _level.enemiesLevel.RemoveAt(deleteEnemies);
-                                        }
                                     }
                                     break;
 
@@ -456,19 +531,13 @@ namespace GameStateManagement.SideScrollGame
 
                                     for (int i = 0; i < enemiesLevel; i++)
                                     {
-                                        if (_level.enemiesLevel[i].health > 0)
-                                        {
-                                            _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
-                                            _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
-                                            _level.enemiesLevel[i].health = msg.ReadInt16();
-                                            _level.enemiesLevel[i].position.X = msg.ReadFloat();
-                                            _level.enemiesLevel[i].position.Y = msg.ReadFloat();
-                                        }
-                                        else
-                                        {
-                                            _level.enemiesLevel.RemoveAt(i);
-                                            break;
-                                        }
+                                        _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
+                                        _level.enemiesLevel[i].health = msg.ReadInt16();
+                                        _level.enemiesLevel[i].setDead(msg.ReadBoolean());
+                                        _level.enemiesLevel[i].position.X = msg.ReadFloat();
+                                        _level.enemiesLevel[i].position.Y = msg.ReadFloat();
+                                        
                                     }
 
                                     break;

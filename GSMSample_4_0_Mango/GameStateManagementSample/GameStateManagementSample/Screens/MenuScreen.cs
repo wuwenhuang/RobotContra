@@ -29,7 +29,7 @@ namespace GameStateManagementSample
 
         public List<MenuEntry> menuEntries = new List<MenuEntry>();
         public int selectedEntry = 0;
-        string menuTitle;
+        public string menuTitle;
 
         public InputAction menuUp;
         public InputAction menuDown;

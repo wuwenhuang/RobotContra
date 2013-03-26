@@ -13,4 +13,6 @@ Content\Weapon\Powerups\bulletNormal.xnb
 Content\Weapon\Powerups\bulletLaser.xnb
 Content\menufont.xnb
 Content\gamefont.xnb
+Content\WinLoseScreenBackground\win.xnb
+Content\WinLoseScreenBackground\lose.xnb
 Content\Levels\Level.xml

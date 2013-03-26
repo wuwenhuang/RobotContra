@@ -155,6 +155,11 @@ namespace GameStateManagementSample
                 // TODO: this game isn't very fun! You could probably improve
                 // it by inserting something more interesting in this space :-) 
                 game.Update(gameTime);
+
+                if (game.GameOver == true)
+                {
+                    ScreenManager.AddScreen(new WinLoseScreen(game.allPlayersDead, game.allEnemiesDead), ControllingPlayer);
+                }
             }
         }
 

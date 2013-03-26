@@ -46,6 +46,8 @@ namespace GameStateManagement.SideScrollGame
         public int healthMaximum = 500;
         private BulletType typeBullet;
 
+        private bool isDead;
+
         public float attackDamage = 10.0f;
 
         protected List<GameObject> childObjects;
@@ -53,7 +55,8 @@ namespace GameStateManagement.SideScrollGame
         private Vector2 screen = new Vector2(480, 800);
         
         public Character()
-        { 
+        {
+            this.isDead = false;
             this.currentState = CharacterState.IDLE;
             this.lastState = currentState;
             this.childObjects = new List<GameObject>();
@@ -64,7 +67,7 @@ namespace GameStateManagement.SideScrollGame
             : base(texture,0, (int)size.X,(int)size.Y)
         {
             this.character = this;
-            
+            this.isDead = false;
             this.currentState = CharacterState.IDLE;
             this.lastState = CharacterState.MOVERIGHT;
 
@@ -85,6 +88,17 @@ namespace GameStateManagement.SideScrollGame
         {
             this.attackDamage = damage;
         }
+
+        public void setDead(bool dead)
+        {
+            this.isDead = dead;
+        }
+
+        public bool Dead
+        {
+            get { return this.isDead; }
+        }
+
 
         public void setMaximumHealth(int health)
         {
@@ -183,6 +197,7 @@ namespace GameStateManagement.SideScrollGame
             this.texture = null;
             this.position = Vector2.Zero;
             this.speed = 0;
+            this.setDead(true);
             this.sourceRect = new Rectangle();
         }
 

@@ -93,6 +93,8 @@
     <Compile Include="Screens\OptionsMenuScreen.cs" />
     <Compile Include="Screens\PauseMenuScreen.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="Screens\RestartLocalNetwork.cs" />
+    <Compile Include="Screens\WinLoseScreen.cs" />
     <Compile Include="SideScrollGame.cs" />
   </ItemGroup>
   <ItemGroup>

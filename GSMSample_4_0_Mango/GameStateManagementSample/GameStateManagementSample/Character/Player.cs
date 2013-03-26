@@ -29,6 +29,7 @@ namespace GameStateManagement.SideScrollGame
             weapon = new Weapon(this, GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5,35), new Vector2(100,30));
             healthBar = new Health(this);
 
+            this.setDead(false);
             this.AddChild(weapon);
             this.AddChild(healthBar);
             this.setBulletType(BulletType.NORMAL, 15.0f);
@@ -41,6 +42,7 @@ namespace GameStateManagement.SideScrollGame
             weapon = new Weapon(this, GameplayScreen.main.content.Load<Texture2D>("Weapon/rifle"), new Vector2(5, 35), new Vector2(100, 30));
             healthBar = new Health(this);
 
+            this.setDead(false);
             this.AddChild(weapon);
             this.AddChild(healthBar);
             this.setBulletType(BulletType.NORMAL, 15.0f);
@@ -183,6 +185,7 @@ namespace GameStateManagement.SideScrollGame
                     }
                 }
             }
+
         }
 
         public void HandleInput(GamePadState gamePad)
@@ -323,239 +326,243 @@ namespace GameStateManagement.SideScrollGame
 
         public void HandleInput(KeyboardState keyPad, MouseState mousePad)
         {
-            switch (currentState)
+            if (this.Dead == false)
             {
-                case CharacterState.IDLE:
-                    this.lastPosition = position;
-                    if (keyPad.IsKeyDown(Keys.A))
-                    {
-                        this.currentState = CharacterState.MOVELEFT;
-                        this.lastState = currentState;
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.D))
-                    {
-                        this.currentState = CharacterState.MOVERIGHT;
-                        this.lastState = currentState;
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.W))
-                    {
-                        this.currentState = CharacterState.MOVEUP;
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.S))
-                    {
-                        this.currentState = CharacterState.MOVEDOWN;
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.Space))
-                    {
-                        this.velocity = new Vector2(0, jumpHeight);
-                        this.currentState = CharacterState.JUMP;
-
-                        if (SideScrollGame.main.IsNetwork)
+                switch (currentState)
+                {
+                    case CharacterState.IDLE:
+                        this.lastPosition = position;
+                        if (keyPad.IsKeyDown(Keys.A))
                         {
-                            if (this.currentState == CharacterState.JUMP)
+                            this.currentState = CharacterState.MOVELEFT;
+                            this.lastState = currentState;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.D))
+                        {
+                            this.currentState = CharacterState.MOVERIGHT;
+                            this.lastState = currentState;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.W))
+                        {
+                            this.currentState = CharacterState.MOVEUP;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.S))
+                        {
+                            this.currentState = CharacterState.MOVEDOWN;
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.Space))
+                        {
+                            this.velocity = new Vector2(0, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+
+                            if (SideScrollGame.main.IsNetwork)
                             {
-                                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-                                outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
-                                outMsg.Write((byte)this.currentState);
-                                outMsg.Write((byte)this.lastState);
-                                outMsg.Write((float)this.lastPosition.X);
-                                outMsg.Write((float)this.lastPosition.Y);
-                                outMsg.Write((float)this.velocity.X);
-                                outMsg.Write((float)this.velocity.Y);
+                                if (this.currentState == CharacterState.JUMP)
+                                {
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                    outMsg.Write((byte)this.currentState);
+                                    outMsg.Write((byte)this.lastState);
+                                    outMsg.Write((float)this.lastPosition.X);
+                                    outMsg.Write((float)this.lastPosition.Y);
+                                    outMsg.Write((float)this.velocity.X);
+                                    outMsg.Write((float)this.velocity.Y);
 
-                                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 
+                                }
                             }
                         }
-                    }
-                    if (mousePad.LeftButton == ButtonState.Pressed)
-                    {
-                        this.currentState = CharacterState.SHOOT;
-                    }
-                    if (keyPad.IsKeyDown(Keys.OemMinus))
-                    {
-                        this.health -= 10;
-                    }
-                    if (keyPad.IsKeyDown(Keys.OemPlus))
-                    {
-                        if (health < healthMaximum)
-                            this.health += 10;
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.PageUp))
-                    {
-                        this.setBulletType(BulletType.NORMAL, 15.0f);
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.PageDown))
-                    {
-                        this.setBulletType(BulletType.LASER, 30.0f);
-                    }
-
-                    if (keyPad.IsKeyDown(Keys.Delete))
-                    {
-                        foreach (Enemy enemy in Level.main.enemiesLevel)
-                        {
-                            if (enemy.Alive)
-                                enemy.getHit(10);
-                        }
-                    }
-                    break;
-
-                case CharacterState.MOVERIGHT:
-                    if (keyPad.IsKeyUp(Keys.D))
-                    {
-                        this.lastState = currentState;
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    else
-                    {
-                        this.lastPosition = position;
                         if (mousePad.LeftButton == ButtonState.Pressed)
                         {
                             this.currentState = CharacterState.SHOOT;
                         }
-
-                        if (keyPad.IsKeyDown(Keys.Space))
+                        if (keyPad.IsKeyDown(Keys.OemMinus))
                         {
-                            this.velocity = new Vector2(jumpDistance, jumpHeight);
-                            this.currentState = CharacterState.JUMP;
+                            this.health -= 10;
+                        }
+                        if (keyPad.IsKeyDown(Keys.OemPlus))
+                        {
+                            if (health < healthMaximum)
+                                this.health += 10;
+                        }
 
-                            if (SideScrollGame.main.IsNetwork)
+                        if (keyPad.IsKeyDown(Keys.PageUp))
+                        {
+                            this.setBulletType(BulletType.NORMAL, 15.0f);
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.PageDown))
+                        {
+                            this.setBulletType(BulletType.LASER, 30.0f);
+                        }
+
+                        if (keyPad.IsKeyDown(Keys.Delete))
+                        {
+                            foreach (Enemy enemy in Level.main.enemiesLevel)
                             {
-                                if (this.currentState == CharacterState.JUMP)
+                                if (enemy.Alive)
+                                    enemy.getHit(10);
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVERIGHT:
+                        if (keyPad.IsKeyUp(Keys.D))
+                        {
+                            this.lastState = currentState;
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        else
+                        {
+                            this.lastPosition = position;
+                            if (mousePad.LeftButton == ButtonState.Pressed)
+                            {
+                                this.currentState = CharacterState.SHOOT;
+                            }
+
+                            if (keyPad.IsKeyDown(Keys.Space))
+                            {
+                                this.velocity = new Vector2(jumpDistance, jumpHeight);
+                                this.currentState = CharacterState.JUMP;
+
+                                if (SideScrollGame.main.IsNetwork)
                                 {
-                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
-                                    outMsg.Write((byte)this.currentState);
-                                    outMsg.Write((byte)this.lastState);
-                                    outMsg.Write((float)this.lastPosition.X);
-                                    outMsg.Write((float)this.lastPosition.Y);
-                                    outMsg.Write((float)this.velocity.X);
-                                    outMsg.Write((float)this.velocity.Y);
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
 
-                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 
+                                    }
+                                }
+                            }
+
+                            if (keyPad.IsKeyDown(Keys.LeftShift))
+                            {
+                                this.currentState = CharacterState.BOOST;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVELEFT:
+                        if (keyPad.IsKeyUp(Keys.A))
+                        {
+                            this.lastState = currentState;
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        else
+                        {
+                            this.lastPosition = position;
+                            if (mousePad.LeftButton == ButtonState.Pressed)
+                            {
+                                this.currentState = CharacterState.SHOOT;
+                            }
+                            if (keyPad.IsKeyDown(Keys.Space))
+                            {
+                                this.velocity = new Vector2(jumpDistance, jumpHeight);
+                                this.currentState = CharacterState.JUMP;
+
+                                if (SideScrollGame.main.IsNetwork)
+                                {
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
+
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                    }
+                                }
+                            }
+
+                            if (keyPad.IsKeyDown(Keys.LeftShift))
+                            {
+                                this.currentState = CharacterState.BOOST;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVEUP:
+                        if (keyPad.IsKeyUp(Keys.W))
+                        {
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        break;
+
+                    case CharacterState.MOVEDOWN:
+                        if (keyPad.IsKeyUp(Keys.S))
+                        {
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        break;
+
+                    case CharacterState.SHOOT:
+                        if (mousePad.LeftButton == ButtonState.Released)
+                        {
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        break;
+
+                    case CharacterState.BOOST:
+                        if (keyPad.IsKeyUp(Keys.LeftShift))
+                        {
+                            this.currentState = lastState;
+                        }
+                        else
+                        {
+                            this.lastPosition = position;
+                            if (keyPad.IsKeyDown(Keys.Space))
+                            {
+                                this.velocity = new Vector2((jumpDistance * 2), jumpHeight);
+                                this.currentState = CharacterState.JUMP;
+
+                                if (SideScrollGame.main.IsNetwork)
+                                {
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
+
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                    }
                                 }
                             }
                         }
-
-                        if (keyPad.IsKeyDown(Keys.LeftShift))
-                        {
-                            this.currentState = CharacterState.BOOST;
-                        }
-                    }
-                    break;
-
-                case CharacterState.MOVELEFT:
-                    if (keyPad.IsKeyUp(Keys.A))
-                    {
-                        this.lastState = currentState;
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    else
-                    {
-                        this.lastPosition = position;
-                        if (mousePad.LeftButton == ButtonState.Pressed)
-                        {
-                            this.currentState = CharacterState.SHOOT;
-                        }
-                        if (keyPad.IsKeyDown(Keys.Space))
-                        {
-                            this.velocity = new Vector2(jumpDistance, jumpHeight);
-                            this.currentState = CharacterState.JUMP;
-
-                            if (SideScrollGame.main.IsNetwork)
-                            {
-                                if (this.currentState == CharacterState.JUMP)
-                                {
-                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
-                                    outMsg.Write((byte)this.currentState);
-                                    outMsg.Write((byte)this.lastState);
-                                    outMsg.Write((float)this.lastPosition.X);
-                                    outMsg.Write((float)this.lastPosition.Y);
-                                    outMsg.Write((float)this.velocity.X);
-                                    outMsg.Write((float)this.velocity.Y);
-
-                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-
-                                }
-                            }
-                        }
-
-                        if (keyPad.IsKeyDown(Keys.LeftShift))
-                        {
-                            this.currentState = CharacterState.BOOST;
-                        }
-                    }
-                    break;
-
-                case CharacterState.MOVEUP:
-                    if (keyPad.IsKeyUp(Keys.W))
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    break;
-
-                case CharacterState.MOVEDOWN:
-                    if (keyPad.IsKeyUp(Keys.S))
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    break;
-
-                case CharacterState.SHOOT:
-                    if (mousePad.LeftButton == ButtonState.Released)
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    break;
-
-                case CharacterState.BOOST:
-                    if (keyPad.IsKeyUp(Keys.LeftShift))
-                    {
-                        this.currentState = lastState;
-                    }
-                    else
-                    {
-                        this.lastPosition = position;
-                        if (keyPad.IsKeyDown(Keys.Space))
-                        {
-                            this.velocity = new Vector2((jumpDistance*2), jumpHeight);
-                            this.currentState = CharacterState.JUMP;
-
-                            if (SideScrollGame.main.IsNetwork)
-                            {
-                                if (this.currentState == CharacterState.JUMP)
-                                {
-                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
-                                    outMsg.Write((byte)this.currentState);
-                                    outMsg.Write((byte)this.lastState);
-                                    outMsg.Write((float)this.lastPosition.X);
-                                    outMsg.Write((float)this.lastPosition.Y);
-                                    outMsg.Write((float)this.velocity.X);
-                                    outMsg.Write((float)this.velocity.Y);
-
-                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-
-                                }
-                            }
-                        }
-                    }
-                    break;
+                        break;
+                }
             }
             
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch);
+            if (this.Dead == false)
+                base.Draw(spriteBatch);
         }
 
         public Texture2D getTexture()

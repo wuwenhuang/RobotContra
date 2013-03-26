@@ -48,7 +48,7 @@ namespace GameStateManagement.SideScrollGame
             {
                 foreach (Enemy enemy in enemiesLevel)
                 {
-                    if (enemy.Alive && enemy.Texture != null)
+                    if (enemy.Alive && enemy.Texture != null && enemy.Dead == false)
                         enemy.Draw(spriteBatch);
                 }
             }
@@ -65,6 +65,7 @@ namespace GameStateManagement.SideScrollGame
             foreach (Enemy enemy in enemiesLevel)
             {
                 enemy.SetTargetPlayer(targetPlayer);
+                enemy.setDead(false);
             }
         }
 
@@ -77,6 +78,7 @@ namespace GameStateManagement.SideScrollGame
             foreach (Enemy enemy in enemiesLevel)
             {
                 enemy.SetTargetPlayer(targetPlayer);
+                enemy.setDead(false);
             }
         }
         
@@ -115,26 +117,23 @@ namespace GameStateManagement.SideScrollGame
             {
                 for (int i = 0; i < enemiesLevel.Count; i++)
                 {
-                    if (!enemiesLevel[i].Alive && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
+                    if (enemiesLevel[i].Alive == false && enemiesLevel[i].Dead == false && enemiesLevel[i].position.X < Camera2D.main.getPosition().X + Camera2D.main.rect.Width)
                         enemiesLevel[i].setAlive(true);
 
-                    if (enemiesLevel[i].Alive)
+                    if (enemiesLevel[i].Alive == true && enemiesLevel[i].Dead == false)
                     {
                         enemiesLevel[i].Update(gameTime, this);
                     }
 
-                    if (enemiesLevel[i].Texture == null)
+                    if (enemiesLevel[i].Texture == null && enemiesLevel[i].Dead == true)
                     {
-                        if (SideScrollGame.main.isHost)
+                        if (SideScrollGame.main.isHost && SideScrollGame.main.IsNetwork)
                         {
                             NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
-                            msgOut.Write((byte)PacketTypes.DELETEENEMY);
+                            msgOut.Write((byte)PacketTypes.DELETEENEMY); // set enemy dead true
                             msgOut.Write((short)i);
                             SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                         }
-                        enemiesLevel.RemoveAt(i);
-
-                        break;
                     }
                 }
             }
@@ -147,17 +146,14 @@ namespace GameStateManagement.SideScrollGame
 
                 foreach (Enemy enemy in enemiesLevel)
                 {
-                    if (enemy.health > 0)
-                    {
-                        outMsg.Write((short)enemy.health);
-                        outMsg.Write((byte)enemy.currentState);
-                        outMsg.Write((byte)enemy.lastState);
+                    outMsg.Write((short)enemy.health);
+                    outMsg.Write((bool)enemy.Dead);
+                    outMsg.Write((byte)enemy.currentState);
+                    outMsg.Write((byte)enemy.lastState);
 
-                        outMsg.Write((float)enemy.position.X);
-                        outMsg.Write((float)enemy.position.Y);
-                    }
-                    else
-                        break;
+                    outMsg.Write((float)enemy.position.X);
+                    outMsg.Write((float)enemy.position.Y);
+
                 }
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
 
