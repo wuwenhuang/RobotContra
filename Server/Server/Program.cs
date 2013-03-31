@@ -173,7 +173,7 @@ namespace XnaGameServer
                                 {
                                     for (int i = 0; i < enemies.Count; i++)
                                     {
-                                        enemies[i].targetPlayer = multiplayerPlayers[rand.Next(multiplayerPlayers.Count)].id;
+                                        enemies[i].targetPlayer = multiplayerPlayers[rand.Next(0,multiplayerPlayers.Count)].id;
                                     }
                                 }
                             }
@@ -312,7 +312,7 @@ namespace XnaGameServer
                                         tempEnemy.x = msg.ReadFloat();
                                         tempEnemy.y = msg.ReadFloat();
 
-                                        tempEnemy.targetPlayer = multiplayerPlayers[rand.Next(multiplayerPlayers.Count)].id;
+                                        tempEnemy.targetPlayer = multiplayerPlayers[rand.Next(0,multiplayerPlayers.Count)].id;
                                         
 
                                         enemies.Add(tempEnemy);
