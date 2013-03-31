@@ -398,16 +398,27 @@ namespace XnaGameServer
                                     break;
 
                                 case (byte)PacketTypes.GETENEMYTARGETPLAYER:
-                                    msgOut = server.CreateMessage();
 
                                     if (enemies.Count > 0)
                                     {
-                                        msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
-                                        for (int i = 0; i < enemies.Count; i++)
+
+                                        for (int i = 0; i < server.Connections.Count; i++)
                                         {
-                                            msgOut.Write((long)enemies[i].targetPlayer);
+                                            NetConnection player = server.Connections[i] as NetConnection;
+                                            // ... send information about every other player (actually including self)
+                                            for (int j = 0; j < multiplayerPlayers.Count; j++)
+                                            {
+                                                // send position update about 'otherPlayer' to 'player'
+                                                NetOutgoingMessage om = server.CreateMessage();
+
+                                                om.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                                                for (int k = 0; k < enemies.Count; k++)
+                                                {
+                                                    om.Write((long)enemies[k].targetPlayer);
+                                                }
+                                                server.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
+                                            }
                                         }
-                                        server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
                                     }
 
                                     break;
