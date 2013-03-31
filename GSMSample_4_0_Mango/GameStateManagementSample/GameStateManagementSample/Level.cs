@@ -67,6 +67,34 @@ namespace GameStateManagement.SideScrollGame
                 enemy.SetTargetPlayer(targetPlayer);
                 enemy.setDead(false);
             }
+
+            if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost)
+            {
+                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                outMsg.Write((byte)PacketTypes.UPDATEENEMYPOSITION);
+                outMsg.Write((short)enemiesLevel.Count);
+
+                foreach (Enemy enemy in enemiesLevel)
+                {
+                    outMsg.Write((short)enemy.health);
+                    outMsg.Write((bool)enemy.Dead);
+                    outMsg.Write((byte)enemy.currentState);
+                    outMsg.Write((byte)enemy.lastState);
+
+                    outMsg.Write((float)enemy.position.X);
+                    outMsg.Write((float)enemy.position.Y);
+
+                }
+                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+            }
+            else if (SideScrollGame.main.isHost == false)
+            {
+                NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
+                msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
+                SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+            }
         }
 
         public void ChangeLevel(int level, Color color)
@@ -80,6 +108,29 @@ namespace GameStateManagement.SideScrollGame
                 enemy.SetTargetPlayer(targetPlayer);
                 enemy.setDead(false);
             }
+
+            if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost)
+            {
+                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                outMsg.Write((byte)PacketTypes.WRITELEVEL);
+                outMsg.Write((short)enemiesLevel.Count);
+                outMsg.Write((short)SideScrollGame.main.currentLevel);
+
+                foreach (Enemy enemy in enemiesLevel)
+                {
+                    outMsg.Write((short)enemy.health);
+                    outMsg.Write((byte)enemy.currentState);
+                    outMsg.Write((byte)enemy.lastState);
+
+                    outMsg.Write((float)enemy.position.X);
+                    outMsg.Write((float)enemy.position.Y);
+
+                }
+                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
+
+            }
+            
         }
         
         public void ChangeColor(Color color)
@@ -137,33 +188,7 @@ namespace GameStateManagement.SideScrollGame
                     }
                 }
             }
-            if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost)
-            {
-                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
-
-                outMsg.Write((byte)PacketTypes.UPDATEENEMYPOSITION);
-                outMsg.Write((short)enemiesLevel.Count);
-
-                foreach (Enemy enemy in enemiesLevel)
-                {
-                    outMsg.Write((short)enemy.health);
-                    outMsg.Write((bool)enemy.Dead);
-                    outMsg.Write((byte)enemy.currentState);
-                    outMsg.Write((byte)enemy.lastState);
-
-                    outMsg.Write((float)enemy.position.X);
-                    outMsg.Write((float)enemy.position.Y);
-
-                }
-                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-
-            }
-            else if (SideScrollGame.main.isHost == false)
-            {
-                NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
-                msgOut.Write((byte)PacketTypes.GETSERVERENEMYPOSITIONS);
-                SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
-            }
+            
         }
         
     }

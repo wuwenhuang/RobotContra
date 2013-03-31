@@ -285,14 +285,16 @@ namespace XnaGameServer
                                     level = msg.ReadInt16();
                                     enemies.Clear();
                                     int enemiesInLevel = msg.ReadInt16();
+                                    level = msg.ReadInt16();
 
                                     for (int i = 0; i < enemiesInLevel; i++)
                                     {
                                         Enemy tempEnemy = new Enemy();
+                                        tempEnemy.isDead = false;
+
+                                        tempEnemy.health = msg.ReadInt16();
                                         tempEnemy.state = (CharacterState)msg.ReadByte();
                                         tempEnemy.lastState = (CharacterState)msg.ReadByte();
-                                        tempEnemy.health = msg.ReadInt32();
-                                        tempEnemy.isDead = msg.ReadBoolean();
                                         tempEnemy.x = msg.ReadFloat();
                                         tempEnemy.y = msg.ReadFloat();
                                         enemies.Add(tempEnemy);
@@ -306,13 +308,15 @@ namespace XnaGameServer
                                     int enemyInLevel = msg.ReadInt16();
                                     for (int i = 0; i < enemyInLevel; i++)
                                     {
-                                        enemies[i].health = msg.ReadInt16();
-                                        enemies[i].isDead = msg.ReadBoolean();
-                                        enemies[i].state = (CharacterState)msg.ReadByte();
-                                        enemies[i].lastState = (CharacterState)msg.ReadByte();
-                                        enemies[i].x = msg.ReadFloat();
-                                        enemies[i].y = msg.ReadFloat();
-                                    
+                                        Enemy tempEnemy = new Enemy();
+                                        tempEnemy.health = msg.ReadInt32();
+                                        tempEnemy.isDead = msg.ReadBoolean();
+                                        tempEnemy.state = (CharacterState)msg.ReadByte();
+                                        tempEnemy.lastState = (CharacterState)msg.ReadByte();
+                                        tempEnemy.x = msg.ReadFloat();
+                                        tempEnemy.y = msg.ReadFloat();
+
+                                        enemies.Add(tempEnemy);
                                     }
                                     break;
 
@@ -331,20 +335,15 @@ namespace XnaGameServer
 
                                     for (int i = 0; i < enemies.Count; i++)
                                     {
-                                        if (enemies[i].health > 0)
-                                        {
-                                            msgOut.Write((byte)enemies[i].state);
-                                            msgOut.Write((byte)enemies[i].lastState);
-                                            msgOut.Write((short)enemies[i].health);
-                                            msgOut.Write((bool)enemies[i].isDead);
-                                            msgOut.Write((float)enemies[i].x);
-                                            msgOut.Write((float)enemies[i].y);
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
+                                       
+                                        msgOut.Write((byte)enemies[i].state);
+                                        msgOut.Write((byte)enemies[i].lastState);
+                                        msgOut.Write((short)enemies[i].health);
+                                        msgOut.Write((bool)enemies[i].isDead);
+                                        msgOut.Write((float)enemies[i].x);
+                                        msgOut.Write((float)enemies[i].y);
                                     }
+
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                                     break;
