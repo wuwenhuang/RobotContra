@@ -319,6 +319,18 @@ namespace XnaGameServer
 
                                     }
 
+                                    msgOut = server.CreateMessage();
+
+                                    if (enemies.Count > 0)
+                                    {
+                                        msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                                        for (int i = 0; i < enemies.Count; i++)
+                                        {
+                                            msgOut.Write((long)enemies[i].targetPlayer);
+                                        }
+                                        server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
+                                    }
+
                                     break;
 
                                 case (byte)PacketTypes.UPDATEENEMYPOSITION:

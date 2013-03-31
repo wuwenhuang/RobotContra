@@ -137,12 +137,6 @@ namespace GameStateManagement.SideScrollGame
                 }
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
 
-
-                 outMsg = SideScrollGame.main.client.CreateMessage();
-
-                outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
-
-                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
             }
             
         }
