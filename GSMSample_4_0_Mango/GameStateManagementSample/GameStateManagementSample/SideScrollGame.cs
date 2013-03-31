@@ -489,17 +489,11 @@ namespace GameStateManagement.SideScrollGame
                                         _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                     }
 
-                                    for (int i = 0; i < _level.enemiesLevel.Count; i++)
-                                    {
-                                        if (_level.enemiesLevel[i].targetPlayer == null)
-                                        {
-                                            NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
 
-                                            outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
+                                    outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
 
-                                            client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-                                        }
-                                    }
+                                    client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                                     break;
 
                                 case (byte)PacketTypes.SENDENEMYPOSITIONS:

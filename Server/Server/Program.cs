@@ -388,12 +388,15 @@ namespace XnaGameServer
                                 case (byte)PacketTypes.GETENEMYTARGETPLAYER:
                                     msgOut = server.CreateMessage();
 
-                                    msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
-                                    for (int i = 0; i < enemies.Count; i++)
+                                    if (enemies.Count > 0)
                                     {
-                                        msgOut.Write((long)enemies[i].targetPlayer);
+                                        msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                                        for (int i = 0; i < enemies.Count; i++)
+                                        {
+                                            msgOut.Write((long)enemies[i].targetPlayer);
+                                        }
+                                        server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
                                     }
-                                    server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                                     break;
                             }
