@@ -29,6 +29,14 @@ namespace GameStateManagement.SideScrollGame
                 this.targetPlayer = targetPlayer;
         }
 
+        public Level()
+            : base()
+        {
+            main = this;
+            gameWidth = 0;
+            color = Color.CornflowerBlue;
+        }
+
         public void setTargetPlayer(Character targetPlayer)
         {
             this.targetPlayer = targetPlayer;
@@ -129,6 +137,18 @@ namespace GameStateManagement.SideScrollGame
                 }
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
 
+
+                for (int i = 0; i < enemiesLevel.Count; i++)
+                {
+                    if (enemiesLevel[i].targetPlayer == null)
+                    {
+                        outMsg = SideScrollGame.main.client.CreateMessage();
+
+                        outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
+
+                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                    }
+                }
             }
             
         }

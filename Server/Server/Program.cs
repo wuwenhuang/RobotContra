@@ -25,7 +25,10 @@ namespace XnaGameServer
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
         GETSERVERENEMYPOSITIONS,
-        DELETEENEMY
+        DELETEENEMY,
+
+        SENDENEMYTARGETPLAYER,
+        GETENEMYTARGETPLAYER
     };
 
     enum CharacterState
@@ -63,6 +66,7 @@ namespace XnaGameServer
     class Enemy
     {
         public float x,y;
+        public long targetPlayer;
         public CharacterState state;
         public CharacterState lastState;
         public int health;
@@ -74,6 +78,8 @@ namespace XnaGameServer
     {
         static List<MultiplayerPlayers> multiplayerPlayers = new List<MultiplayerPlayers>();
         static List<Enemy> enemies = new List<Enemy>();
+
+        static Random rand = new Random();
 
         static double nextSendUpdates;
         static NetServer server;
@@ -160,6 +166,14 @@ namespace XnaGameServer
                                         outMessage.Write((float)multiplayerPlayers[i].y);
                                         server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         break;
+                                    }
+                                }
+
+                                if (enemies.Count >= 0)
+                                {
+                                    for (int i = 0; i < enemies.Count; i++)
+                                    {
+                                        enemies[i].targetPlayer = multiplayerPlayers[rand.Next(multiplayerPlayers.Count)].id;
                                     }
                                 }
                             }
@@ -283,6 +297,7 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.WRITELEVEL:
                                     enemies.Clear();
+
                                     int enemiesInLevel = msg.ReadInt16();
                                     level = msg.ReadInt16();
 
@@ -296,10 +311,13 @@ namespace XnaGameServer
                                         tempEnemy.lastState = (CharacterState)msg.ReadByte();
                                         tempEnemy.x = msg.ReadFloat();
                                         tempEnemy.y = msg.ReadFloat();
+
+                                        tempEnemy.targetPlayer = multiplayerPlayers[rand.Next(multiplayerPlayers.Count)].id;
+                                        
+
                                         enemies.Add(tempEnemy);
 
                                     }
-
 
                                     break;
 
@@ -365,6 +383,18 @@ namespace XnaGameServer
 
                                     }
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
+                                    break;
+
+                                case (byte)PacketTypes.GETENEMYTARGETPLAYER:
+                                    msgOut = server.CreateMessage();
+
+                                    msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                                    for (int i = 0; i < enemies.Count; i++)
+                                    {
+                                        msgOut.Write((long)enemies[i].targetPlayer);
+                                    }
+                                    server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
+
                                     break;
                             }
                             break;

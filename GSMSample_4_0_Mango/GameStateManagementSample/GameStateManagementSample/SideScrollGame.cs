@@ -31,7 +31,10 @@ namespace GameStateManagement.SideScrollGame
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
         GETSERVERENEMYPOSITIONS,
-        DELETEENEMY
+        DELETEENEMY,
+
+        SENDENEMYTARGETPLAYER,
+        GETENEMYTARGETPLAYER
     };
 
     class SideScrollGame
@@ -311,7 +314,7 @@ namespace GameStateManagement.SideScrollGame
             currentLevel = -1;
 
             if (player != null)
-                _level = new Level(player);
+                _level = new Level();
             _camera = new Camera2D();
 
             _camera.setSize(gameplay.ScreenManager.GraphicsDevice.Viewport.Width,
@@ -462,7 +465,7 @@ namespace GameStateManagement.SideScrollGame
 
                                         isHost = false;
 
-                                        NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
+                                        NetOutgoingMessage msgOut = client.CreateMessage();
                                         msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
                                         SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                                     }
@@ -485,6 +488,10 @@ namespace GameStateManagement.SideScrollGame
                                         _level.enemiesLevel[i].position.X = msg.ReadFloat();
                                         _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                     }
+
+                                    NetOutgoingMessage outMsg = client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                                    client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                                     break;
 
                                 case (byte)PacketTypes.SENDENEMYPOSITIONS:
@@ -501,6 +508,29 @@ namespace GameStateManagement.SideScrollGame
                                         
                                     }
 
+                                    break;
+
+                                case (byte)PacketTypes.SENDENEMYTARGETPLAYER:
+                                    for (int i = 0; i < _level.enemiesLevel.Count; i++)
+                                    {
+                                        long tempTargetPlayer = msg.ReadInt64();
+
+                                        if (player.id == tempTargetPlayer)
+                                        {
+                                            _level.enemiesLevel[i].SetTargetPlayer(player);
+                                        }
+                                        else
+                                        {
+                                            for (i = 0; i < otherPlayers.Count; i++)
+                                            {
+                                                if (otherPlayers[i].id == tempTargetPlayer)
+                                                {
+                                                    _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[i]);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
                                     break;
                             }
                             break;
