@@ -138,17 +138,11 @@ namespace GameStateManagement.SideScrollGame
                 SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
 
 
-                for (int i = 0; i < enemiesLevel.Count; i++)
-                {
-                    if (enemiesLevel[i].targetPlayer == null)
-                    {
-                        outMsg = SideScrollGame.main.client.CreateMessage();
+                 outMsg = SideScrollGame.main.client.CreateMessage();
 
-                        outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
+                outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
 
-                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-                    }
-                }
+                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
             }
             
         }
