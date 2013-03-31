@@ -282,7 +282,6 @@ namespace XnaGameServer
                                     break;
 
                                 case (byte)PacketTypes.WRITELEVEL:
-                                    level = msg.ReadInt16();
                                     enemies.Clear();
                                     int enemiesInLevel = msg.ReadInt16();
                                     level = msg.ReadInt16();
