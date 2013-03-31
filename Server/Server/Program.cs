@@ -169,7 +169,7 @@ namespace XnaGameServer
                                     }
                                 }
 
-                                if (enemies.Count >= 0)
+                                if (enemies.Count > 0)
                                 {
                                     for (int i = 0; i < enemies.Count; i++)
                                     {

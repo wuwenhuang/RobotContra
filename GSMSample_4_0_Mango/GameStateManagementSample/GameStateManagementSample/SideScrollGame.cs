@@ -529,14 +529,7 @@ namespace GameStateManagement.SideScrollGame
                                         }
                                         else
                                         {
-                                            for (i = 0; i < otherPlayers.Count; i++)
-                                            {
-                                                if (otherPlayers[i].id == tempTargetPlayer)
-                                                {
-                                                    _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[i]);
-                                                    break;
-                                                }
-                                            }
+                                            _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[tempTargetPlayer]);
                                         }
                                     }
                                     break;
