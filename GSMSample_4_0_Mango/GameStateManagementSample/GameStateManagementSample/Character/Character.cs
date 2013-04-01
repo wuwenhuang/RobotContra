@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Lidgren.Network;
 
 namespace GameStateManagement.SideScrollGame
 {
@@ -225,6 +226,15 @@ namespace GameStateManagement.SideScrollGame
                 this.frame = 0;
                 this.velocity = new Vector2(deadDistance, deadHeight);
                 this.currentState = CharacterState.DEAD;
+
+                if (SideScrollGame.main.IsNetwork)
+                {
+                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                    outMsg.Write((byte)PacketTypes.SENDPLAYERDEAD);
+
+                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                }
             }
 
             if (this.currentState == CharacterState.DEAD)

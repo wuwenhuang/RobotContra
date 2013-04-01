@@ -21,6 +21,7 @@ namespace XnaGameServer
         UPDATEPLAYERS,
         UPDATEVELOCITY,
         SENDUPDATEVELOCITY,
+        SENDPLAYERDEAD,
 
         UPDATEENEMYPOSITION,
         SENDENEMYPOSITIONS,
@@ -56,10 +57,12 @@ namespace XnaGameServer
         public CharacterState state;
         public CharacterState lastState;
         public int health;
+        public bool isDead;
 
         public MultiplayerPlayers(long id)
         {
             this.id = id;
+            this.isDead = false;
         }
     };
 
@@ -81,11 +84,8 @@ namespace XnaGameServer
 
         static Random rand = new Random();
 
-        static double nextSendUpdates;
         static NetServer server;
-        static bool updateEnemy = true;
         static Semaphore sem;
-        static bool deleteEnemy = false;
 
         static int level;
 
@@ -169,13 +169,7 @@ namespace XnaGameServer
                                     }
                                 }
 
-                                if (enemies.Count > 0)
-                                {
-                                    for (int i = 0; i < enemies.Count; i++)
-                                    {
-                                        enemies[i].targetPlayer = multiplayerPlayers[rand.Next(0,multiplayerPlayers.Count)].id;
-                                    }
-                                }
+                                SetEnemyTarget();
                             }
                             else if (status == NetConnectionStatus.Disconnected || status == NetConnectionStatus.Disconnecting)
                             {
@@ -258,32 +252,22 @@ namespace XnaGameServer
                                         }
                                     }
 
-                                    for (int i = 0; i < server.Connections.Count; i++)
+                                    SendToAllPlayerPositionVelocity();
+
+                                    break;
+
+                                case (byte)PacketTypes.SENDPLAYERDEAD:
+                                    foreach (MultiplayerPlayers players in multiplayerPlayers)
                                     {
-                                        NetConnection player = server.Connections[i] as NetConnection;
-                                        // ... send information about every other player (actually including self)
-                                        for (int j = 0; j < server.Connections.Count; j++)
+                                        if (players.id == msg.SenderConnection.RemoteUniqueIdentifier)
                                         {
-                                            // send position update about 'otherPlayer' to 'player'
-                                            NetOutgoingMessage om = server.CreateMessage();
-
-                                            // write who this position is for
-
-                                            om.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
-                                            om.Write((long)multiplayerPlayers[j].id);
-                                            om.Write((byte)multiplayerPlayers[j].state);
-                                            om.Write((byte)multiplayerPlayers[j].lastState);
-                                            om.Write((float)multiplayerPlayers[j].lastPosX);
-                                            om.Write((float)multiplayerPlayers[j].lastPosY);
-                                            om.Write((float)multiplayerPlayers[j].velocityX);
-                                            om.Write((float)multiplayerPlayers[j].velocityY);
-
-                                            // send message
-                                            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                                            players.isDead = true;
+                                            break;
                                         }
-
                                     }
 
+                                    SetEnemyTarget();
+                                    SendToAllPlayerEnemyTarget();
                                     break;
 
                                 case (byte)PacketTypes.GETNUMBEROFPLAYERS:
@@ -319,17 +303,7 @@ namespace XnaGameServer
 
                                     }
 
-                                    msgOut = server.CreateMessage();
-
-                                    if (enemies.Count > 0)
-                                    {
-                                        msgOut.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
-                                        for (int i = 0; i < enemies.Count; i++)
-                                        {
-                                            msgOut.Write((long)enemies[i].targetPlayer);
-                                        }
-                                        server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
-                                    }
+                                    SendToAllPlayerEnemyTarget();
 
                                     break;
 
@@ -397,29 +371,11 @@ namespace XnaGameServer
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
                                     break;
 
+                                
+
                                 case (byte)PacketTypes.GETENEMYTARGETPLAYER:
 
-                                    if (enemies.Count > 0)
-                                    {
-
-                                        for (int i = 0; i < server.Connections.Count; i++)
-                                        {
-                                            NetConnection player = server.Connections[i] as NetConnection;
-                                            // ... send information about every other player (actually including self)
-                                            for (int j = 0; j < multiplayerPlayers.Count; j++)
-                                            {
-                                                // send position update about 'otherPlayer' to 'player'
-                                                NetOutgoingMessage om = server.CreateMessage();
-
-                                                om.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
-                                                for (int k = 0; k < enemies.Count; k++)
-                                                {
-                                                    om.Write((long)enemies[k].targetPlayer);
-                                                }
-                                                server.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
-                                            }
-                                        }
-                                    }
+                                    SendToAllPlayerEnemyTarget();
 
                                     break;
                             }
@@ -434,29 +390,7 @@ namespace XnaGameServer
                     // Yes, it's time to send position updates
 
                     // for each player...
-                    for (int i = 0; i < server.Connections.Count; i++)
-                    {
-                        NetConnection player = server.Connections[i] as NetConnection;
-                        // ... send information about every other player (actually including self)
-                        for (int j = 0; j < multiplayerPlayers.Count; j++)
-                        {
-                            // send position update about 'otherPlayer' to 'player'
-                            NetOutgoingMessage om = server.CreateMessage();
-
-                            // write who this position is for
-                            om.Write((byte)PacketTypes.UPDATEPLAYERS);
-                            om.Write((long)multiplayerPlayers[j].id);
-                            om.Write((byte)multiplayerPlayers[j].state);
-                            om.Write((byte)multiplayerPlayers[j].lastState);
-                            om.Write((int)multiplayerPlayers[j].health);
-                            om.Write((float)multiplayerPlayers[j].x);
-                            om.Write((float)multiplayerPlayers[j].y);
-
-                            // send message
-                            server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
-                        }
-
-                    }
+                    SendToAllPlayerPositionVelocity();
 
                     // schedule next update
                     nextSendUpdates += (1.0 / 60.0);
@@ -466,6 +400,80 @@ namespace XnaGameServer
             }
 
             server.Shutdown("app exiting");
+        }
+
+        static void SetEnemyTarget()
+        {
+            if (enemies.Count > 0)
+            {
+                for (int i = 0; i < enemies.Count; i++)
+                {
+                    int index = rand.Next(0, multiplayerPlayers.Count);
+
+                    while (multiplayerPlayers[index].isDead == true)
+                    {
+                        index = rand.Next(0, multiplayerPlayers.Count);
+                    }
+
+                    if (multiplayerPlayers[index].isDead == false)
+                    {
+                        enemies[i].targetPlayer = multiplayerPlayers[index].id;
+                    }
+                }
+            }
+        }
+
+        static void SendToAllPlayerEnemyTarget()
+        {
+            if (enemies.Count > 0)
+            {
+                for (int i = 0; i < server.Connections.Count; i++)
+                {
+                    NetConnection player = server.Connections[i] as NetConnection;
+                    // ... send information about every other player (actually including self)
+                    for (int j = 0; j < multiplayerPlayers.Count; j++)
+                    {
+                        // send position update about 'otherPlayer' to 'player'
+                        NetOutgoingMessage om = server.CreateMessage();
+
+                        om.Write((byte)PacketTypes.SENDENEMYTARGETPLAYER);
+                        for (int k = 0; k < enemies.Count; k++)
+                        {
+                            om.Write((long)enemies[k].targetPlayer);
+                        }
+                        server.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
+                    }
+                }
+            }
+        }
+
+        static void SendToAllPlayerPositionVelocity()
+        {
+            for (int i = 0; i < server.Connections.Count; i++)
+            {
+                NetConnection player = server.Connections[i] as NetConnection;
+                // ... send information about every other player (actually including self)
+                for (int j = 0; j < server.Connections.Count; j++)
+                {
+                    // send position update about 'otherPlayer' to 'player'
+                    NetOutgoingMessage om = server.CreateMessage();
+
+                    // write who this position is for
+
+                    om.Write((byte)PacketTypes.SENDUPDATEVELOCITY);
+                    om.Write((long)multiplayerPlayers[j].id);
+                    om.Write((byte)multiplayerPlayers[j].state);
+                    om.Write((byte)multiplayerPlayers[j].lastState);
+                    om.Write((float)multiplayerPlayers[j].lastPosX);
+                    om.Write((float)multiplayerPlayers[j].lastPosY);
+                    om.Write((float)multiplayerPlayers[j].velocityX);
+                    om.Write((float)multiplayerPlayers[j].velocityY);
+
+                    // send message
+                    server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                }
+
+            }
         }
 
         static bool deletePlayerFromServer(long id)
