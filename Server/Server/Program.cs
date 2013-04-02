@@ -203,6 +203,9 @@ namespace XnaGameServer
 
                                             server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         }
+
+                                        SetEnemyTarget();
+                                        SendToAllPlayerEnemyTarget();
                                         
                                         break;
                                     }
