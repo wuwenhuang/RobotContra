@@ -122,6 +122,7 @@ namespace GameStateManagement.SideScrollGame
                 NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
 
                 outMsg.Write((byte)PacketTypes.WRITELEVEL);
+
                 outMsg.Write((short)enemiesLevel.Count);
                 outMsg.Write((short)SideScrollGame.main.currentLevel);
 

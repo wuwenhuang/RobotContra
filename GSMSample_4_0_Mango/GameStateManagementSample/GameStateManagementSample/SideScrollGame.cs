@@ -18,6 +18,7 @@ namespace GameStateManagement.SideScrollGame
         CREATEPLAYER,
         GETNUMBEROFPLAYERS,
         DELETEPLAYER,
+        CHANGEHOST,
 
         WRITELEVEL,
         GETLEVEL,
@@ -380,6 +381,11 @@ namespace GameStateManagement.SideScrollGame
                                             }
                                         }
                                     }
+
+                                    break;
+
+                                case (byte)PacketTypes.CHANGEHOST:
+                                    this.isHost = msg.ReadBoolean();
 
                                     break;
 

@@ -12,6 +12,7 @@ namespace XnaGameServer
         CREATEPLAYER,
         GETNUMBEROFPLAYERS,
         DELETEPLAYER,
+        CHANGEHOST,
 
         WRITELEVEL,
         GETLEVEL,
@@ -58,11 +59,13 @@ namespace XnaGameServer
         public CharacterState lastState;
         public int health;
         public bool isDead;
+        public bool isHost;
 
         public MultiplayerPlayers(long id)
         {
             this.id = id;
             this.health = 500;
+            this.isHost = false;
             this.lastState = CharacterState.MOVERIGHT;
             this.state = CharacterState.IDLE;
             this.isDead = false;
@@ -204,6 +207,23 @@ namespace XnaGameServer
                                             server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         }
 
+                                        if (multiplayerPlayers[i].isHost)
+                                        {
+                                            if (multiplayerPlayers.Count > 1)
+                                            {
+                                                multiplayerPlayers[i + 1].isHost = true;
+
+                                                NetConnection player = server.Connections[i + 1];
+
+                                                NetOutgoingMessage outMsg = server.CreateMessage();
+                                                outMsg.Write((byte)PacketTypes.CHANGEHOST);
+                                                outMsg.Write((bool)multiplayerPlayers[i + 1].isHost);
+
+                                                server.SendMessage(outMsg, player, NetDeliveryMethod.ReliableOrdered);
+
+                                            }
+                                        }
+
                                         SetEnemyTarget();
                                         SendToAllPlayerEnemyTarget();
                                         
@@ -312,6 +332,14 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.WRITELEVEL:
                                     enemies.Clear();
+
+                                    for (int i = 0; i < multiplayerPlayers.Count; i++)
+                                    {
+                                        if (multiplayerPlayers[i].id == msg.SenderConnection.RemoteUniqueIdentifier)
+                                        {
+                                            multiplayerPlayers[i].isHost = true;
+                                        }
+                                    }
 
                                     int enemiesInLevel = msg.ReadInt16();
                                     level = msg.ReadInt16();
