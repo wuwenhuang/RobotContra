@@ -196,7 +196,7 @@ namespace GameStateManagement.SideScrollGame
 
                                 foreach (Enemy enemy in enemiesLevel)
                                 {
-                                    outMsg.Write((short)enemy.health);
+                                    outMsg.Write((int)enemy.health);
                                     outMsg.Write((bool)enemy.Dead);
                                     outMsg.Write((byte)enemy.currentState);
                                     outMsg.Write((byte)enemy.lastState);
