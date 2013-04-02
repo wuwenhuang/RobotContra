@@ -182,6 +182,39 @@ namespace GameStateManagement.SideScrollGame
                     if (enemiesLevel[i].Alive == true && enemiesLevel[i].Dead == false)
                     {
                         enemiesLevel[i].Update(gameTime, this);
+
+                    }
+
+                    if (SideScrollGame.main.IsNetwork)
+                    {
+                        if (SideScrollGame.main.isHost)
+                        {
+                            if (enemiesLevel.Count > 0)
+                            {
+                                NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                outMsg.Write((byte)PacketTypes.UPDATEENEMYPOSITION);
+
+                                foreach (Enemy enemy in enemiesLevel)
+                                {
+                                    outMsg.Write((short)enemy.health);
+                                    outMsg.Write((bool)enemy.Dead);
+                                    outMsg.Write((byte)enemy.currentState);
+                                    outMsg.Write((byte)enemy.lastState);
+                                    outMsg.Write((float)enemy.position.X);
+                                    outMsg.Write((float)enemy.position.Y);
+                                }
+
+                                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                            }
+                        }
+                        else
+                        {
+                            NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                            outMsg.Write((byte)PacketTypes.GETSERVERENEMYPOSITIONS);
+
+                            SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                        }
                     }
 
                     if (enemiesLevel[i].Texture == null && enemiesLevel[i].Dead == true)
@@ -194,6 +227,8 @@ namespace GameStateManagement.SideScrollGame
                             SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
                         }
                     }
+
+
                 }
             }
             

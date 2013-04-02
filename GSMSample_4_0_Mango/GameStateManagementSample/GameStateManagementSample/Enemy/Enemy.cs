@@ -140,6 +140,8 @@ namespace GameStateManagement.SideScrollGame
                         break;
                 }
             }
+
+            
             base.Update(gameTime, level);
         }
 
