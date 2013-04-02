@@ -524,7 +524,8 @@ namespace GameStateManagement.SideScrollGame
                                         }
                                         else
                                         {
-                                            _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[tempTargetPlayer]);
+                                            if (otherPlayers.ContainsKey(tempTargetPlayer) == true)
+                                                _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[tempTargetPlayer]);
                                         }
                                     }
                                     break;
