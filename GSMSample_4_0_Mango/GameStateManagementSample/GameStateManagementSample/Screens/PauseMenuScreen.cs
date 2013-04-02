@@ -69,6 +69,13 @@ namespace GameStateManagementSample
         /// </summary>
         void ConfirmQuitMessageBoxAccepted(object sender, PlayerIndexEventArgs e)
         {
+            GameStateManagement.SideScrollGame.SideScrollGame.main.player = null;
+            if (GameStateManagement.SideScrollGame.SideScrollGame.main.IsNetwork)
+            {
+                GameStateManagement.SideScrollGame.SideScrollGame.main.client.Disconnect("exiting");
+                GameStateManagement.SideScrollGame.SideScrollGame.main.otherPlayers.Clear();
+            }
+
             LoadingScreen.Load(ScreenManager, false, null, new BackgroundScreen(),
                                                            new MainMenuScreen());
         }

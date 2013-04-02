@@ -188,6 +188,23 @@ namespace XnaGameServer
                                 {
                                     if (multiplayerPlayers[i].id == msg.SenderConnection.RemoteUniqueIdentifier)
                                     {
+                                        if (multiplayerPlayers[i].isHost)
+                                        {
+                                            if (multiplayerPlayers.Count > 1)
+                                            {
+                                                multiplayerPlayers[i + 1].isHost = true;
+
+                                                NetConnection player = server.Connections[i];
+
+                                                NetOutgoingMessage outMsg = server.CreateMessage();
+                                                outMsg.Write((byte)PacketTypes.CHANGEHOST);
+                                                outMsg.Write((bool)multiplayerPlayers[i + 1].isHost);
+
+                                                server.SendMessage(outMsg, player, NetDeliveryMethod.ReliableOrdered);
+
+                                            }
+                                        }
+
                                         multiplayerPlayers.RemoveAt(i);
                                         if (deletePlayerFromServer(msg.SenderConnection.RemoteUniqueIdentifier))
                                         {
@@ -205,23 +222,6 @@ namespace XnaGameServer
                                             outMessage.Write((long)msg.SenderConnection.RemoteUniqueIdentifier);
 
                                             server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
-                                        }
-
-                                        if (multiplayerPlayers[i].isHost)
-                                        {
-                                            if (multiplayerPlayers.Count > 1)
-                                            {
-                                                multiplayerPlayers[i + 1].isHost = true;
-
-                                                NetConnection player = server.Connections[i + 1];
-
-                                                NetOutgoingMessage outMsg = server.CreateMessage();
-                                                outMsg.Write((byte)PacketTypes.CHANGEHOST);
-                                                outMsg.Write((bool)multiplayerPlayers[i + 1].isHost);
-
-                                                server.SendMessage(outMsg, player, NetDeliveryMethod.ReliableOrdered);
-
-                                            }
                                         }
 
                                         SetEnemyTarget();
@@ -477,7 +477,7 @@ namespace XnaGameServer
 
         static void SetEnemyTarget()
         {
-            if (enemies.Count > 0)
+            if (enemies.Count > 0 && multiplayerPlayers.Count > 0)
             {
                 for (int i = 0; i < enemies.Count; i++)
                 {
