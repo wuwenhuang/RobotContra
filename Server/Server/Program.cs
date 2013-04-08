@@ -461,7 +461,20 @@ namespace XnaGameServer
                             // send message
                             server.SendMessage(om, player, NetDeliveryMethod.Unreliable);
                         }
+                        for (int k = 0; k < enemies.Count; k++)
+                        {
+                            NetOutgoingMessage msgOut = server.CreateMessage();
 
+                            msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
+                            msgOut.Write((byte)enemies[i].state);
+                            msgOut.Write((byte)enemies[i].lastState);
+                            msgOut.Write((short)enemies[i].health);
+                            msgOut.Write((bool)enemies[i].isDead);
+                            msgOut.Write((float)enemies[i].x);
+                            msgOut.Write((float)enemies[i].y);
+
+                            server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
+                        }
                     }
 
                     // schedule next update
