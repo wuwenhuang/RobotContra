@@ -454,6 +454,7 @@ namespace XnaGameServer
                             om.Write((byte)multiplayerPlayers[j].state);
                             om.Write((byte)multiplayerPlayers[j].lastState);
                             om.Write((int)multiplayerPlayers[j].health);
+                            om.Write((bool)multiplayerPlayers[j].isDead);
                             om.Write((float)multiplayerPlayers[j].x);
                             om.Write((float)multiplayerPlayers[j].y);
 

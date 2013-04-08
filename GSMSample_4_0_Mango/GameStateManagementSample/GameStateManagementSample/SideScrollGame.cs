@@ -464,6 +464,7 @@ namespace GameStateManagement.SideScrollGame
                                     CharacterState state = (CharacterState)msg.ReadByte();
                                     CharacterState laststate = (CharacterState)msg.ReadByte();
                                     int health = msg.ReadInt32();
+                                    bool dead = msg.ReadBoolean();
                                     float x = msg.ReadFloat();
                                     float y = msg.ReadFloat();
 
@@ -479,6 +480,7 @@ namespace GameStateManagement.SideScrollGame
                                                     otherPlayers[who].lastState = laststate;
                                                 }
                                                 otherPlayers[who].health = health;
+                                                otherPlayers[who].setDead(dead);
                                             }
                                             else
                                             {
