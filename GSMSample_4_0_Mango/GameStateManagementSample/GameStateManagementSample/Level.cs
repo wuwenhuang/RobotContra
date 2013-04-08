@@ -218,18 +218,6 @@ namespace GameStateManagement.SideScrollGame
                         }
                     }
 
-                    if (enemiesLevel[i].Texture == null && enemiesLevel[i].Dead == true)
-                    {
-                        if (SideScrollGame.main.isHost && SideScrollGame.main.IsNetwork)
-                        {
-                            NetOutgoingMessage msgOut = SideScrollGame.main.client.CreateMessage();
-                            msgOut.Write((byte)PacketTypes.DELETEENEMY); // set enemy dead true
-                            msgOut.Write((short)i);
-                            SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
-                        }
-                    }
-
-
                 }
             }
             

@@ -175,36 +175,18 @@ namespace GameStateManagement.SideScrollGame
                     {
                         if (player.Dead == false)
                             player.Update(gameTime, _level);
+                        else
+                            CheckPlayerOtherPlayersDead();
                         
                         foreach (var otherplayers in otherPlayers)
                         {
                             if (otherplayers.Value.Dead == false)
                                 otherplayers.Value.CharacterUpdate(gameTime, _level);
+                            else
+                                CheckPlayerOtherPlayersDead();
                         }
 
-                        if (player.Dead == true)
-                        {
-                            if (otherPlayers.Count <= 0)
-                            {
-                                gameOver = true;
-                            }
-                            else
-                            {
-                                foreach (var otherplayers in otherPlayers)
-                                {
-                                    if (otherplayers.Value.Dead == true)
-                                    {
-                                        gameOver = true;
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        gameOver = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                        
                         _level.Update(gameTime, player);
 
                         if (gameOver)
@@ -294,6 +276,33 @@ namespace GameStateManagement.SideScrollGame
                 }
             }
             
+        }
+
+        public void CheckPlayerOtherPlayersDead()
+        {
+            if (player.Dead == true)
+            {
+                if (otherPlayers.Count <= 0)
+                {
+                    gameOver = true;
+                }
+                else
+                {
+                    foreach (var otherplayers in otherPlayers)
+                    {
+                        if (otherplayers.Value.Dead == true)
+                        {
+                            gameOver = true;
+                            continue;
+                        }
+                        else
+                        {
+                            gameOver = false;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -541,10 +550,10 @@ namespace GameStateManagement.SideScrollGame
                                     {
                                         _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                         _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
-                                        //_level.enemiesLevel[i].health = msg.ReadInt16();
-                                        //_level.enemiesLevel[i].setDead(msg.ReadBoolean());
-                                        //_level.enemiesLevel[i].position.X = msg.ReadFloat();
-                                        //_level.enemiesLevel[i].position.Y = msg.ReadFloat();
+                                        _level.enemiesLevel[i].health = msg.ReadInt16();
+                                        _level.enemiesLevel[i].setDead(msg.ReadBoolean());
+                                        _level.enemiesLevel[i].position.X = msg.ReadFloat();
+                                        _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                         
                                     }
 

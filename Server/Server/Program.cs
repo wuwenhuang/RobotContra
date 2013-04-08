@@ -377,9 +377,7 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.DELETEENEMY:
                                     int enemyDead = msg.ReadInt16();
-                                    sem.WaitOne();
                                     enemies[enemyDead].isDead = true;
-                                    sem.Release();
                                     break;
 
                                 case (byte)PacketTypes.GETSERVERENEMYPOSITIONS:
@@ -392,10 +390,10 @@ namespace XnaGameServer
                                        
                                         msgOut.Write((byte)enemies[i].state);
                                         msgOut.Write((byte)enemies[i].lastState);
-                                        //msgOut.Write((short)enemies[i].health);
-                                        //msgOut.Write((bool)enemies[i].isDead);
-                                        //msgOut.Write((float)enemies[i].x);
-                                        //msgOut.Write((float)enemies[i].y);
+                                        msgOut.Write((short)enemies[i].health);
+                                        msgOut.Write((bool)enemies[i].isDead);
+                                        msgOut.Write((float)enemies[i].x);
+                                        msgOut.Write((float)enemies[i].y);
                                     }
 
                                     server.SendMessage(msgOut, msg.SenderConnection, NetDeliveryMethod.ReliableOrdered);
@@ -538,7 +536,16 @@ namespace XnaGameServer
             ////
             while (true)
             {
-                
+                if (enemies.Count > 0)
+                {
+                    for (int i = 0; i < enemies.Count; i++)
+                    {
+                        if (enemies[i].health < 0)
+                        {
+                            enemies[i].isDead = true;
+                        }
+                    }
+                }
             }
         }
     }
