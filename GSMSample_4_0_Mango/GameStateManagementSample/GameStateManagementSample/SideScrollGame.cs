@@ -259,6 +259,38 @@ namespace GameStateManagement.SideScrollGame
                     if (gameOver == false)
                         this.Reset(currentLevel, level[currentLevel]);
 
+                    if (IsNetwork == true)
+                    {
+                        if (isHost == true)
+                        {
+                            NetOutgoingMessage outMsg = client.CreateMessage();
+
+                            outMsg.Write((byte)PacketTypes.WRITELEVEL);
+
+                            outMsg.Write((short)_level.enemiesLevel.Count);
+                            outMsg.Write((short)currentLevel);
+
+                            foreach (Enemy enemy in _level.enemiesLevel)
+                            {
+                                outMsg.Write((short)enemy.health);
+                                outMsg.Write((byte)enemy.currentState);
+                                outMsg.Write((byte)enemy.lastState);
+
+                                outMsg.Write((float)enemy.position.X);
+                                outMsg.Write((float)enemy.position.Y);
+
+                            }
+                            client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
+                        }
+
+                        else
+                        {
+                            NetOutgoingMessage msgOut = client.CreateMessage();
+                            msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
+                            SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+                        }
+                    }
+
                 }
             }
             
