@@ -547,16 +547,25 @@ namespace GameStateManagement.SideScrollGame
                                     break;
 
                                 case (byte)PacketTypes.SENDENEMYPOSITIONS:
+                                    CharacterState EnemyCurrentState = (CharacterState)msg.ReadByte();
+                                    CharacterState EnemyLastState = (CharacterState)msg.ReadByte();
+                                    int EnemyHealth = msg.ReadInt32();
+                                    bool EnemyDead = msg.ReadBoolean();
+                                    float EnemyPosX = msg.ReadFloat();
+                                    float EnemyPosY = msg.ReadFloat();
 
-                                    for (int i = 0; i < _level.enemiesLevel.Count; i++)
+                                    if (currentLevel > 0)
                                     {
-                                        _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
-                                        _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
-                                        _level.enemiesLevel[i].health = msg.ReadInt16();
-                                        _level.enemiesLevel[i].setDead(msg.ReadBoolean());
-                                        _level.enemiesLevel[i].position.X = msg.ReadFloat();
-                                        _level.enemiesLevel[i].position.Y = msg.ReadFloat();
-                                        
+                                        for (int i = 0; i < _level.enemiesLevel.Count; i++)
+                                        {
+                                            _level.enemiesLevel[i].currentState = EnemyCurrentState;
+                                            _level.enemiesLevel[i].lastState = EnemyLastState;
+                                            _level.enemiesLevel[i].health = EnemyHealth;
+                                            _level.enemiesLevel[i].setDead(EnemyDead);
+                                            _level.enemiesLevel[i].position.X = EnemyPosX;
+                                            _level.enemiesLevel[i].position.Y = EnemyPosY;
+
+                                        }
                                     }
 
                                     break;
