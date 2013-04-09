@@ -23,6 +23,7 @@ namespace GameStateManagement.SideScrollGame
         WRITELEVEL,
         GETLEVEL,
         GETSERVERLEVEL,
+        GETNEWLEVEL,
 
         MYPOSITION,
         UPDATEPLAYERS,
@@ -166,6 +167,49 @@ namespace GameStateManagement.SideScrollGame
                         }
 
                     }
+                    if (currentLevel <= level.Count)
+                    {
+                        for (int i = 0; i < _level.enemiesLevel.Count; i++)
+                        {
+                            if (i == _level.enemiesLevel.Count - 1)
+                            {
+                                if (_level.enemiesLevel[i].Dead == true && _goToNextLevel == false)
+                                {
+                                    _goToNextLevel = true;
+                                    break;
+                                }
+                                else
+                                    break;
+                            }
+
+                            if (_level.enemiesLevel[i].Dead == true)
+                                continue;
+                            else
+                            {
+                                _goToNextLevel = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (_goToNextLevel == true && currentLevel <= level.Count)
+                    {
+                        _goToNextLevel = false;
+                        currentLevel += 1;
+
+                        if (currentLevel > level.Count)
+                        {
+                            gameOver = true;
+                            allEnemiesDead = true;
+                            allPlayersDead = false;
+                            _goToNextLevel = false;
+                        }
+
+                        //single player reset level
+                        if (gameOver == false)
+                            this.Reset(currentLevel, level[currentLevel]);
+
+                    }
 
                 }
                 // Networks is true  
@@ -197,82 +241,6 @@ namespace GameStateManagement.SideScrollGame
                         }
 
                     }
-                }
-
-                if (currentLevel <= level.Count)
-                {
-                    for (int i = 0; i < _level.enemiesLevel.Count; i++)
-                    {
-                        if (i == _level.enemiesLevel.Count - 1)
-                        {
-                            if (_level.enemiesLevel[i].Dead == true && _goToNextLevel == false)
-                            {
-                                _goToNextLevel = true;
-                                break;
-                            }
-                            else
-                                break;
-                        }
-
-                        if (_level.enemiesLevel[i].Dead == true)
-                            continue;
-                        else
-                        {
-                            _goToNextLevel = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (_goToNextLevel == true && currentLevel <= level.Count)
-                {
-                    _goToNextLevel = false;
-                    currentLevel += 1;
-
-                    if (currentLevel > level.Count)
-                    {
-                        gameOver = true;
-                        allEnemiesDead = true;
-                        allPlayersDead = false;
-                        _goToNextLevel = false;
-                    }
-
-                    //single player reset level
-                    if (gameOver == false)
-                        this.Reset(currentLevel, level[currentLevel]);
-
-                    if (IsNetwork == true)
-                    {
-                        if (isHost == true)
-                        {
-                            NetOutgoingMessage outMsg = client.CreateMessage();
-
-                            outMsg.Write((byte)PacketTypes.WRITELEVEL);
-
-                            outMsg.Write((short)_level.enemiesLevel.Count);
-                            outMsg.Write((short)currentLevel);
-
-                            foreach (Enemy enemy in _level.enemiesLevel)
-                            {
-                                outMsg.Write((short)enemy.health);
-                                outMsg.Write((byte)enemy.currentState);
-                                outMsg.Write((byte)enemy.lastState);
-
-                                outMsg.Write((float)enemy.position.X);
-                                outMsg.Write((float)enemy.position.Y);
-
-                            }
-                            client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
-                        }
-
-                        else
-                        {
-                            NetOutgoingMessage msgOut = client.CreateMessage();
-                            msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
-                            SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
-                        }
-                    }
-
                 }
             }
             
@@ -506,6 +474,25 @@ namespace GameStateManagement.SideScrollGame
                                         isHost = true;
 
                                         this.Reset(currentLevel, this.level[currentLevel]);
+                                        
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+
+                                        outMsg.Write((byte)PacketTypes.WRITELEVEL);
+
+                                        outMsg.Write((short)_level.enemiesLevel.Count);
+                                        outMsg.Write((short)SideScrollGame.main.currentLevel);
+
+                                        foreach (Enemy enemy in _level.enemiesLevel)
+                                        {
+                                            outMsg.Write((short)enemy.health);
+                                            outMsg.Write((byte)enemy.currentState);
+                                            outMsg.Write((byte)enemy.lastState);
+
+                                            outMsg.Write((float)enemy.position.X);
+                                            outMsg.Write((float)enemy.position.Y);
+
+                                        }
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
 
                                     }
 
@@ -539,11 +526,11 @@ namespace GameStateManagement.SideScrollGame
                                         _level.enemiesLevel[i].position.Y = msg.ReadFloat();
                                     }
 
-                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    NetOutgoingMessage levelOut = client.CreateMessage();
 
-                                    outMsg.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
+                                    levelOut.Write((byte)PacketTypes.GETENEMYTARGETPLAYER);
 
-                                    client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                                    client.SendMessage(levelOut, NetDeliveryMethod.ReliableOrdered);
                                     break;
 
                                 case (byte)PacketTypes.SENDENEMYPOSITIONS:
@@ -583,6 +570,59 @@ namespace GameStateManagement.SideScrollGame
                                         {
                                             if (otherPlayers.ContainsKey(tempTargetPlayer) == true)
                                                 _level.enemiesLevel[i].SetTargetPlayer(otherPlayers[tempTargetPlayer]);
+                                        }
+                                    }
+                                    break;
+
+                                case (byte)PacketTypes.GETNEWLEVEL:
+
+                                    int newLevel = msg.ReadInt32();
+                                    currentLevel = newLevel;
+
+                                    if (currentLevel > this.level.Count)
+                                    {
+                                        gameOver = true;
+                                        allEnemiesDead = true;
+                                        allPlayersDead = false;
+                                        _goToNextLevel = false;
+                                    }
+                                    else
+                                    {
+
+                                        this.Reset(currentLevel, this.level[currentLevel]);
+
+                                        if (IsNetwork == true)
+                                        {
+                                            if (isHost == true)
+                                            {
+                                                NetOutgoingMessage outMsg = client.CreateMessage();
+
+                                                outMsg.Write((byte)PacketTypes.WRITELEVEL);
+
+                                                outMsg.Write((short)_level.enemiesLevel.Count);
+                                                outMsg.Write((short)currentLevel);
+
+                                                foreach (Enemy enemy in _level.enemiesLevel)
+                                                {
+                                                    outMsg.Write((short)enemy.health);
+                                                    outMsg.Write((byte)enemy.currentState);
+                                                    outMsg.Write((byte)enemy.lastState);
+
+                                                    outMsg.Write((float)enemy.position.X);
+                                                    outMsg.Write((float)enemy.position.Y);
+
+                                                    client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
+
+                                                }
+                                                
+                                            }
+
+                                            else
+                                            {
+                                                NetOutgoingMessage msgOut = client.CreateMessage();
+                                                msgOut.Write((byte)PacketTypes.GETSERVERLEVEL);
+                                                SideScrollGame.main.client.SendMessage(msgOut, NetDeliveryMethod.ReliableOrdered);
+                                            }
                                         }
                                     }
                                     break;

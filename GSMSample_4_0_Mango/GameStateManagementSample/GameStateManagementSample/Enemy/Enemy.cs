@@ -101,7 +101,7 @@ namespace GameStateManagement.SideScrollGame
 
         public virtual void  Update(GameTime gameTime, Level level)
         {
-            if (this.currentState != CharacterState.DEAD)
+            if (this.currentState != CharacterState.DEAD && this.targetPlayer != null)
             {
                 FindPlayerYPosition(gameTime);
 

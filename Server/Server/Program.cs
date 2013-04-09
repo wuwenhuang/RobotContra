@@ -17,6 +17,7 @@ namespace XnaGameServer
         WRITELEVEL,
         GETLEVEL,
         GETSERVERLEVEL,
+        GETNEWLEVEL,
 
         MYPOSITION,
         UPDATEPLAYERS,
@@ -367,7 +368,6 @@ namespace XnaGameServer
                                     for (int i = 0; i < enemies.Count; i++)
                                     {
                                         enemies[i].health = msg.ReadInt32();
-                                        enemies[i].isDead = msg.ReadBoolean();
                                         enemies[i].state = (CharacterState)msg.ReadByte();
                                         enemies[i].lastState = (CharacterState)msg.ReadByte();
                                         enemies[i].x = msg.ReadFloat();
@@ -423,7 +423,7 @@ namespace XnaGameServer
                                 
 
                                 case (byte)PacketTypes.GETENEMYTARGETPLAYER:
-
+                                    SetEnemyTarget();
                                     SendToAllPlayerEnemyTarget();
 
                                     break;
@@ -554,21 +554,62 @@ namespace XnaGameServer
 
         static void writeClientsUpdate()
         {
-            ////
-            //// send position updates 60 times per second
-            ////
+            
+            bool isAllEnemyDead = false;
             while (true)
             {
                 if (enemies.Count > 0)
                 {
                     for (int i = 0; i < enemies.Count; i++)
                     {
-                        if (enemies[i].health < 0)
+                        if (enemies[i].health <= 15)
                         {
                             enemies[i].isDead = true;
                         }
+
+                        if (isAllEnemyDead == false && enemies[i].isDead == true)
+                        {
+                            
+                            foreach (Enemy enemy in enemies)
+                            {
+                                if (enemy.isDead == true)
+                                {
+                                    isAllEnemyDead = true;
+                                    continue;
+                                }
+                                else
+                                {
+                                    isAllEnemyDead = false;
+                                    break;
+                                }
+                            }
+                        }
                     }
+
+                    if (isAllEnemyDead == true && server.Connections.Count > 0)
+                    {
+                        isAllEnemyDead = false;
+
+                        level += 1;
+
+                        enemies.Clear();
+
+                        for (int i = 0; i < server.Connections.Count; i++)
+                        {
+                            NetConnection player = server.Connections[i] as NetConnection;
+
+                            NetOutgoingMessage updateClientLevel = server.CreateMessage();
+
+                            updateClientLevel.Write((byte)PacketTypes.GETNEWLEVEL);
+                            updateClientLevel.Write((int)level);
+
+                            server.SendMessage(updateClientLevel, player, NetDeliveryMethod.ReliableOrdered);
+                        }
+                    }
+
                 }
+
+                
             }
         }
     }
