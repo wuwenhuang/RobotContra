@@ -22,6 +22,7 @@ namespace GameStateManagement.SideScrollGame
         private Weapon weapon;
         private Health healthBar;
         public long id;
+        public Vector2 initialPosition;
 
         public Player(Texture2D texture, Vector2 position)
             : base(texture, position, new Vector2(70, 130))

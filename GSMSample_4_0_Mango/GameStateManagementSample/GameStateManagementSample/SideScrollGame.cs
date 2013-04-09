@@ -343,6 +343,19 @@ namespace GameStateManagement.SideScrollGame
 
         }
 
+        void ResetAllPlayersPositions()
+        {
+            player.position = player.initialPosition;
+
+            if (otherPlayers.Count > 0)
+            {
+                foreach (var otherPlayer in otherPlayers)
+                {
+                    otherPlayer.Value.position = otherPlayer.Value.initialPosition;
+                }
+            }
+        }
+
         void getPlayerUpdate()
         {
             while (true)
@@ -370,6 +383,7 @@ namespace GameStateManagement.SideScrollGame
                                     if (player == null)
                                     {
                                         player = new Player(id, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(xPos, yPos));
+                                        player.initialPosition = player.position;
                                     }
                                     break;
 
@@ -453,11 +467,13 @@ namespace GameStateManagement.SideScrollGame
                                             else
                                             {
                                                 otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                                otherPlayers[who].initialPosition = otherPlayers[who].position;
                                             }
                                         }
                                         else
                                         {
                                             otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
+                                            otherPlayers[who].initialPosition = otherPlayers[who].position;
                                         }
                                     }
                                     break;
@@ -593,6 +609,7 @@ namespace GameStateManagement.SideScrollGame
 
                                         if (IsNetwork == true)
                                         {
+                                            ResetAllPlayersPositions();
                                             if (isHost == true)
                                             {
                                                 NetOutgoingMessage outMsg = client.CreateMessage();

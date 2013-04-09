@@ -54,6 +54,7 @@ namespace XnaGameServer
     {
         public long id;
         public float x,y;
+        public float initialX, initialY;
         public float lastPosX, lastPosY;
         public float velocityX, velocityY;
         public CharacterState state;
@@ -157,11 +158,17 @@ namespace XnaGameServer
                                 {
                                     multiplayerPlayers[0].x = 10;
                                     multiplayerPlayers[0].y = 350;
+
+                                    multiplayerPlayers[0].initialX = multiplayerPlayers[0].x;
+                                    multiplayerPlayers[0].initialY = multiplayerPlayers[0].y;
                                 }
                                 else
                                 {
                                     multiplayerPlayers[multiplayerPlayers.Count-1].x = multiplayerPlayers[multiplayerPlayers.Count - 2].x + 70;
                                     multiplayerPlayers[multiplayerPlayers.Count-1].y = multiplayerPlayers[multiplayerPlayers.Count - 2].y;
+
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialX = multiplayerPlayers[multiplayerPlayers.Count - 1].x;
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialY = multiplayerPlayers[multiplayerPlayers.Count - 1].y;
                                 }
 
                                 for (int i = 0; i < server.Connections.Count; i++)
