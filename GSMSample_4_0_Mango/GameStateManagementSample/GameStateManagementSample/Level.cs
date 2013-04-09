@@ -135,7 +135,7 @@ namespace GameStateManagement.SideScrollGame
 
                     }
 
-                    if (enemiesLevel[i].Dead && SideScrollGame.main.IsNetwork)
+                    if (enemiesLevel[i].Dead && SideScrollGame.main.IsNetwork && SideScrollGame.main.GameOver == false)
                     {
                         NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
 
@@ -144,7 +144,7 @@ namespace GameStateManagement.SideScrollGame
                         SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                     }
 
-                    if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost && enemiesLevel[i].targetPlayer != null)
+                    if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost && enemiesLevel[i].targetPlayer != null && SideScrollGame.main.GameOver == false)
                     {
                         if (enemiesLevel.Count > 0)
                         {

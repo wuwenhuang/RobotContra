@@ -611,10 +611,8 @@ namespace GameStateManagement.SideScrollGame
                                                     outMsg.Write((float)enemy.position.X);
                                                     outMsg.Write((float)enemy.position.Y);
 
-                                                    client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
-
                                                 }
-                                                
+                                                client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
                                             }
 
                                             else

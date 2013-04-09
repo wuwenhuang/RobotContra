@@ -469,24 +469,21 @@ namespace XnaGameServer
                         // ... send information about every other player (actually including self)
                         for (int j = 0; j < multiplayerPlayers.Count; j++)
                         {
-                            if (multiplayerPlayers[i].isHost == false)
+                            if (enemies.Count > 0)
                             {
-                                if (enemies.Count > 0)
+                                for (int k = 0; k < enemies.Count; k++)
                                 {
-                                    for (int k = 0; k < enemies.Count; k++)
-                                    {
-                                        NetOutgoingMessage msgOut = server.CreateMessage();
+                                    NetOutgoingMessage msgOut = server.CreateMessage();
 
-                                        msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
-                                        msgOut.Write((byte)enemies[i].state);
-                                        msgOut.Write((byte)enemies[i].lastState);
-                                        msgOut.Write((int)enemies[i].health);
-                                        msgOut.Write((bool)enemies[i].isDead);
-                                        msgOut.Write((float)enemies[i].x);
-                                        msgOut.Write((float)enemies[i].y);
+                                    msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
+                                    msgOut.Write((byte)enemies[i].state);
+                                    msgOut.Write((byte)enemies[i].lastState);
+                                    msgOut.Write((int)enemies[i].health);
+                                    msgOut.Write((bool)enemies[i].isDead);
+                                    msgOut.Write((float)enemies[i].x);
+                                    msgOut.Write((float)enemies[i].y);
 
-                                        server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
-                                    }
+                                    server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
                                 }
                             }
                         }
