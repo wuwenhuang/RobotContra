@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Lidgren.Network;
 using GameStateManagementSample;
 using System.Net;
+using System.Net.Sockets;
 
 namespace GameStateManagement.SideScrollGame
 {
@@ -111,7 +112,8 @@ namespace GameStateManagement.SideScrollGame
             {
 
                 NetPeerConfiguration config = new NetPeerConfiguration("robotcontra");
-                //config.LocalAddress = IPAddress.Parse("10.60.233.59"); // disable if there is firewall
+                string localIp = LocalIPAddress();
+                config.LocalAddress = IPAddress.Parse(localIp); // disable if there is firewall
                 config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
 
                 client = new NetClient(config);
@@ -304,6 +306,21 @@ namespace GameStateManagement.SideScrollGame
 
 
     #region PrivateFunctions
+
+        private string LocalIPAddress()
+        {
+            IPHostEntry host;
+            string localIP = "";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    localIP = ip.ToString();
+                }
+            }
+            return localIP;
+        }
 
         void Awake()
         {
