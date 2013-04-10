@@ -379,6 +379,8 @@ namespace XnaGameServer
                                         enemies[i].x = msg.ReadFloat();
                                         enemies[i].y = msg.ReadFloat();
                                     }
+
+                                    SendToAllEnemyPositionsToPlayers();
                                     break;
 
                                 case (byte)PacketTypes.DELETEENEMY:
@@ -437,6 +439,8 @@ namespace XnaGameServer
                             break;
                     }
 
+
+
                 }
 
                 double now = NetTime.Now;
@@ -469,32 +473,6 @@ namespace XnaGameServer
                         }
 
                     }
-                    for (int i = 0; i < server.Connections.Count; i++)
-                    {
-                        NetConnection player = server.Connections[i] as NetConnection;
-                        // ... send information about every other player (actually including self)
-                        for (int j = 0; j < multiplayerPlayers.Count; j++)
-                        {
-                            if (enemies.Count > 0)
-                            {
-                                for (int k = 0; k < enemies.Count; k++)
-                                {
-                                    NetOutgoingMessage msgOut = server.CreateMessage();
-
-                                    msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
-                                    msgOut.Write((byte)enemies[i].state);
-                                    msgOut.Write((byte)enemies[i].lastState);
-                                    msgOut.Write((int)enemies[i].health);
-                                    msgOut.Write((bool)enemies[i].isDead);
-                                    msgOut.Write((float)enemies[i].x);
-                                    msgOut.Write((float)enemies[i].y);
-
-                                    server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
-                                }
-                            }
-                        }
-                    }
-
                     // schedule next update
                     nextSendUpdates += (1.0 / 60.0);
                 }
@@ -503,6 +481,36 @@ namespace XnaGameServer
             }
 
             server.Shutdown("app exiting");
+        }
+
+        static void SendToAllEnemyPositionsToPlayers()
+        {
+            for (int i = 0; i < server.Connections.Count; i++)
+            {
+                NetConnection player = server.Connections[i] as NetConnection;
+                // ... send information about every other player (actually including self)
+                for (int j = 0; j < multiplayerPlayers.Count; j++)
+                {
+                    if (enemies.Count > 0)
+                    {
+                        NetOutgoingMessage msgOut = server.CreateMessage();
+
+                        msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
+
+                        for (int k = 0; k < enemies.Count; k++)
+                        {
+                            
+                            msgOut.Write((byte)enemies[k].state);
+                            msgOut.Write((byte)enemies[k].lastState);
+                            msgOut.Write((int)enemies[k].health);
+                            msgOut.Write((bool)enemies[k].isDead);
+                            msgOut.Write((float)enemies[k].x);
+                            msgOut.Write((float)enemies[k].y);
+                        }
+                        server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
+                    }
+                }
+            }
         }
 
         static void SetEnemyTarget()

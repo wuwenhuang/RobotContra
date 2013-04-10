@@ -29,6 +29,7 @@ namespace GameStateManagement.SideScrollGame
         protected Vector2 networkPosition;
 
         public Vector2 position;
+
         public Vector2 lastPosition;
         public Vector2 velocity;
         public float speed = 250.0f;
