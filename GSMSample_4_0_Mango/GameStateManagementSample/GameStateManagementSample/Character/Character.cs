@@ -228,7 +228,7 @@ namespace GameStateManagement.SideScrollGame
                 this.velocity = new Vector2(deadDistance, deadHeight);
                 this.currentState = CharacterState.DEAD;
 
-                if (SideScrollGame.main.IsNetwork)
+                if (SideScrollGame.main.IsNetwork && SideScrollGame.main.player.currentState == CharacterState.DEAD)
                 {
                     NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
 
@@ -236,6 +236,8 @@ namespace GameStateManagement.SideScrollGame
 
                     SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                 }
+
+                
             }
 
             if (this.currentState == CharacterState.DEAD)

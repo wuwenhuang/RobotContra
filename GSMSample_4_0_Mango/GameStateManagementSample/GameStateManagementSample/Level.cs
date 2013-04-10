@@ -135,14 +135,14 @@ namespace GameStateManagement.SideScrollGame
 
                     }
 
-                    //if (enemiesLevel[i].Dead && SideScrollGame.main.IsNetwork && SideScrollGame.main.GameOver == false)
-                    //{
-                    //    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                    if (enemiesLevel[i].Dead && SideScrollGame.main.IsNetwork && SideScrollGame.main.GameOver == false && SideScrollGame.main.isFinishWriteLevel == true)
+                    {
+                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
 
-                    //    outMsg.Write((byte)PacketTypes.DELETEENEMY);
-                    //    outMsg.Write((short)i);
-                    //    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
-                    //}
+                        outMsg.Write((byte)PacketTypes.DELETEENEMY);
+                        outMsg.Write((short)i);
+                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                    }
 
                     if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost && enemiesLevel[i].targetPlayer != null && SideScrollGame.main.GameOver == false && SideScrollGame.main.isFinishWriteLevel == true)
                     {

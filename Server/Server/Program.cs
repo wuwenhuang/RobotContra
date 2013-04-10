@@ -385,7 +385,8 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.DELETEENEMY:
                                     int enemyDead = msg.ReadInt16();
-                                    enemies[enemyDead].isDead = true;
+                                    if (enemies.Count > 0)
+                                        enemies[enemyDead].isDead = true;
                                     break;
 
                                 case (byte)PacketTypes.GETSERVERENEMYPOSITIONS:
@@ -579,10 +580,11 @@ namespace XnaGameServer
                 {
                     for (int i = 0; i < enemies.Count; i++)
                     {
-                        if (enemies[i].health <= 15)
-                        {
-                            enemies[i].isDead = true;
-                        }
+                        //if (enemies[i].health <= 15 && enemies[i].state != CharacterState.DEAD)
+                        //{
+                        //    //enemies[i].isDead = true;
+                        //    enemies[i].state = CharacterState.DEAD;
+                        //}
 
                         if (isAllEnemyDead == false && enemies[i].isDead == true)
                         {
