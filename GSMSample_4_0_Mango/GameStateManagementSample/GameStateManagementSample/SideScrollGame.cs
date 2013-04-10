@@ -69,6 +69,8 @@ namespace GameStateManagement.SideScrollGame
 
         public static SideScrollGame main;
 
+        public bool isFinishWriteLevel;
+
         GameplayScreen gameplay;
 
         private bool _isNetwork;
@@ -122,6 +124,8 @@ namespace GameStateManagement.SideScrollGame
 
                 Thread updateClientsWorld = new Thread(new ThreadStart(getPlayerUpdate));
                 updateClientsWorld.Start();
+
+                isFinishWriteLevel = false;
 
                 while (player == null)
                 {
@@ -528,6 +532,7 @@ namespace GameStateManagement.SideScrollGame
                                         }
                                         SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
 
+                                        isFinishWriteLevel = true;
                                     }
 
                                     else
@@ -605,6 +610,8 @@ namespace GameStateManagement.SideScrollGame
 
                                 case (byte)PacketTypes.GETNEWLEVEL:
 
+                                    isFinishWriteLevel = false;
+
                                     int newLevel = msg.ReadInt32();
                                     currentLevel = newLevel;
 
@@ -643,6 +650,8 @@ namespace GameStateManagement.SideScrollGame
 
                                                 }
                                                 client.SendMessage(outMsg, NetDeliveryMethod.Unreliable);
+
+                                                isFinishWriteLevel = true;
                                             }
 
                                             else
