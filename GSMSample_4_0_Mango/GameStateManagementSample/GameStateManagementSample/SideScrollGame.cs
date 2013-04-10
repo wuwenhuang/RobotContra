@@ -38,7 +38,9 @@ namespace GameStateManagement.SideScrollGame
         DELETEENEMY,
 
         SENDENEMYTARGETPLAYER,
-        GETENEMYTARGETPLAYER
+        GETENEMYTARGETPLAYER,
+        
+        GAMEOVER
     };
 
     class SideScrollGame
@@ -621,6 +623,12 @@ namespace GameStateManagement.SideScrollGame
                                         allEnemiesDead = true;
                                         allPlayersDead = false;
                                         _goToNextLevel = false;
+
+                                        NetOutgoingMessage outMsg = client.CreateMessage();
+
+                                        outMsg.Write((byte)PacketTypes.GAMEOVER);
+
+                                        client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                                     }
                                     else
                                     {

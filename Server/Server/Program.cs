@@ -30,7 +30,9 @@ namespace XnaGameServer
         DELETEENEMY,
 
         SENDENEMYTARGETPLAYER,
-        GETENEMYTARGETPLAYER
+        GETENEMYTARGETPLAYER,
+
+        GAMEOVER
     };
 
     enum CharacterState
@@ -99,6 +101,8 @@ namespace XnaGameServer
 
         static int level;
 
+        static bool gameOver;
+
         static void Main(string[] args)
         {
             sem = new Semaphore(1, 1);
@@ -111,6 +115,8 @@ namespace XnaGameServer
             // create and start server
             server = new NetServer(config);
             server.Start();
+
+            gameOver = false;
             
             // schedule initial sending of position updates
             double nextSendUpdates = NetTime.Now;
@@ -436,6 +442,10 @@ namespace XnaGameServer
                                     SendToAllPlayerEnemyTarget();
 
                                     break;
+
+                                case (byte)PacketTypes.GAMEOVER:
+                                    gameOver = true;
+                                    break;
                             }
                             break;
                     }
@@ -486,29 +496,32 @@ namespace XnaGameServer
 
         static void SendToAllEnemyPositionsToPlayers()
         {
-            for (int i = 0; i < server.Connections.Count; i++)
+            if (gameOver == false)
             {
-                NetConnection player = server.Connections[i] as NetConnection;
-                // ... send information about every other player (actually including self)
-                for (int j = 0; j < multiplayerPlayers.Count; j++)
+                for (int i = 0; i < server.Connections.Count; i++)
                 {
-                    if (enemies.Count > 0)
+                    NetConnection player = server.Connections[i] as NetConnection;
+                    // ... send information about every other player (actually including self)
+                    for (int j = 0; j < multiplayerPlayers.Count; j++)
                     {
-                        NetOutgoingMessage msgOut = server.CreateMessage();
-
-                        msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
-
-                        for (int k = 0; k < enemies.Count; k++)
+                        if (enemies.Count > 0)
                         {
-                            
-                            msgOut.Write((byte)enemies[k].state);
-                            msgOut.Write((byte)enemies[k].lastState);
-                            msgOut.Write((int)enemies[k].health);
-                            msgOut.Write((bool)enemies[k].isDead);
-                            msgOut.Write((float)enemies[k].x);
-                            msgOut.Write((float)enemies[k].y);
+                            NetOutgoingMessage msgOut = server.CreateMessage();
+
+                            msgOut.Write((byte)PacketTypes.SENDENEMYPOSITIONS);
+
+                            for (int k = 0; k < enemies.Count; k++)
+                            {
+
+                                msgOut.Write((byte)enemies[k].state);
+                                msgOut.Write((byte)enemies[k].lastState);
+                                msgOut.Write((int)enemies[k].health);
+                                msgOut.Write((bool)enemies[k].isDead);
+                                msgOut.Write((float)enemies[k].x);
+                                msgOut.Write((float)enemies[k].y);
+                            }
+                            server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
                         }
-                        server.SendMessage(msgOut, player, NetDeliveryMethod.ReliableOrdered);
                     }
                 }
             }
