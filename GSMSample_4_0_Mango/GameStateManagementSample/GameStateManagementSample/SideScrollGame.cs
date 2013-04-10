@@ -577,13 +577,12 @@ namespace GameStateManagement.SideScrollGame
                                 case (byte)PacketTypes.SENDENEMYPOSITIONS:
 
 
-                                    if (currentLevel > 0)
+                                    if (currentLevel > 0 && _level != null && _level.enemiesLevel.Count > 0)
                                     {
                                         for (int i = 0; i < _level.enemiesLevel.Count; i++)
                                         {
                                             _level.enemiesLevel[i].currentState = (CharacterState)msg.ReadByte();
                                             _level.enemiesLevel[i].lastState = (CharacterState)msg.ReadByte();
-                                            _level.enemiesLevel[i].health = msg.ReadInt32();
                                             _level.enemiesLevel[i].setDead(msg.ReadBoolean());
                                             _level.enemiesLevel[i].position.X = msg.ReadFloat();
                                             _level.enemiesLevel[i].position.Y = msg.ReadFloat();
