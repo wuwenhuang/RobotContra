@@ -405,7 +405,6 @@ namespace XnaGameServer
                                        
                                         msgOut.Write((byte)enemies[i].state);
                                         msgOut.Write((byte)enemies[i].lastState);
-                                        msgOut.Write((short)enemies[i].health);
                                         msgOut.Write((bool)enemies[i].isDead);
                                         msgOut.Write((float)enemies[i].x);
                                         msgOut.Write((float)enemies[i].y);
