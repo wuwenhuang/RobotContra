@@ -384,7 +384,6 @@ namespace XnaGameServer
                                         enemies[i].health = msg.ReadInt32();
                                         enemies[i].state = (CharacterState)msg.ReadByte();
                                         enemies[i].lastState = (CharacterState)msg.ReadByte();
-                                        enemies[i].isDead = msg.ReadBoolean();
                                         enemies[i].x = msg.ReadFloat();
                                         enemies[i].y = msg.ReadFloat();
                                     }
