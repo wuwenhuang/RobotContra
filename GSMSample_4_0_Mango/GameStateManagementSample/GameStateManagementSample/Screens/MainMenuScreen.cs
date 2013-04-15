@@ -30,19 +30,19 @@ namespace GameStateManagementSample
             // Create our menu entries.
             MenuEntry playGameMenuEntry = new MenuEntry("Play");
             MenuEntry multiplayerMenuEntry = new MenuEntry("Multiplayer");
-            MenuEntry optionsMenuEntry = new MenuEntry("Options");
+            MenuEntry howtoplayMenuEntry = new MenuEntry("How To Play");
             MenuEntry exitMenuEntry = new MenuEntry("Exit");
 
             // Hook up menu event handlers.
             playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
             multiplayerMenuEntry.Selected += MultiplayerMenuEntrySelected;
-            optionsMenuEntry.Selected += OptionsMenuEntrySelected;
+            howtoplayMenuEntry.Selected += HowtoplayMenuEntrySelected;
             exitMenuEntry.Selected += OnCancel;
 
             // Add entries to the menu.
             MenuEntries.Add(playGameMenuEntry);
             MenuEntries.Add(multiplayerMenuEntry);
-            MenuEntries.Add(optionsMenuEntry);
+            MenuEntries.Add(howtoplayMenuEntry);
             MenuEntries.Add(exitMenuEntry);
         }
 
@@ -71,9 +71,9 @@ namespace GameStateManagementSample
         /// <summary>
         /// Event handler for when the Options menu entry is selected.
         /// </summary>
-        void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        void HowtoplayMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
+            ScreenManager.AddScreen(new HowtoplayMenuScreen(), e.PlayerIndex);
         }
 
 

@@ -112,6 +112,11 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
+    <Compile Include="howtoplay.png">
+      <Name>howtoplay</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Content Include="Levels\Level.xml">
       <Name>Level</Name>
       <Importer>XmlImporter</Importer>
