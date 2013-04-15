@@ -61,6 +61,7 @@ namespace GameStateManagement.SideScrollGame
         {
             {1, Color.Blue},
             {2, Color.Red},
+            {3, Color.Black}
         };
 
         public int currentLevel;

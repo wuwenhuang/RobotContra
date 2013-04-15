@@ -59,10 +59,12 @@
         <startY>0</startY>
       </tile>
       <layout>
-        <row>SSS</row>
-        <row>211E</row>
-        <row>   N N</row>
-        <row>RRR</row>
+        <row>SSSSSS</row>
+        <row>21121E</row>
+        <row> N N  N N</row>
+        <row>  N N NN NN</row>
+        <row>  N N</row>
+        <row>RRRRRR</row>
       </layout>
 
       <name>2</name>
@@ -71,11 +73,28 @@
         <startY>0</startY>
       </tile>
       <layout>
-        <row>SSSSSSSSSS</row>
-        <row>1221221212E</row>
-        <row>         NN</row>
-        <row>  N  N</row>
-        <row>RRRRRRRRRR</row>
+        <row>SSSSSS</row>
+        <row>12212E</row>
+        <row>   NN NN  NN</row>
+        <row>  N  N  NN NN</row>
+        <row>    NN N NN NNN</row>
+        <row>   N NN NN NNN</row>
+        <row>RRRRRR</row>
+      </layout>
+
+      <name>3</name>
+      <tile>
+        <startX>0</startX>
+        <startY>0</startY>
+      </tile>
+      <layout>
+        <row>SSSSSSSSSSSSSSSS</row>
+        <row>212211221221212E</row>
+        <row>    NNN N NN NNN NN N   NN NNN NNN NN</row>
+        <row>  N  N    N  N NN N N  NN NN NN NNNN</row>
+        <row>   N NNN NN NNN NN NNN NNN NN  N NNN </row>
+        <row>    N NN NN N N    N   N NN N NNN NNN N</row>
+        <row>RRRRRRRRRRRRRRRR</row>
       </layout>
       
     </level>
