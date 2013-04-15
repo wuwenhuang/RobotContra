@@ -102,6 +102,7 @@ namespace XnaGameServer
         static int level;
 
         static bool gameOver;
+        static bool finishWritingLevel;
 
         static void Main(string[] args)
         {
@@ -117,6 +118,7 @@ namespace XnaGameServer
             server.Start();
 
             gameOver = false;
+            finishWritingLevel = false;
             
             // schedule initial sending of position updates
             double nextSendUpdates = NetTime.Now;
@@ -373,7 +375,7 @@ namespace XnaGameServer
                                     }
                                     SetEnemyTarget();
                                     SendToAllPlayerEnemyTarget();
-
+                                    finishWritingLevel = true;
                                     break;
 
                                 case (byte)PacketTypes.UPDATEENEMYPOSITION:
@@ -382,6 +384,7 @@ namespace XnaGameServer
                                         enemies[i].health = msg.ReadInt32();
                                         enemies[i].state = (CharacterState)msg.ReadByte();
                                         enemies[i].lastState = (CharacterState)msg.ReadByte();
+                                        enemies[i].isDead = msg.ReadBoolean();
                                         enemies[i].x = msg.ReadFloat();
                                         enemies[i].y = msg.ReadFloat();
                                     }
@@ -495,7 +498,7 @@ namespace XnaGameServer
 
         static void SendToAllEnemyPositionsToPlayers()
         {
-            if (gameOver == false)
+            if (gameOver == false && finishWritingLevel == true)
             {
                 for (int i = 0; i < server.Connections.Count; i++)
                 {
@@ -503,7 +506,7 @@ namespace XnaGameServer
                     // ... send information about every other player (actually including self)
                     for (int j = 0; j < multiplayerPlayers.Count; j++)
                     {
-                        if (enemies.Count > 0)
+                        if (enemies.Count > 0 && finishWritingLevel == true)
                         {
                             NetOutgoingMessage msgOut = server.CreateMessage();
 
@@ -587,7 +590,7 @@ namespace XnaGameServer
             bool isAllEnemyDead = false;
             while (true)
             {
-                if (enemies.Count > 0)
+                if (enemies.Count > 0 && finishWritingLevel == true)
                 {
                     for (int i = 0; i < enemies.Count; i++)
                     {
@@ -619,6 +622,8 @@ namespace XnaGameServer
                     if (isAllEnemyDead == true && server.Connections.Count > 0)
                     {
                         isAllEnemyDead = false;
+
+                        finishWritingLevel = false;
 
                         level += 1;
 
