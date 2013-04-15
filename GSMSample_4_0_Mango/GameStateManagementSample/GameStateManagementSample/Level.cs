@@ -159,8 +159,8 @@ namespace GameStateManagement.SideScrollGame
                                 outMsg.Write((float)enemy.position.X);
                                 outMsg.Write((float)enemy.position.Y);
                             }
-
-                            SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                            if (SideScrollGame.main.isFinishWriteLevel == true)
+                                SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                         }
                        
                     }

@@ -62,7 +62,7 @@
         <row>SSSSSS</row>
         <row>21121E</row>
         <row> N N  N N</row>
-        <row>  N N NN NN</row>
+        <row>  N N </row>
         <row>  N N</row>
         <row>RRRRRR</row>
       </layout>
@@ -75,10 +75,10 @@
       <layout>
         <row>SSSSSS</row>
         <row>12212E</row>
-        <row>   NN NN  NN</row>
-        <row>  N  N  NN NN</row>
-        <row>    NN N NN NNN</row>
-        <row>   N NN NN NNN</row>
+        <row>   NN NN  N</row>
+        <row>  N  N  NN</row>
+        <row>    NN N NN </row>
+        <row>   N NN NN</row>
         <row>RRRRRR</row>
       </layout>
 
@@ -88,13 +88,13 @@
         <startY>0</startY>
       </tile>
       <layout>
-        <row>SSSSSSSSSSSSSSSS</row>
-        <row>212211221221212E</row>
-        <row>    NNN N NN NNN NN N   NN NNN NNN NN</row>
-        <row>  N  N    N  N NN N N  NN NN NN NNNN</row>
-        <row>   N NNN NN NNN NN NNN NNN NN  N NNN </row>
-        <row>    N NN NN N N    N   N NN N NNN NNN N</row>
-        <row>RRRRRRRRRRRRRRRR</row>
+        <row>SSSSSSSSSSS</row>
+        <row>2122112212E</row>
+        <row>    NNN N NN NNN NN N</row>
+        <row>  N  N    N  N NN N N</row>
+        <row>   N NNN NN NNN NN NNN</row>
+        <row>    N NN NN N N    N</row>
+        <row>RRRRRRRRRRR</row>
       </layout>
       
     </level>

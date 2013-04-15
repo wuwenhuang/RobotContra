@@ -379,13 +379,17 @@ namespace XnaGameServer
                                     break;
 
                                 case (byte)PacketTypes.UPDATEENEMYPOSITION:
+
                                     for (int i = 0; i < enemies.Count; i++)
                                     {
-                                        enemies[i].health = msg.ReadInt32();
-                                        enemies[i].state = (CharacterState)msg.ReadByte();
-                                        enemies[i].lastState = (CharacterState)msg.ReadByte();
-                                        enemies[i].x = msg.ReadFloat();
-                                        enemies[i].y = msg.ReadFloat();
+                                        if (finishWritingLevel == true)
+                                        {
+                                            enemies[i].health = msg.ReadInt32();
+                                            enemies[i].state = (CharacterState)msg.ReadByte();
+                                            enemies[i].lastState = (CharacterState)msg.ReadByte();
+                                            enemies[i].x = msg.ReadFloat();
+                                            enemies[i].y = msg.ReadFloat();
+                                        }
                                     }
 
                                     SendToAllEnemyPositionsToPlayers();
@@ -393,7 +397,7 @@ namespace XnaGameServer
 
                                 case (byte)PacketTypes.DELETEENEMY:
                                     int enemyDead = msg.ReadInt16();
-                                    if (enemies.Count > 0)
+                                    if (enemies.Count > 0 && finishWritingLevel == true)
                                         enemies[enemyDead].isDead = true;
                                     break;
 

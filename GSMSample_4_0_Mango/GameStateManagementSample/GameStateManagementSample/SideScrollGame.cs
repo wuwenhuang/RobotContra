@@ -204,6 +204,7 @@ namespace GameStateManagement.SideScrollGame
                     if (_goToNextLevel == true && currentLevel <= level.Count)
                     {
                         _goToNextLevel = false;
+                        isFinishWriteLevel = false;
                         currentLevel += 1;
 
                         if (currentLevel > level.Count)
