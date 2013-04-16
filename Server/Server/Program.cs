@@ -193,16 +193,8 @@ namespace XnaGameServer
                                     }
                                 }
 
-                                if (multiplayerPlayers.Count > 1)
-                                {
-                                    for (int i = 1; i < multiplayerPlayers.Count; i++)
-                                    {
-                                        multiplayerPlayers[i].x = multiplayerPlayers[i].initialX;
-                                        multiplayerPlayers[i].y = multiplayerPlayers[i].initialY;
-                                    }
-                                }
-
                                 SetEnemyTarget();
+
                             }
                             else if (status == NetConnectionStatus.Disconnected || status == NetConnectionStatus.Disconnecting)
                             {
@@ -649,6 +641,8 @@ namespace XnaGameServer
 
                             updateClientLevel.Write((byte)PacketTypes.GETNEWLEVEL);
                             updateClientLevel.Write((int)level);
+                            updateClientLevel.Write((float)multiplayerPlayers[i].initialX);
+                            updateClientLevel.Write((float)multiplayerPlayers[i].initialY);
 
                             server.SendMessage(updateClientLevel, player, NetDeliveryMethod.ReliableOrdered);
                         }
