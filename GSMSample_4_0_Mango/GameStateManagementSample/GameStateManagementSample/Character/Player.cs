@@ -55,7 +55,7 @@ namespace GameStateManagement.SideScrollGame
                 position = new Vector2(10, 350);
             else
             {
-                position = networkPosition;
+                position = initialPosition;
             }
         }
 

@@ -486,7 +486,7 @@ namespace GameStateManagement.SideScrollGame
 
                                     if (player != null && player.id != who)
                                     {
-                                        if (otherPlayers.Count > 1)
+                                        if (otherPlayers.Count > 0)
                                         {
                                             if (otherPlayers[who].id.Equals(who))
                                             {
@@ -502,14 +502,12 @@ namespace GameStateManagement.SideScrollGame
                                             {
                                                 otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                                                 otherPlayers[who].initialPosition = new Vector2(otherPlayers[who-1].initialPosition.X + otherPlayers[who-1].initialPosition.Y);
-                                                otherPlayers.Add(who, otherPlayers[who]);
                                             }
                                         }
                                         else
                                         {
                                             otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
                                             otherPlayers[who].initialPosition = new Vector2(player.initialPosition.X + 70, player.initialPosition.Y);
-                                            otherPlayers.Add(who, otherPlayers[who]);
                                         }
                                     }
                                     break;
