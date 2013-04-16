@@ -174,8 +174,8 @@ namespace XnaGameServer
                                     multiplayerPlayers[multiplayerPlayers.Count-1].x = multiplayerPlayers[multiplayerPlayers.Count - 2].x + 70;
                                     multiplayerPlayers[multiplayerPlayers.Count-1].y = multiplayerPlayers[multiplayerPlayers.Count - 2].y;
 
-                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialX = multiplayerPlayers[multiplayerPlayers.Count - 1].x;
-                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialY = multiplayerPlayers[multiplayerPlayers.Count - 1].y;
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialX = multiplayerPlayers[multiplayerPlayers.Count - 2].initialX + 70;
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialY = multiplayerPlayers[multiplayerPlayers.Count - 2].initialY;
                                 }
 
                                 for (int i = 0; i < server.Connections.Count; i++)

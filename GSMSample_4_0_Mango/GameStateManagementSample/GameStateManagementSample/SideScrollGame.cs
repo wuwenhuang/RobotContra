@@ -304,6 +304,14 @@ namespace GameStateManagement.SideScrollGame
             if (player != null)
                 player.Reset();
 
+            if (otherPlayers.Count > 0)
+            {
+                foreach(var otherPlayer in otherPlayers)
+                {
+                    otherPlayer.Value.position = otherPlayer.Value.initialPosition;
+                }
+            }
+
             _level.Reset();
             _camera.setPosition(Vector2.Zero);
             _level.ChangeLevel(levelnum, color);
@@ -478,7 +486,7 @@ namespace GameStateManagement.SideScrollGame
 
                                     if (player != null && player.id != who)
                                     {
-                                        if (otherPlayers.Count > 0)
+                                        if (otherPlayers.Count > 1)
                                         {
                                             if (otherPlayers[who].id.Equals(who))
                                             {
@@ -493,13 +501,15 @@ namespace GameStateManagement.SideScrollGame
                                             else
                                             {
                                                 otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                                                otherPlayers[who].initialPosition = otherPlayers[who].position;
+                                                otherPlayers[who].initialPosition = new Vector2(otherPlayers[who-1].initialPosition.X + otherPlayers[who-1].initialPosition.Y);
+                                                otherPlayers.Add(who, otherPlayers[who]);
                                             }
                                         }
                                         else
                                         {
                                             otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                                            otherPlayers[who].initialPosition = otherPlayers[who].position;
+                                            otherPlayers[who].initialPosition = new Vector2(player.initialPosition.X + 70, player.initialPosition.Y);
+                                            otherPlayers.Add(who, otherPlayers[who]);
                                         }
                                     }
                                     break;
