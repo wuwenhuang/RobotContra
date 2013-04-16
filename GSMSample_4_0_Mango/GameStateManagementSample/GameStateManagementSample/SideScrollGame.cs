@@ -618,9 +618,6 @@ namespace GameStateManagement.SideScrollGame
                                     int newLevel = msg.ReadInt32();
                                     currentLevel = newLevel;
 
-                                    player.position.X = msg.ReadFloat();
-                                    player.position.Y = msg.ReadFloat();
-
                                     if (currentLevel > this.level.Count)
                                     {
                                         gameOver = true;
