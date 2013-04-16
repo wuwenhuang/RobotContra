@@ -55,7 +55,8 @@ namespace GameStateManagement.SideScrollGame
                 position = new Vector2(10, 350);
             else
             {
-                position = initialPosition;
+                if (SideScrollGame.main.isHost)
+                    position = initialPosition;
             }
         }
 

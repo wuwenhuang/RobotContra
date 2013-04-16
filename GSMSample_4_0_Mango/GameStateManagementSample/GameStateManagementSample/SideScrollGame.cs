@@ -373,20 +373,32 @@ namespace GameStateManagement.SideScrollGame
         void ResetAllPlayersPositions()
         {
             if (SideScrollGame.main.isHost)
-                player.position = player.initialPosition;
-            else
             {
-                player.initialPosition = otherPlayers[(otherPlayers.Count - 1)].initialPosition;
                 player.position = player.initialPosition;
-            }
-
-            if (otherPlayers.Count > 0)
-            {
-                foreach (var otherPlayer in otherPlayers)
+                if (otherPlayers.Count > 0)
                 {
-                    otherPlayer.Value.position = otherPlayer.Value.initialPosition;
+                    foreach (var otherPlayer in otherPlayers)
+                    {
+                        otherPlayer.Value.initialPosition = new Vector2(70, 350);
+                        otherPlayer.Value.position = otherPlayer.Value.initialPosition;
+                    }
                 }
             }
+            else
+            {
+                player.initialPosition = new Vector2(70, 350);
+                player.position = player.initialPosition;
+
+                if (otherPlayers.Count > 0)
+                {
+                    foreach (var otherPlayer in otherPlayers)
+                    {
+                        otherPlayer.Value.initialPosition = new Vector2(10, 350);
+                        otherPlayer.Value.position = otherPlayer.Value.initialPosition;
+                    }
+                }
+            }
+
         }
 
         void getPlayerUpdate()
