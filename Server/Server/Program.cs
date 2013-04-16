@@ -174,8 +174,8 @@ namespace XnaGameServer
                                     multiplayerPlayers[multiplayerPlayers.Count-1].x = multiplayerPlayers[multiplayerPlayers.Count - 2].x + 70;
                                     multiplayerPlayers[multiplayerPlayers.Count-1].y = multiplayerPlayers[multiplayerPlayers.Count - 2].y;
 
-                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialX = multiplayerPlayers[multiplayerPlayers.Count - 1].x;
-                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialY = multiplayerPlayers[multiplayerPlayers.Count - 1].y;
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialX = multiplayerPlayers[multiplayerPlayers.Count - 2].initialX + 70;
+                                    multiplayerPlayers[multiplayerPlayers.Count - 1].initialY = multiplayerPlayers[multiplayerPlayers.Count - 2].initialY;
                                 }
 
                                 for (int i = 0; i < server.Connections.Count; i++)
@@ -190,6 +190,15 @@ namespace XnaGameServer
                                         outMessage.Write((float)multiplayerPlayers[i].y);
                                         server.SendMessage(outMessage, player, NetDeliveryMethod.ReliableOrdered);
                                         break;
+                                    }
+                                }
+
+                                if (multiplayerPlayers.Count > 1)
+                                {
+                                    for (int i = 1; i < multiplayerPlayers.Count; i++)
+                                    {
+                                        multiplayerPlayers[i].x = multiplayerPlayers[i].initialX;
+                                        multiplayerPlayers[i].y = multiplayerPlayers[i].initialY;
                                     }
                                 }
 
