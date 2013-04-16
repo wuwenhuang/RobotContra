@@ -304,13 +304,6 @@ namespace GameStateManagement.SideScrollGame
             if (player != null)
                 player.Reset();
 
-            if (otherPlayers.Count > 0)
-            {
-                foreach(var otherPlayer in otherPlayers)
-                {
-                    otherPlayer.Value.position = otherPlayer.Value.initialPosition;
-                }
-            }
 
             _level.Reset();
             _camera.setPosition(Vector2.Zero);
@@ -379,7 +372,13 @@ namespace GameStateManagement.SideScrollGame
 
         void ResetAllPlayersPositions()
         {
-            player.position = player.initialPosition;
+            if (SideScrollGame.main.isHost)
+                player.position = player.initialPosition;
+            else
+            {
+                player.initialPosition = otherPlayers[(otherPlayers.Count - 1)].initialPosition;
+                player.position = player.initialPosition;
+            }
 
             if (otherPlayers.Count > 0)
             {
@@ -501,13 +500,13 @@ namespace GameStateManagement.SideScrollGame
                                             else
                                             {
                                                 otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                                                otherPlayers[who].initialPosition = new Vector2(otherPlayers[who-1].initialPosition.X + otherPlayers[who-1].initialPosition.Y);
+                                                otherPlayers[who].initialPosition = otherPlayers[who].position;
                                             }
                                         }
                                         else
                                         {
                                             otherPlayers[who] = new Player(who, gameplay.content.Load<Texture2D>("Character/player"), new Vector2(x, y));
-                                            otherPlayers[who].initialPosition = new Vector2(player.initialPosition.X + 70, player.initialPosition.Y);
+                                            otherPlayers[who].initialPosition = otherPlayers[who].position;
                                         }
                                     }
                                     break;
