@@ -141,7 +141,9 @@ namespace GameStateManagement.SideScrollGame
 
                         outMsg.Write((byte)PacketTypes.DELETEENEMY);
                         outMsg.Write((short)i);
-                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+                        
+                        if(SideScrollGame.main.isFinishWriteLevel == true)
+                            SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
                     }
 
                     if (SideScrollGame.main.IsNetwork && SideScrollGame.main.isHost && enemiesLevel[i].targetPlayer != null && SideScrollGame.main.GameOver == false && SideScrollGame.main.isFinishWriteLevel == true)
