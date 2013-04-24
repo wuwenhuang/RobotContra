@@ -192,138 +192,210 @@ namespace GameStateManagement.SideScrollGame
 
         public void HandleInput(GamePadState gamePad)
         {
-            switch (currentState)
+            if (this.Dead == false)
             {
-                case CharacterState.IDLE:
-                    this.lastPosition = position;
-                    
-                    if (gamePad.IsButtonDown(Buttons.DPadLeft))
-                    {
-                        this.currentState = CharacterState.MOVELEFT;
-                        this.lastState = currentState;
-                    }
-
-                    if (gamePad.IsButtonDown(Buttons.DPadRight))
-                    {
-                        this.currentState = CharacterState.MOVERIGHT;
-                        this.lastState = currentState;
-                    }
-
-                    if (gamePad.IsButtonDown(Buttons.DPadUp))
-                    {
-                        this.currentState = CharacterState.MOVEUP;
-                    }
-
-                    if (gamePad.IsButtonDown(Buttons.DPadDown))
-                    {
-                        this.currentState = CharacterState.MOVEDOWN;
-                    }
-                    
-                    if (gamePad.IsButtonDown(Buttons.A))
-                    {
-
-                        this.velocity = new Vector2(0, jumpHeight);
-                        this.currentState = CharacterState.JUMP;
-                    }
-
-                    if (gamePad.IsButtonDown(Buttons.X))
-                    {
-                        this.currentState = CharacterState.SHOOT;
-                    }
-                    break;
-
-                case CharacterState.MOVERIGHT:
-                    if (gamePad.IsButtonUp(Buttons.DPadRight))
-                    {
-                        this.lastState = currentState;
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    else
-                    {
+                switch (currentState)
+                {
+                    case CharacterState.IDLE:
                         this.lastPosition = position;
+                        if (gamePad.IsButtonDown(Buttons.DPadLeft))
+                        {
+                            this.currentState = CharacterState.MOVELEFT;
+                            this.lastState = currentState;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.DPadRight))
+                        {
+                            this.currentState = CharacterState.MOVERIGHT;
+                            this.lastState = currentState;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.DPadUp))
+                        {
+                            this.currentState = CharacterState.MOVEUP;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.DPadDown))
+                        {
+                            this.currentState = CharacterState.MOVEDOWN;
+                        }
+
+                        if (gamePad.IsButtonDown(Buttons.A))
+                        {
+                            this.velocity = new Vector2(0, jumpHeight);
+                            this.currentState = CharacterState.JUMP;
+
+                            if (SideScrollGame.main.IsNetwork)
+                            {
+                                if (this.currentState == CharacterState.JUMP)
+                                {
+                                    NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                    outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                    outMsg.Write((byte)this.currentState);
+                                    outMsg.Write((byte)this.lastState);
+                                    outMsg.Write((float)this.lastPosition.X);
+                                    outMsg.Write((float)this.lastPosition.Y);
+                                    outMsg.Write((float)this.velocity.X);
+                                    outMsg.Write((float)this.velocity.Y);
+
+                                    SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                }
+                            }
+                        }
+
                         if (gamePad.IsButtonDown(Buttons.X))
                         {
                             this.currentState = CharacterState.SHOOT;
                         }
+                        break;
 
-                        if (gamePad.IsButtonDown(Buttons.A))
+                    case CharacterState.MOVERIGHT:
+                        if (gamePad.IsButtonUp(Buttons.DPadRight))
                         {
-                            this.velocity = new Vector2(jumpDistance, jumpHeight);
-                            this.currentState = CharacterState.JUMP;
+                            this.lastState = currentState;
+                            this.currentState = CharacterState.IDLE;
                         }
-
-                        if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                        else
                         {
-                            this.currentState = CharacterState.BOOST;
-                        }
-                    }
-                    break;
+                            this.lastPosition = position;
+                            if (gamePad.IsButtonDown(Buttons.X))
+                            {
+                                this.currentState = CharacterState.SHOOT;
+                            }
 
-                case CharacterState.MOVELEFT:
-                    if (gamePad.IsButtonUp(Buttons.DPadLeft))
-                    {
-                        this.lastState = currentState;
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    else
-                    {
-                        this.lastPosition = position;
-                        if (gamePad.IsButtonDown(Buttons.X))
+                            if (gamePad.IsButtonDown(Buttons.A))
+                            {
+                                this.velocity = new Vector2(jumpDistance, jumpHeight);
+                                this.currentState = CharacterState.JUMP;
+
+                                if (SideScrollGame.main.IsNetwork)
+                                {
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
+
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                    }
+                                }
+                            }
+
+                            if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                            {
+                                this.currentState = CharacterState.BOOST;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVELEFT:
+                        if (gamePad.IsButtonUp(Buttons.DPadLeft))
                         {
-                            this.currentState = CharacterState.SHOOT;
+                            this.lastState = currentState;
+                            this.currentState = CharacterState.IDLE;
                         }
-
-                        if (gamePad.IsButtonDown(Buttons.A))
+                        else
                         {
-                            this.velocity = new Vector2(jumpDistance, jumpHeight);
-                            this.currentState = CharacterState.JUMP;
-                        }
+                            this.lastPosition = position;
+                            if (gamePad.IsButtonDown(Buttons.X))
+                            {
+                                this.currentState = CharacterState.SHOOT;
+                            }
+                            if (gamePad.IsButtonDown(Buttons.A))
+                            {
+                                this.velocity = new Vector2(jumpDistance, jumpHeight);
+                                this.currentState = CharacterState.JUMP;
 
-                        if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                                if (SideScrollGame.main.IsNetwork)
+                                {
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
+
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                    }
+                                }
+                            }
+
+                            if (gamePad.IsButtonDown(Buttons.RightTrigger))
+                            {
+                                this.currentState = CharacterState.BOOST;
+                            }
+                        }
+                        break;
+
+                    case CharacterState.MOVEUP:
+                        if (gamePad.IsButtonUp(Buttons.DPadUp))
                         {
-                            this.currentState = CharacterState.BOOST;
+                            this.currentState = CharacterState.IDLE;
                         }
-                    }
-                    break;
+                        break;
 
-                case CharacterState.MOVEUP:
-                    if (gamePad.IsButtonUp(Buttons.DPadUp))
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    break;
-
-                case CharacterState.MOVEDOWN:
-                    if (gamePad.IsButtonUp(Buttons.DPadDown))
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    
-                    break;
-
-                case CharacterState.SHOOT:
-                    if (gamePad.IsButtonUp(Buttons.X))
-                    {
-                        this.currentState = CharacterState.IDLE;
-                    }
-                    break;
-
-                case CharacterState.BOOST:
-                    if (gamePad.IsButtonUp(Buttons.RightTrigger))
-                    {
-                        this.currentState = lastState;
-                    }
-                    else
-                    {
-                        this.lastPosition = position;
-                        if (gamePad.IsButtonDown(Buttons.A))
+                    case CharacterState.MOVEDOWN:
+                        if (gamePad.IsButtonUp(Buttons.DPadDown))
                         {
-                            this.velocity = new Vector2((jumpDistance * 2), jumpHeight);
-                            this.currentState = CharacterState.JUMP;
+                            this.currentState = CharacterState.IDLE;
                         }
-                    }
-                    break;
+                        break;
+
+                    case CharacterState.SHOOT:
+                        if (gamePad.IsButtonUp(Buttons.X))
+                        {
+                            this.currentState = CharacterState.IDLE;
+                        }
+                        break;
+
+                    case CharacterState.BOOST:
+                        if (gamePad.IsButtonUp(Buttons.RightTrigger))
+                        {
+                            this.currentState = lastState;
+                        }
+                        else
+                        {
+                            this.lastPosition = position;
+                            if (gamePad.IsButtonDown(Buttons.A))
+                            {
+                                this.velocity = new Vector2((jumpDistance * 2), jumpHeight);
+                                this.currentState = CharacterState.JUMP;
+
+                                if (SideScrollGame.main.IsNetwork)
+                                {
+                                    if (this.currentState == CharacterState.JUMP)
+                                    {
+                                        NetOutgoingMessage outMsg = SideScrollGame.main.client.CreateMessage();
+                                        outMsg.Write((byte)PacketTypes.UPDATEVELOCITY);
+                                        outMsg.Write((byte)this.currentState);
+                                        outMsg.Write((byte)this.lastState);
+                                        outMsg.Write((float)this.lastPosition.X);
+                                        outMsg.Write((float)this.lastPosition.Y);
+                                        outMsg.Write((float)this.velocity.X);
+                                        outMsg.Write((float)this.velocity.Y);
+
+                                        SideScrollGame.main.client.SendMessage(outMsg, NetDeliveryMethod.ReliableOrdered);
+
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
             }
+
         }
 
         public void HandleInput(KeyboardState keyPad, MouseState mousePad)
